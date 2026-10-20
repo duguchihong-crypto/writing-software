@@ -2,10 +2,7 @@
 <html lang="zh-CN">
 
 <head>
-    <!-- ==================================================
-         一、基础信息
-    ================================================== -->
-
+    <!-- 基础信息 -->
     <meta charset="UTF-8">
 
     <meta
@@ -28,44 +25,25 @@
     <title>写作软件 · 书架</title>
 
 
-    <!-- ==================================================
-         二、公共样式
-    ================================================== -->
-
+    <!-- 公共样式 -->
     <link rel="stylesheet" href="./css/theme.css">
-
     <link rel="stylesheet" href="./css/base.css">
-
     <link rel="stylesheet" href="./css/header.css">
-
     <link rel="stylesheet" href="./css/footer.css">
 
 
-    <!-- ==================================================
-         三、首页专属样式
-    ================================================== -->
-
+    <!-- 首页样式 -->
     <link rel="stylesheet" href="./page-css/home.css">
 
 
-    <!-- ==================================================
-         四、公共 JavaScript
-    ================================================== -->
-
+    <!-- 公共 JavaScript -->
     <script src="./js/storage.js" defer></script>
-
-    <!-- 分组存储模块 -->
     <script src="./js/groups-storage.js" defer></script>
-
     <script src="./js/navigation.js" defer></script>
-
     <script src="./js/components.js" defer></script>
 
 
-    <!-- ==================================================
-         五、首页 JavaScript
-    ================================================== -->
-
+    <!-- 首页 JavaScript -->
     <script src="./page-js/home.js" defer></script>
 
 </head>
@@ -73,20 +51,10 @@
 
 <body>
 
-    <!-- ==================================================
-         软件主体
-    ================================================== -->
-
     <div class="app" id="app">
 
-
-        <!-- ==================================================
-             一、顶部导航栏
-        ================================================== -->
-
+        <!-- 顶部导航栏 -->
         <header class="app-header" id="app-header">
-
-            <!-- 软件名称 -->
 
             <div class="app-header__brand">
 
@@ -95,28 +63,22 @@
                     href="./index.html"
                     aria-label="返回写作软件首页"
                 >
-
                     <span class="app-header__brand-name">
                         写作软件
                     </span>
-
                 </a>
 
             </div>
 
 
-            <!-- 顶部操作区 -->
-
             <div class="app-header__actions">
 
                 <!-- 新建作品 -->
-
                 <a
                     class="app-header__button app-header__button--create"
                     href="./pages/create.html"
                     aria-label="新建作品"
                 >
-
                     <span
                         class="app-header__button-icon"
                         aria-hidden="true"
@@ -125,22 +87,18 @@
                     <span class="app-header__button-text">
                         新建
                     </span>
-
                 </a>
 
 
                 <!-- 设置 -->
-
                 <a
                     class="app-header__button app-header__button--settings"
                     href="./pages/settings.html"
                     aria-label="软件设置"
                 >
-
                     <span class="app-header__button-text">
                         设置
                     </span>
-
                 </a>
 
             </div>
@@ -149,13 +107,8 @@
 
 
 
-        <!-- ==================================================
-             二、中间页面主体
-        ================================================== -->
-
+        <!-- 页面主体 -->
         <main class="app-main" id="app-main">
-
-            <!-- 书架页面 -->
 
             <section
                 class="home-page"
@@ -163,11 +116,7 @@
                 aria-label="书架"
             >
 
-
-                <!-- ==========================================
-                     2.1 空书架状态
-                =========================================== -->
-
+                <!-- 空书架状态 -->
                 <section
                     class="empty-state"
                     id="empty-state"
@@ -181,8 +130,6 @@
                         卷帙未启
                     </h1>
 
-
-                    <!-- 装饰分隔线 -->
 
                     <div
                         class="empty-state__divider"
@@ -204,14 +151,10 @@
                     </div>
 
 
-                    <!-- 空书架提示 -->
-
                     <p class="empty-state__subtitle">
                         书架尚空，静候新篇。
                     </p>
 
-
-                    <!-- 空书架引导 -->
 
                     <p class="empty-state__description">
                         此间尚无作品，不妨挥毫落墨，<br>
@@ -222,10 +165,7 @@
 
 
 
-                <!-- ==========================================
-                     2.2 我的分组
-                =========================================== -->
-
+                <!-- 我的分组 -->
                 <section
                     class="home-groups"
                     id="home-groups"
@@ -233,55 +173,35 @@
                     hidden
                 >
 
-                    <!-- 分组区域标题 -->
-
                     <div class="home-groups__header">
 
                         <h2 class="home-groups__title">
                             我的分组
                         </h2>
 
-                        <span
-                            class="home-groups__count"
-                            id="home-groups-count"
-                            aria-live="polite"
-                        >
-                            0 个分组
-                        </span>
-
                     </div>
 
 
-                    <!-- 分组卡片容器 -->
-
+                    <!-- 分组卡片：只显示组名字 -->
                     <div
                         class="home-groups__list"
                         id="home-groups-list"
                         aria-label="分组列表"
                     >
-
-                        <!--
-                            分组卡片由 home.js 动态生成。
-                        -->
-
+                        <!-- 分组卡片由 home.js 生成 -->
                     </div>
 
                 </section>
 
 
 
-                <!-- ==========================================
-                     2.3 作品列表
-                =========================================== -->
-
+                <!-- 我的作品 -->
                 <section
                     class="shelf-content"
                     id="shelf-content"
                     aria-label="我的作品"
                     hidden
                 >
-
-                    <!-- 作品区域标题 -->
 
                     <div class="shelf-content__header">
 
@@ -300,22 +220,15 @@
                     </div>
 
 
-                    <!-- 作品卡片容器 -->
-
                     <div
                         class="shelf-list"
                         id="shelf-list"
                         aria-label="作品列表"
                     >
-
-                        <!--
-                            作品卡片由 home.js 动态生成。
-                        -->
-
+                        <!-- 作品卡片由 home.js 生成 -->
                     </div>
 
                 </section>
-
 
             </section>
 
@@ -323,10 +236,7 @@
 
 
 
-        <!-- ==================================================
-             三、底部导航栏
-        ================================================== -->
-
+        <!-- 底部导航栏 -->
         <footer class="app-footer" id="app-footer">
 
             <nav
@@ -334,11 +244,7 @@
                 aria-label="主导航"
             >
 
-
-                <!-- ==========================================
-                     3.1 书架
-                =========================================== -->
-
+                <!-- 书架 -->
                 <a
                     class="bottom-nav__item bottom-nav__item--active"
                     href="./index.html"
@@ -378,10 +284,7 @@
 
 
 
-                <!-- ==========================================
-                     3.2 工具
-                =========================================== -->
-
+                <!-- 工具 -->
                 <a
                     class="bottom-nav__item"
                     href="./pages/tools.html"
@@ -418,11 +321,9 @@
 
                 </a>
 
-
             </nav>
 
         </footer>
-
 
     </div>
 
