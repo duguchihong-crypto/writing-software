@@ -1,256 +1,556 @@
-/* ==================================================
-   文墨写作软件
-   公共设计系统
-================================================== */
+/* =========================================================
+   写作软件 · 公共基础样式
+   文件：css/base.css
+
+   负责：
+   1. 传统五色配色体系
+   2. 全局基础参数
+   3. 页面统一初始化
+   4. 公共字体与排版
+   5. 页面整体布局基础
+   6. 公共交互规范
+========================================================= */
 
 
-/* ------------------------------
-   1. 传统五色设计规范
------------------------------- */
+/* =========================================================
+   一、传统五色设计体系
+
+   赤：顶部导航与品牌
+   青：主要操作按钮
+   黄：导航强调与装饰
+   黑：底部导航与正文
+   白：内容背景与留白
+========================================================= */
 
 :root {
-    /* 五色体系 */
 
-    --color-red: #A83232;
-    --color-red-light: #C65A4A;
-    --color-red-dark: #762424;
+    /* -----------------------------------------------------
+       1. 传统五色
+    ----------------------------------------------------- */
 
-    --color-blue: #376B68;
-    --color-blue-light: #6D9990;
-    --color-blue-dark: #254B49;
+    --color-red: #9E2428;
+    --color-red-dark: #76191D;
+    --color-red-light: #B83A3E;
 
-    --color-yellow: #D6B15C;
-    --color-yellow-light: #E9D59B;
-    --color-yellow-dark: #9C7731;
+    --color-cyan: #287C73;
+    --color-cyan-dark: #1D6059;
+    --color-cyan-light: #46988D;
 
-    --color-black: #242522;
-    --color-black-light: #353630;
-    --color-black-dark: #171815;
+    --color-yellow: #D6B15E;
+    --color-yellow-light: #E9CF88;
+    --color-yellow-dark: #A9873E;
 
-    --color-white: #F8F5ED;
+    --color-black: #211F1C;
+    --color-black-light: #302D29;
+    --color-black-deep: #171613;
+
+    --color-white: #F8F4E9;
     --color-white-pure: #FFFFFF;
-    --color-paper: #F1EBDD;
+    --color-white-dark: #EDE5D5;
 
-    /* 辅助色 */
 
-    --color-text: #302F2A;
-    --color-text-secondary: #77746B;
-    --color-border: #DED5C3;
-    --color-border-light: #EAE3D6;
+    /* -----------------------------------------------------
+       2. 页面基础颜色
+    ----------------------------------------------------- */
 
-    /* 字体 */
+    --color-page-background: #F5F0E5;
 
-    --font-main:
-        -apple-system,
-        BlinkMacSystemFont,
+    --color-content-background: #FAF7EF;
+
+    --color-text-primary: #292720;
+
+    --color-text-secondary: #777064;
+
+    --color-text-muted: #A29A8B;
+
+    --color-border: #D9CFBB;
+
+    --color-border-light: #E8DFCF;
+
+
+    /* -----------------------------------------------------
+       3. 品牌颜色
+    ----------------------------------------------------- */
+
+    --color-brand: var(--color-red);
+
+    --color-brand-hover: var(--color-red-dark);
+
+    --color-action: var(--color-cyan);
+
+    --color-action-hover: var(--color-cyan-dark);
+
+    --color-accent: var(--color-yellow);
+
+    --color-navigation: var(--color-black);
+
+
+    /* -----------------------------------------------------
+       4. 阴影
+    ----------------------------------------------------- */
+
+    --shadow-light:
+        0 2px 8px rgba(40, 32, 20, 0.06);
+
+    --shadow-medium:
+        0 4px 16px rgba(40, 32, 20, 0.10);
+
+    --shadow-heavy:
+        0 8px 28px rgba(20, 18, 14, 0.16);
+
+
+    /* -----------------------------------------------------
+       5. 边框
+    ----------------------------------------------------- */
+
+    --border-thin: 1px solid var(--color-border);
+
+    --border-gold:
+        1px solid rgba(214, 177, 94, 0.75);
+
+
+    /* -----------------------------------------------------
+       6. 圆角
+    ----------------------------------------------------- */
+
+    --radius-small: 4px;
+
+    --radius-medium: 8px;
+
+    --radius-large: 12px;
+
+    --radius-round: 999px;
+
+
+    /* -----------------------------------------------------
+       7. 间距
+    ----------------------------------------------------- */
+
+    --space-1: 4px;
+
+    --space-2: 8px;
+
+    --space-3: 12px;
+
+    --space-4: 16px;
+
+    --space-5: 20px;
+
+    --space-6: 24px;
+
+    --space-8: 32px;
+
+    --space-10: 40px;
+
+    --space-12: 48px;
+
+
+    /* -----------------------------------------------------
+       8. 字体大小
+    ----------------------------------------------------- */
+
+    --font-size-small: 12px;
+
+    --font-size-normal: 14px;
+
+    --font-size-medium: 16px;
+
+    --font-size-large: 18px;
+
+    --font-size-title: 24px;
+
+    --font-size-heading: 30px;
+
+
+    /* -----------------------------------------------------
+       9. 页面尺寸
+    ----------------------------------------------------- */
+
+    --topbar-height: 64px;
+
+    --bottom-bar-height: 64px;
+
+    --page-max-width: 1440px;
+
+
+    /* -----------------------------------------------------
+       10. 动画时间
+    ----------------------------------------------------- */
+
+    --transition-fast: 150ms ease;
+
+    --transition-normal: 250ms ease;
+
+    --transition-slow: 350ms ease;
+
+
+    /* -----------------------------------------------------
+       11. 层级
+    ----------------------------------------------------- */
+
+    --z-content: 1;
+
+    --z-topbar: 100;
+
+    --z-bottom-bar: 100;
+
+    --z-dropdown: 200;
+
+    --z-modal: 300;
+
+}
+
+
+/* =========================================================
+   二、全局初始化
+========================================================= */
+
+*,
+*::before,
+*::after {
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   三、HTML 基础
+========================================================= */
+
+html {
+
+    width: 100%;
+
+    min-width: 320px;
+
+    height: 100%;
+
+    margin: 0;
+
+    padding: 0;
+
+    scroll-behavior: smooth;
+
+    -webkit-text-size-adjust: 100%;
+
+    text-size-adjust: 100%;
+
+}
+
+
+/* =========================================================
+   四、页面主体
+========================================================= */
+
+body {
+
+    width: 100%;
+
+    min-width: 320px;
+
+    min-height: 100%;
+
+    margin: 0;
+
+    padding: 0;
+
+    background-color: var(--color-page-background);
+
+    color: var(--color-text-primary);
+
+    font-family:
         "PingFang SC",
         "Hiragino Sans GB",
         "Microsoft YaHei",
+        "Noto Sans CJK SC",
         sans-serif;
 
-    --font-classical:
-        "Songti SC",
-        "STSong",
-        "SimSun",
-        serif;
+    font-size: var(--font-size-medium);
 
-    /* 布局 */
+    line-height: 1.7;
 
-    --header-height: 68px;
-    --nav-height: 72px;
-    --content-width: 760px;
+    -webkit-font-smoothing: antialiased;
 
-    /* 圆角 */
+    -moz-osx-font-smoothing: grayscale;
 
-    --radius-small: 8px;
-    --radius-medium: 14px;
-    --radius-large: 20px;
-
-    /* 阴影 */
-
-    --shadow-card:
-        0 5px 18px rgba(51, 42, 26, 0.055);
-
-    --shadow-raised:
-        0 8px 24px rgba(35, 31, 22, 0.12);
 }
 
 
-/* ------------------------------
-   2. 基础重置
------------------------------- */
+/* =========================================================
+   五、标题与段落
+========================================================= */
 
-* {
-    box-sizing: border-box;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+
+    margin-top: 0;
+
+    margin-bottom: 0;
+
+    color: inherit;
+
+    font-weight: 600;
+
+    line-height: 1.4;
+
 }
 
-html {
-    min-height: 100%;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
+
+p {
+
+    margin-top: 0;
+
+    margin-bottom: 0;
+
 }
 
-body {
-    min-height: 100vh;
-    margin: 0;
 
-    font-family: var(--font-main);
+/* =========================================================
+   六、链接
+========================================================= */
 
-    color: var(--color-text);
-    background: var(--color-white);
+a {
+
+    color: inherit;
+
+    text-decoration: none;
 
     -webkit-tap-highlight-color: transparent;
+
 }
+
+
+a:focus-visible {
+
+    outline: 2px solid var(--color-yellow);
+
+    outline-offset: 4px;
+
+}
+
+
+/* =========================================================
+   七、按钮与表单
+========================================================= */
 
 button,
 input,
 textarea,
 select {
+
     font: inherit;
+
 }
 
-button,
-a {
-    -webkit-tap-highlight-color: transparent;
-}
 
 button {
+
+    color: inherit;
+
     cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
 }
 
-a {
-    color: inherit;
-    text-decoration: none;
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+
+    outline: 2px solid var(--color-cyan);
+
+    outline-offset: 3px;
+
 }
+
+
+button:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.5;
+
+}
+
+
+/* =========================================================
+   八、图片与 SVG
+========================================================= */
 
 img,
 svg {
+
     display: block;
+
     max-width: 100%;
-}
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-    outline: 2px solid var(--color-blue);
-    outline-offset: 3px;
 }
 
 
-/* ------------------------------
-   3. 公共按钮
------------------------------- */
+img {
 
-.button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    height: auto;
 
-    min-height: 40px;
-    padding: 0 13px;
-
-    border: 1px solid transparent;
-    border-radius: var(--radius-small);
-
-    font-size: 14px;
-    font-weight: 500;
-
-    white-space: nowrap;
-
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.button:active {
-    transform: scale(0.97);
-}
-
-.button-primary {
-    color: var(--color-white-pure);
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--color-red-light),
-            var(--color-red)
-        );
-
-    border-color: var(--color-red-dark);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 2px 5px rgba(118, 36, 36, 0.15);
-}
-
-.button-primary:hover {
-    background: var(--color-red-dark);
 }
 
 
-/* ------------------------------
-   4. 公共分隔装饰
------------------------------- */
+/* =========================================================
+   九、列表
+========================================================= */
 
-.ornament-line {
-    display: inline-block;
+ul,
+ol {
 
-    width: 24px;
-    height: 1px;
+    margin-top: 0;
 
-    background: var(--color-yellow-dark);
-}
+    margin-bottom: 0;
 
-.classical-divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+    padding-left: 0;
 
-.classical-divider::before,
-.classical-divider::after {
-    content: "";
-
-    flex: 1;
-    height: 1px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--color-border),
-            transparent
-        );
 }
 
 
-/* ------------------------------
-   5. 公共文字
------------------------------- */
+li {
+
+    list-style: none;
+
+}
+
+
+/* =========================================================
+   十、隐藏状态
+========================================================= */
+
+/*
+   确保 HTML 的 hidden 属性生效，
+   避免后续页面样式意外覆盖隐藏状态。
+*/
+
+[hidden] {
+
+    display: none !important;
+
+}
+
+
+/* =========================================================
+   十一、公共页面容器
+========================================================= */
+
+.app {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    min-height: 100dvh;
+
+    margin: 0 auto;
+
+    background-color: var(--color-page-background);
+
+}
+
+
+/* =========================================================
+   十二、公共文字样式
+========================================================= */
+
+.text-primary {
+
+    color: var(--color-text-primary);
+
+}
+
 
 .text-secondary {
+
     color: var(--color-text-secondary);
-}
 
-.classical-title {
-    font-family: var(--font-classical);
-    font-weight: 600;
 }
 
 
-/* ------------------------------
-   6. 减少动态效果
------------------------------- */
+.text-muted {
+
+    color: var(--color-text-muted);
+
+}
+
+
+.text-gold {
+
+    color: var(--color-yellow);
+
+}
+
+
+/* =========================================================
+   十三、公共分隔线
+========================================================= */
+
+.divider {
+
+    width: 100%;
+
+    height: 1px;
+
+    background-color: var(--color-border);
+
+}
+
+
+.divider--gold {
+
+    background-color: rgba(214, 177, 94, 0.65);
+
+}
+
+
+/* =========================================================
+   十四、公共交互效果
+========================================================= */
+
+.interactive {
+
+    transition:
+        color var(--transition-normal),
+        background-color var(--transition-normal),
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        opacity var(--transition-normal);
+
+}
+
+
+/* =========================================================
+   十五、减少动态效果
+
+   尊重设备的减少动态效果设置。
+========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
+
         scroll-behavior: auto !important;
+
         animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
         transition-duration: 0.01ms !important;
+
     }
+
 }
