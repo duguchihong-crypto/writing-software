@@ -1,0 +1,483 @@
+/* ======================================================
+   新建分组页面
+   文件：page-css/create-group.css
+====================================================== */
+
+
+/* ======================================================
+   一、页面基础布局
+====================================================== */
+
+.create-group-page {
+    width: 100%;
+    max-width: 760px;
+    min-height: calc(100vh - 132px);
+    margin: 0 auto;
+    padding: 36px 24px 48px;
+    box-sizing: border-box;
+    color: var(--color-black);
+}
+
+
+/* ======================================================
+   二、页面标题
+====================================================== */
+
+.create-group-heading {
+    margin: 0 auto 32px;
+    text-align: center;
+}
+
+.create-group-heading__ornament {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--color-yellow-dark);
+    font-size: 23px;
+    line-height: 1;
+}
+
+.create-group-heading__title {
+    margin: 0;
+    color: var(--color-red);
+    font-family: "Noto Serif SC", "Songti SC", serif;
+    font-size: 29px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 3px;
+}
+
+.create-group-heading__subtitle {
+    margin: 10px 0 0;
+    color: var(--color-black-soft);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.create-group-heading__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 22px auto 0;
+}
+
+.create-group-heading__divider::before,
+.create-group-heading__divider::after {
+    width: 54px;
+    height: 1px;
+    background: var(--color-yellow);
+    content: "";
+}
+
+.create-group-heading__divider span {
+    color: var(--color-yellow-dark);
+    font-size: 12px;
+}
+
+
+/* ======================================================
+   三、表单容器
+====================================================== */
+
+.create-group-form {
+    width: 100%;
+    padding: 32px;
+    box-sizing: border-box;
+    background: var(--color-white-pure);
+    border: 1px solid var(--color-white-deep);
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgb(33 31 28 / 5%);
+}
+
+
+/* ======================================================
+   四、分组图章
+====================================================== */
+
+.create-group-emblem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 28px;
+    box-sizing: border-box;
+    color: var(--color-red);
+    background: var(--color-white);
+    border: 1px solid var(--color-yellow);
+    border-radius: 50%;
+    box-shadow:
+        inset 0 0 0 5px var(--color-white-pure),
+        inset 0 0 0 6px var(--color-yellow-soft);
+}
+
+.create-group-emblem__character {
+    font-family: "Noto Serif SC", "Songti SC", serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+
+/* ======================================================
+   五、分组名称字段
+====================================================== */
+
+.create-group-field {
+    margin-bottom: 24px;
+}
+
+.create-group-field__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.create-group-field__label {
+    color: var(--color-black);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.create-group-field__required {
+    margin-left: 4px;
+    color: var(--color-red);
+    font-size: 14px;
+}
+
+.create-group-field__counter {
+    flex-shrink: 0;
+    color: var(--color-black-soft);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.create-group-field__input {
+    display: block;
+    width: 100%;
+    min-height: 50px;
+    padding: 0 15px;
+    box-sizing: border-box;
+    color: var(--color-black);
+    background: var(--color-white-pure);
+    border: 1px solid var(--color-white-deep);
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.create-group-field__input::placeholder {
+    color: #A7A095;
+}
+
+.create-group-field__input:hover {
+    border-color: var(--color-yellow-dark);
+}
+
+.create-group-field__input:focus {
+    background: var(--color-white-pure);
+    border-color: var(--color-cyan);
+    box-shadow: 0 0 0 3px rgb(40 124 115 / 12%);
+}
+
+.create-group-field__input[aria-invalid="true"] {
+    border-color: var(--color-red);
+    box-shadow: 0 0 0 3px rgb(158 36 40 / 8%);
+}
+
+.create-group-field__help {
+    margin: 10px 0 0;
+    color: var(--color-black-soft);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.create-group-field__error {
+    margin: 8px 0 0;
+    color: var(--color-red);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.create-group-field__error[hidden] {
+    display: none;
+}
+
+
+/* ======================================================
+   六、操作反馈消息
+====================================================== */
+
+.create-group-message {
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    color: var(--color-black);
+    background: var(--color-white);
+    border: 1px solid var(--color-white-deep);
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.create-group-message[hidden] {
+    display: none;
+}
+
+.create-group-message--success {
+    color: var(--color-cyan-dark);
+    background: rgb(40 124 115 / 7%);
+    border-color: rgb(40 124 115 / 25%);
+}
+
+.create-group-message--error {
+    color: var(--color-red);
+    background: rgb(158 36 40 / 5%);
+    border-color: rgb(158 36 40 / 20%);
+}
+
+
+/* ======================================================
+   七、按钮区域
+====================================================== */
+
+.create-group-form__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-white-dark);
+}
+
+.create-group-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 112px;
+    min-height: 44px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.create-group-button:focus-visible {
+    outline: 3px solid rgb(214 177 94 / 55%);
+    outline-offset: 3px;
+}
+
+.create-group-button:active {
+    transform: translateY(1px);
+}
+
+.create-group-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* 取消按钮 */
+
+.create-group-button--cancel {
+    color: var(--color-black-soft);
+    background: var(--color-white-pure);
+    border-color: var(--color-white-deep);
+}
+
+.create-group-button--cancel:hover {
+    color: var(--color-red);
+    background: var(--color-white);
+    border-color: var(--color-yellow);
+}
+
+
+/* 创建按钮 */
+
+.create-group-button--submit {
+    color: var(--color-white-pure);
+    background: var(--color-cyan);
+    border-color: var(--color-cyan);
+}
+
+.create-group-button--submit:hover {
+    background: var(--color-cyan-dark);
+    border-color: var(--color-cyan-dark);
+    box-shadow: 0 3px 10px rgb(40 124 115 / 18%);
+}
+
+
+/* ======================================================
+   八、底部说明
+====================================================== */
+
+.create-group-note {
+    margin: 22px 0 0;
+    color: var(--color-black-soft);
+    font-size: 12px;
+    line-height: 1.9;
+    text-align: center;
+}
+
+.create-group-note__icon {
+    margin-right: 5px;
+    color: var(--color-yellow-dark);
+}
+
+
+/* ======================================================
+   九、平板适配
+====================================================== */
+
+@media (max-width: 768px) {
+    .create-group-page {
+        max-width: 600px;
+        padding: 30px 20px 40px;
+    }
+
+    .create-group-form {
+        padding: 28px;
+    }
+}
+
+
+/* ======================================================
+   十、手机适配
+====================================================== */
+
+@media (max-width: 480px) {
+    .create-group-page {
+        min-height: calc(100vh - 120px);
+        padding: 24px 16px 32px;
+    }
+
+    .create-group-heading {
+        margin-bottom: 26px;
+    }
+
+    .create-group-heading__ornament {
+        margin-bottom: 8px;
+        font-size: 20px;
+    }
+
+    .create-group-heading__title {
+        font-size: 25px;
+        letter-spacing: 2px;
+    }
+
+    .create-group-heading__subtitle {
+        margin-top: 8px;
+        font-size: 13px;
+    }
+
+    .create-group-heading__divider {
+        margin-top: 18px;
+    }
+
+    .create-group-form {
+        padding: 24px 18px;
+        border-radius: 10px;
+    }
+
+    .create-group-emblem {
+        width: 68px;
+        height: 68px;
+        margin-bottom: 24px;
+    }
+
+    .create-group-emblem__character {
+        font-size: 29px;
+    }
+
+    .create-group-field__input {
+        min-height: 48px;
+        font-size: 16px;
+    }
+
+    .create-group-form__actions {
+        gap: 10px;
+        margin-top: 26px;
+        padding-top: 20px;
+    }
+
+    .create-group-button {
+        flex: 1;
+        min-width: 0;
+        min-height: 46px;
+        padding: 0 12px;
+    }
+
+    .create-group-note {
+        margin-top: 18px;
+        font-size: 11px;
+    }
+}
+
+
+/* ======================================================
+   十一、小屏手机适配
+====================================================== */
+
+@media (max-width: 360px) {
+    .create-group-page {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .create-group-form {
+        padding: 22px 14px;
+    }
+
+    .create-group-heading__title {
+        font-size: 23px;
+    }
+
+    .create-group-field__label-row {
+        align-items: flex-start;
+    }
+
+    .create-group-form__actions {
+        flex-direction: column-reverse;
+    }
+
+    .create-group-button {
+        width: 100%;
+        flex: auto;
+    }
+}
+
+
+/* ======================================================
+   十二、减少动态效果
+====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .create-group-field__input,
+    .create-group-button {
+        transition: none;
+    }
+}
