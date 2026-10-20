@@ -21,10 +21,14 @@
 
     <title>写作软件 · 书斋</title>
 
-    <!-- 公共样式 -->
+    <!-- ==================================================
+         公共样式
+    ================================================== -->
+
     <link rel="stylesheet" href="css/base.css">
 
     <!-- 首页样式 -->
+
     <link rel="stylesheet" href="css/home.css">
 </head>
 
@@ -44,52 +48,62 @@
         <header class="topbar" id="topbar">
 
             <!-- 左侧：软件名称 -->
+
             <div class="topbar__brand">
 
                 <a
                     class="topbar__brand-link"
                     href="./index.html"
-                    aria-label="返回首页"
+                    aria-label="返回书架首页"
                 >
+
                     <span class="topbar__brand-name">
                         写作软件
                     </span>
+
                 </a>
 
             </div>
 
 
             <!-- 右侧：操作按钮 -->
+
             <nav
                 class="topbar__actions"
                 aria-label="顶部导航"
             >
 
                 <!-- 新建作品 -->
+
                 <a
                     class="topbar__button topbar__button--create"
                     href="pages/create.html"
                 >
+
                     <span
                         class="topbar__button-icon"
                         aria-hidden="true"
                     >＋</span>
 
                     <span>新建</span>
+
                 </a>
 
 
                 <!-- 软件设置 -->
+
                 <a
                     class="topbar__button topbar__button--settings"
                     href="pages/settings.html"
                 >
+
                     <span
                         class="topbar__button-icon"
                         aria-hidden="true"
                     >⚙</span>
 
                     <span>设置</span>
+
                 </a>
 
             </nav>
@@ -100,11 +114,15 @@
 
         <!-- ==================================================
              ② 中间主内容区
+
+             首页本身就是书架。
+             不需要单独创建 shelf.html。
         ================================================== -->
 
         <main class="main-content" id="main-content">
 
-            <!-- 首页内容容器 -->
+            <!-- 书架首页 -->
+
             <section
                 class="home-view"
                 id="home-view"
@@ -125,35 +143,44 @@
                 >
 
                     <!-- 中央文字内容 -->
+
                     <div class="empty-state__content">
 
 
                         <!-- 主标题 -->
+
                         <h1 class="empty-state__title">
                             卷帙未启
                         </h1>
 
 
                         <!-- 标题装饰线 -->
+
                         <div
                             class="empty-state__ornament"
                             aria-hidden="true"
                         >
+
                             <span></span>
+
                             <span class="empty-state__ornament-center">
                                 ◆
                             </span>
+
                             <span></span>
+
                         </div>
 
 
                         <!-- 空书架提示 -->
+
                         <p class="empty-state__subtitle">
                             书架尚空，静候新篇。
                         </p>
 
 
                         <!-- 创作引导 -->
+
                         <p class="empty-state__description">
                             此间尚无作品，不妨挥毫落墨，<br>
                             写下你的第一个故事。
@@ -180,6 +207,7 @@
                 >
 
                     <!-- 作品列表标题 -->
+
                     <header class="shelf-content__header">
 
                         <h1 class="shelf-content__title">
@@ -193,10 +221,12 @@
                     </header>
 
 
-                    <!--
-                        JavaScript 将作品卡片插入这里。
-                        作品数据暂时不在 HTML 中写死。
-                    -->
+                    <!-- ======================================
+                         作品列表
+
+                         JavaScript 会在这里生成作品卡片。
+                         作品数据不直接写在 HTML 中。
+                    ======================================= -->
 
                     <div
                         class="shelf-list"
@@ -224,10 +254,16 @@
             >
 
 
-                <!-- 书架 -->
+                <!-- ==========================================
+                     书架
+
+                     首页本身就是书架。
+                     点击后返回 index.html。
+                =========================================== -->
+
                 <a
                     class="bottom-nav__item bottom-nav__item--active"
-                    href="pages/shelf.html"
+                    href="./index.html"
                     aria-current="page"
                 >
 
@@ -237,6 +273,7 @@
                     >
 
                         <!-- 书卷图标 -->
+
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -284,7 +321,12 @@
 
 
 
-                <!-- 工具 -->
+                <!-- ==========================================
+                     工具
+
+                     点击后进入工具页面。
+                =========================================== -->
+
                 <a
                     class="bottom-nav__item"
                     href="pages/tools.html"
@@ -296,6 +338,7 @@
                     >
 
                         <!-- 文房工具图标 -->
+
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
