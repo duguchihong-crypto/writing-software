@@ -2,447 +2,418 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-  <meta
-    name="theme-color"
-    content="#9E2428"
-  >
+    <meta
+        name="theme-color"
+        content="#9E2428"
+    >
 
-  <meta
-    name="description"
-    content="创建你的新作品，开启全新的写作旅程。"
-  >
+    <title>新建 - 写作软件</title>
 
-  <title>新建作品 - 写作软件</title>
+    <!-- 公共样式 -->
+    <link
+        rel="stylesheet"
+        href="../css/theme.css"
+    >
 
+    <link
+        rel="stylesheet"
+        href="../css/base.css"
+    >
 
-  <!-- ==================================================
-       一、公共样式
-  =================================================== -->
+    <link
+        rel="stylesheet"
+        href="../css/header.css"
+    >
 
-  <link
-    rel="stylesheet"
-    href="../css/theme.css"
-  >
+    <link
+        rel="stylesheet"
+        href="../css/footer.css"
+    >
 
-  <link
-    rel="stylesheet"
-    href="../css/base.css"
-  >
-
-  <link
-    rel="stylesheet"
-    href="../css/header.css"
-  >
-
-  <link
-    rel="stylesheet"
-    href="../css/footer.css"
-  >
-
-
-  <!-- ==================================================
-       二、新建作品页面样式
-  =================================================== -->
-
-  <link
-    rel="stylesheet"
-    href="../page-css/create.css"
-  >
-
+    <!-- 新建页面样式 -->
+    <link
+        rel="stylesheet"
+        href="../page-css/create.css"
+    >
 </head>
-
 
 <body>
 
-  <div id="app">
+<div id="app">
 
+    <!-- =========================
+         顶部栏
+    ========================== -->
 
-    <!-- ==================================================
-         三、顶部栏
-    =================================================== -->
+    <header class="app-header" id="app-header">
 
-    <header
-      class="app-header"
-      id="app-header"
-    >
+        <div class="app-header__brand">
 
-      <div class="app-header__brand">
+            <span class="app-header__brand-name">
+                写作软件
+            </span>
 
-        <span class="app-header__brand-name">
-          写作软件
-        </span>
+        </div>
 
-      </div>
+        <div class="app-header__actions">
 
+            <button
+                class="app-header__button app-header__button--settings"
+                id="cancel-create-top"
+                type="button"
+            >
+                返回书架
+            </button>
 
-      <div class="app-header__actions">
-
-        <button
-          class="app-header__button app-header__button--settings"
-          id="cancel-create-top"
-          type="button"
-        >
-          返回书架
-        </button>
-
-      </div>
+        </div>
 
     </header>
 
 
-    <!-- ==================================================
-         四、主要内容区域
-    =================================================== -->
+    <!-- =========================
+         页面主体
+    ========================== -->
 
-    <main
-      class="app-main create-main"
-      id="app-main"
-    >
+    <main class="app-main create-main">
 
-      <section
-        class="create-page"
-        id="create-page"
-        aria-labelledby="create-page-title"
-      >
-
-
-        <!-- 页面标题 -->
-
-        <div class="create-page__heading">
-
-          <p class="create-page__eyebrow">
-            BEGIN A NEW STORY
-          </p>
-
-          <h1
-            class="create-page__title"
-            id="create-page-title"
-          >
-            新建作品
-          </h1>
-
-          <div
-            class="create-page__divider"
-            aria-hidden="true"
-          ></div>
-
-          <p class="create-page__subtitle">
-            为你的故事立卷，开启新的创作。
-          </p>
-
-        </div>
-
-
-        <!-- ==================================================
-             五、作品创建表单
-        =================================================== -->
-
-        <form
-          class="create-form"
-          id="create-book-form"
-          novalidate
+        <section
+            class="create-page"
+            aria-labelledby="create-page-title"
         >
 
+            <!-- 页面标题 -->
 
-          <!-- 作品名称 -->
+            <div class="create-page__heading">
 
-          <div class="create-form__field">
+                <p class="create-page__eyebrow">
+                    BEGIN A NEW STORY
+                </p>
 
-            <label
-              class="create-form__label"
-              for="book-title"
-            >
-              作品名称
+                <h1
+                    class="create-page__title"
+                    id="create-page-title"
+                >
+                    新建
+                </h1>
 
-              <span
-                class="create-form__required"
-                aria-hidden="true"
-              >
-                *
-              </span>
+                <div
+                    class="create-page__divider"
+                    aria-hidden="true"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
 
-            </label>
-
-
-            <input
-              class="create-form__input"
-              id="book-title"
-              name="title"
-              type="text"
-              placeholder="请输入作品名称"
-              maxlength="100"
-              autocomplete="off"
-              required
-              aria-describedby="book-title-help book-title-error"
-            >
-
-
-            <div class="create-form__field-footer">
-
-              <p
-                class="create-form__help"
-                id="book-title-help"
-              >
-                为你的故事取一个名字。
-              </p>
-
-              <span
-                class="create-form__counter"
-                id="book-title-counter"
-                aria-live="polite"
-              >
-                0 / 100
-              </span>
+                <p class="create-page__subtitle">
+                    选择你想创建的内容
+                </p>
 
             </div>
 
 
-            <p
-              class="create-form__error"
-              id="book-title-error"
-              hidden
-            ></p>
+            <!-- =========================
+                 新建功能
+            ========================== -->
 
-          </div>
+            <div class="create-options">
 
 
-          <!-- 作品简介 -->
+                <!-- 新建书籍 -->
 
-          <div class="create-form__field">
+                <a
+                    class="create-option create-option--book"
+                    href="./create-book.html"
+                >
 
-            <label
-              class="create-form__label"
-              for="book-description"
-            >
-              作品简介
+                    <div
+                        class="create-option__icon"
+                        aria-hidden="true"
+                    >
+                        <svg
+                            viewBox="0 0 48 48"
+                            fill="none"
+                        >
+                            <path
+                                d="M8 10.5C8 8.8 9.3 7.5 11 7.5H22V39H11C9.3 39 8 37.7 8 36V10.5Z"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                            />
 
-              <span class="create-form__optional">
-                选填
-              </span>
+                            <path
+                                d="M40 10.5C40 8.8 38.7 7.5 37 7.5H26V39H37C38.7 39 40 37.7 40 36V10.5Z"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                            />
 
-            </label>
+                            <path
+                                d="M22 11H16"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M32 11H26"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M22 17H16"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M32 17H26"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </div>
 
 
-            <textarea
-              class="create-form__textarea"
-              id="book-description"
-              name="description"
-              placeholder="写下这个故事的背景、主题或创作构想……"
-              maxlength="2000"
-              rows="6"
-              aria-describedby="book-description-help book-description-counter"
-            ></textarea>
+                    <div class="create-option__content">
+
+                        <h2 class="create-option__title">
+                            新建书籍
+                        </h2>
+
+                        <p class="create-option__description">
+                            创建一部新作品，为它取名并选择专属封面。
+                        </p>
+
+                        <span class="create-option__detail">
+                            书名 · 封面
+                        </span>
+
+                    </div>
 
 
-            <div class="create-form__field-footer">
+                    <span
+                        class="create-option__arrow"
+                        aria-hidden="true"
+                    >
+                        →
+                    </span>
 
-              <p
-                class="create-form__help"
-                id="book-description-help"
-              >
-                可以介绍故事背景、主要人物或世界观。
-              </p>
+                </a>
 
-              <span
-                class="create-form__counter"
-                id="book-description-counter"
-                aria-live="polite"
-              >
-                0 / 2000
-              </span>
+
+                <!-- 新建分组 -->
+
+                <a
+                    class="create-option create-option--group"
+                    href="./create-group.html"
+                >
+
+                    <div
+                        class="create-option__icon"
+                        aria-hidden="true"
+                    >
+                        <svg
+                            viewBox="0 0 48 48"
+                            fill="none"
+                        >
+                            <path
+                                d="M5.5 13C5.5 11.3 6.8 10 8.5 10H19L23 14H39.5C41.2 14 42.5 15.3 42.5 17V35C42.5 36.7 41.2 38 39.5 38H8.5C6.8 38 5.5 36.7 5.5 35V13Z"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                            />
+
+                            <path
+                                d="M5.5 19H42.5"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                            />
+
+                            <path
+                                d="M24 24V33"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M19.5 28.5H28.5"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </div>
+
+
+                    <div class="create-option__content">
+
+                        <h2 class="create-option__title">
+                            新建分组
+                        </h2>
+
+                        <p class="create-option__description">
+                            创建一个分类，将不同的作品整理归类。
+                        </p>
+
+                        <span class="create-option__detail">
+                            分组名称
+                        </span>
+
+                    </div>
+
+
+                    <span
+                        class="create-option__arrow"
+                        aria-hidden="true"
+                    >
+                        →
+                    </span>
+
+                </a>
+
 
             </div>
 
-          </div>
-
-
-          <!-- 创建结果提示 -->
-
-          <div
-            class="create-form__message"
-            id="create-message"
-            role="status"
-            aria-live="polite"
-            hidden
-          ></div>
-
-
-          <!-- 表单操作 -->
-
-          <div class="create-form__actions">
-
-            <button
-              class="create-form__button create-form__button--cancel"
-              id="cancel-create"
-              type="button"
-            >
-              取消
-            </button>
-
-
-            <button
-              class="create-form__button create-form__button--submit"
-              id="create-book-submit"
-              type="submit"
-            >
-
-              <span
-                class="create-form__button-icon"
-                aria-hidden="true"
-              >
-                ＋
-              </span>
-
-              创建作品
-
-            </button>
-
-          </div>
-
-
-          <!-- 必填提示 -->
-
-          <p class="create-form__footnote">
-            <span aria-hidden="true">*</span>
-            为必填项目。作品创建后，可以继续编辑和完善。
-          </p>
-
-        </form>
-
-      </section>
+        </section>
 
     </main>
 
 
-    <!-- ==================================================
-         六、底部导航
-    =================================================== -->
+    <!-- =========================
+         底部导航
+    ========================== -->
 
-    <footer
-      class="app-footer"
-      id="app-footer"
-    >
+    <footer class="app-footer" id="app-footer">
 
-      <nav
-        class="bottom-nav"
-        aria-label="主导航"
-      >
-
-
-        <!-- 书架 -->
-
-        <a
-          class="bottom-nav__item"
-          href="../index.html"
-          aria-label="书架"
+        <nav
+            class="bottom-nav"
+            aria-label="主导航"
         >
 
-          <svg
-            class="bottom-nav__icon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
+            <a
+                class="bottom-nav__item"
+                href="../index.html"
+                data-nav="home"
+            >
 
-            <path
-              d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"
-            ></path>
+                <span
+                    class="bottom-nav__icon"
+                    aria-hidden="true"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                    >
+                        <path
+                            d="M3 10.5L12 3L21 10.5"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
 
-            <path
-              d="M4 5.5v16"
-            ></path>
+                        <path
+                            d="M5.5 9.5V21H18.5V9.5"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
 
-            <path
-              d="M8 7h8"
-            ></path>
+                        <path
+                            d="M9 21V14H15V21"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </span>
 
-            <path
-              d="M8 11h8"
-            ></path>
+                <span class="bottom-nav__label">
+                    书架
+                </span>
 
-          </svg>
-
-          <span class="bottom-nav__label">
-            书架
-          </span>
-
-        </a>
+            </a>
 
 
-        <!-- 工具 -->
+            <a
+                class="bottom-nav__item"
+                href="./tools.html"
+                data-nav="tools"
+            >
 
-        <a
-          class="bottom-nav__item"
-          href="./tools.html"
-          aria-label="工具"
-        >
+                <span
+                    class="bottom-nav__icon"
+                    aria-hidden="true"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                    >
+                        <path
+                            d="M4 5H10V11H4V5Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
 
-          <svg
-            class="bottom-nav__icon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
+                        <path
+                            d="M14 5H20V11H14V5Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
 
-            <path
-              d="M14 6.5a5 5 0 0 0-6.5 6.5L3 17.5 6.5 21l4.5-4.5a5 5 0 0 0 6.5-6.5L14 13l-3-3z"
-            ></path>
+                        <path
+                            d="M4 15H10V21H4V15Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
 
-            <path
-              d="m14 6.5 3.5-3.5 3.5 3.5-3.5 3.5"
-            ></path>
+                        <path
+                            d="M14 15H20V21H14V15Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </span>
 
-          </svg>
+                <span class="bottom-nav__label">
+                    工具
+                </span>
 
-          <span class="bottom-nav__label">
-            工具
-          </span>
+            </a>
 
-        </a>
-
-      </nav>
+        </nav>
 
     </footer>
 
+</div>
 
-  </div>
 
+<!-- =========================
+     公共脚本
+========================== -->
 
-  <!-- ==================================================
-       七、公共 JavaScript
-  =================================================== -->
-
-  <script
-    src="../js/storage.js"
-    defer
-  ></script>
-
-  <script
+<script
     src="../js/navigation.js"
     defer
-  ></script>
-
-  <script
-    src="../js/components.js"
-    defer
-  ></script>
-
-
-  <!-- ==================================================
-       八、新建作品页面逻辑
-  =================================================== -->
-
-  <script
-    src="../page-js/create.js"
-    defer
-  ></script>
-
+></script>
 
 </body>
-
 </html>
