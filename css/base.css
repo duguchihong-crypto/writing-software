@@ -1,0 +1,220 @@
+/* ==================================================
+   写作软件 · 公共基础样式
+   职责：基础色彩、字体、布局、安全区域
+================================================== */
+
+:root {
+    /* 五色体系 */
+    --color-red: #a72f32;
+    --color-red-dark: #792124;
+    --color-red-light: #d46b5f;
+
+    --color-blue: #245e59;
+    --color-blue-light: #8bb9a9;
+    --color-blue-pale: #e4eee8;
+
+    --color-yellow: #d3ad57;
+    --color-yellow-light: #f0dca2;
+    --color-yellow-dark: #8e6d2d;
+
+    --color-black: #241c1a;
+    --color-black-soft: #382c28;
+    --color-ink: #352d29;
+
+    --color-white: #fffdf7;
+    --color-paper: #f7f1e5;
+    --color-paper-dark: #e9dfcc;
+
+    /* 文字 */
+    --text-primary: #352d29;
+    --text-secondary: #82776a;
+    --text-muted: #a69a89;
+    --text-light: #fffaf0;
+
+    /* 边框 */
+    --border-paper: #e6dac4;
+    --border-gold: rgba(211, 173, 87, 0.55);
+
+    /* 阴影 */
+    --shadow-soft:
+        0 5px 18px rgba(52, 36, 24, 0.06);
+
+    --shadow-card:
+        0 8px 24px rgba(52, 36, 24, 0.08);
+
+    /* 布局 */
+    --header-height: 76px;
+    --navigation-height: 72px;
+
+    --page-width: 900px;
+
+    /* 圆角 */
+    --radius-small: 8px;
+    --radius-medium: 14px;
+    --radius-large: 20px;
+}
+
+/* 基础重置 */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    background: var(--color-paper);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    color: var(--text-primary);
+
+    font-family:
+        "Noto Serif SC",
+        "Songti SC",
+        "STSong",
+        "SimSun",
+        serif;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.85),
+            transparent 60%
+        ),
+        var(--color-paper);
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--color-yellow-dark);
+    outline-offset: 3px;
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+/* 应用整体 */
+
+.app-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* 中间内容区独立滚动 */
+
+.main-content {
+    width: 100%;
+    max-width: var(--page-width);
+
+    min-height: calc(
+        100vh -
+        var(--header-height) -
+        var(--navigation-height)
+    );
+
+    margin: 0 auto;
+
+    padding:
+        calc(var(--header-height) + 22px)
+        22px
+        calc(var(--navigation-height) + 30px);
+}
+
+/* 通用标题 */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.section-heading h2 {
+    margin: 5px 0 0;
+
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.section-eyebrow {
+    color: var(--color-red);
+
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+}
+
+/* 传统装饰细线 */
+
+.classical-line {
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--color-yellow),
+        transparent
+    );
+}
+
+/* 减少动态效果 */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 手机适配 */
+
+@media (max-width: 480px) {
+    :root {
+        --header-height: 68px;
+        --navigation-height: 68px;
+    }
+
+    .main-content {
+        padding-left: 17px;
+        padding-right: 17px;
+    }
+}
