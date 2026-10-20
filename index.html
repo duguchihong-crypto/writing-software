@@ -1,181 +1,58 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-    <meta name="theme-color" content="#241c1a">
-
-    <title>写作软件</title>
-
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/navigation.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    <link rel="stylesheet" href="css/home.css">
-</head>
-
-<body>
-    <div class="app-shell">
-
-        <!-- 顶部固定栏 -->
-        <header class="topbar">
-            <a class="brand" href="index.html" aria-label="写作软件首页">
-                <span class="brand-seal">文</span>
-
-                <span class="brand-name">
-                    <span class="brand-title">写作软件</span>
-                    <span class="brand-subtitle">落笔成章 · 笔墨生华</span>
-                </span>
-            </a>
-
-            <div class="topbar-actions">
-                <a class="action-button action-create"
-                   href="pages/create.html">
-                    <span class="action-symbol">＋</span>
-                    <span>新建</span>
-                </a>
-
-                <a class="action-button action-settings"
-                   href="pages/settings.html">
-                    <span class="settings-symbol">⚙</span>
-                    <span>设置</span>
-                </a>
-            </div>
-        </header>
-
-        <!-- 主体内容 -->
-        <main class="main-content">
-
-            <!-- 首页欢迎区域 -->
-            <section class="welcome-panel">
-                <div class="welcome-decoration decoration-left">❖</div>
-
-                <div class="welcome-content">
-                    <p class="welcome-kicker">THE ART OF WRITING</p>
-
-                    <h1>笔墨之间，自有天地</h1>
-
-                    <p class="welcome-description">
-                        以文字为舟，载万千故事。
-                    </p>
-
-                    <div class="welcome-divider">
-                        <span></span>
-                        <i>✦</i>
-                        <span></span>
-                    </div>
-                </div>
-
-                <div class="welcome-decoration decoration-right">❖</div>
-            </section>
-
-            <!-- 快捷操作 -->
-            <section class="quick-section">
-                <div class="section-heading">
-                    <div>
-                        <span class="section-eyebrow">QUICK ACCESS</span>
-                        <h2>快捷入口</h2>
-                    </div>
-
-                    <span class="section-seal">文房</span>
-                </div>
-
-                <div class="quick-grid">
-
-                    <a class="quick-card card-shelf"
-                       href="pages/shelf.html">
-                        <span class="quick-icon icon-shelf">卷</span>
-
-                        <span class="quick-text">
-                            <strong>我的书架</strong>
-                            <small>收纳每一篇故事</small>
-                        </span>
-
-                        <span class="quick-arrow">↗</span>
-                    </a>
-
-                    <a class="quick-card card-tools"
-                       href="pages/tools.html">
-                        <span class="quick-icon icon-tools">策</span>
-
-                        <span class="quick-text">
-                            <strong>写作工具</strong>
-                            <small>让构思井然有序</small>
-                        </span>
-
-                        <span class="quick-arrow">↗</span>
-                    </a>
-
-                </div>
-            </section>
-
-            <!-- 最近创作 -->
-            <section class="recent-section">
-                <div class="section-heading">
-                    <div>
-                        <span class="section-eyebrow">RECENT WORK</span>
-                        <h2>最近创作</h2>
-                    </div>
-
-                    <a class="text-link" href="pages/shelf.html">
-                        查看书架 <span>→</span>
-                    </a>
-                </div>
-
-                <div class="empty-state">
-                    <div class="empty-illustration">
-                        <span class="empty-circle"></span>
-                        <span class="empty-book">卷</span>
-                    </div>
-
-                    <h3>静候你的第一篇作品</h3>
-
-                    <p>
-                        灵感落于纸上，故事由此开始。
-                    </p>
-
-                    <a class="primary-button"
-                       href="pages/create.html">
-                        <span>＋</span>
-                        创建新作品
-                    </a>
-                </div>
-            </section>
-
-        </main>
-
-        <!-- 底部固定导航 -->
-        <nav class="bottom-nav" aria-label="主导航">
-
-            <a class="nav-item active"
-               href="index.html"
-               aria-current="page">
-                <span class="nav-icon">⌂</span>
-                <span class="nav-label">首页</span>
-                <span class="nav-indicator"></span>
-            </a>
-
-            <a class="nav-item"
-               href="pages/shelf.html">
-                <span class="nav-icon">▤</span>
-                <span class="nav-label">书架</span>
-                <span class="nav-indicator"></span>
-            </a>
-
-            <a class="nav-item"
-               href="pages/tools.html">
-                <span class="nav-icon">✧</span>
-                <span class="nav-label">工具</span>
-                <span class="nav-indicator"></span>
-            </a>
-
-        </nav>
-
-    </div>
-
-    <script src="js/home.js" defer></script>
-    <script src="js/navigation.js" defer></script>
-</body>
-</html>
+<main class="main-content">
+    <section class="creation-hero">
+        <div class="hero-ornament ornament-top">
+            <span></span>
+            <i>✧</i>
+            <span></span>
+        </div>
+        <div class="hero-seal" aria-hidden="true">
+            <span>文</span>
+        </div>
+        <p class="hero-kicker">THE WORLD BEGINS WITH WORDS</p>
+        <h1 class="hero-title">
+            落笔成章
+        </h1>
+        <p class="hero-subtitle">
+            以笔为剑，以字为山河。<br>
+            以心为墨，以梦写乾坤。
+        </p>
+        <div class="hero-divider">
+            <span></span>
+            <i>❖</i>
+            <span></span>
+        </div>
+        <div class="hero-message">
+            <h2>每一个故事，都值得被写下。</h2>
+            <p>
+                纵使只是一点微光，也能照亮一个世界；
+                纵使只有一字一句，也能写尽万里山河。
+            </p>
+            <p>
+                你笔下的人物，可以踏遍九州；
+                你心中的故事，也可以自成天地。
+            </p>
+        </div>
+        <div class="hero-writing-prompt">
+            <span class="prompt-mark">「</span>
+            <p>
+                不必急于写出惊世之作。<br>
+                先写下第一句话，<br>
+                你的世界便有了开始。
+            </p>
+            <span class="prompt-mark prompt-mark-end">」</span>
+        </div>
+        <a class="hero-create-button" href="pages/create.html">
+            <span class="hero-button-symbol">✦</span>
+            <span>开始创作</span>
+            <span class="hero-button-arrow">→</span>
+        </a>
+        <p class="hero-footer-text">
+            一字为始 · 万象由心
+        </p>
+        <div class="hero-ornament ornament-bottom">
+            <span></span>
+            <i>❖</i>
+            <span></span>
+        </div>
+    </section>
+</main>
