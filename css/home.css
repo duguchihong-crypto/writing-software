@@ -1,448 +1,1022 @@
 /* ==================================================
-   首页创作鼓励区域
-   独立职责：只控制首页 main 内的创作内容
+   首页专属样式
+   不控制其他页面
 ================================================== */
 
-.main-content:has(.creation-hero) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
 
-/* 主视觉区域 */
+/* ------------------------------
+   1. 首页基础布局
+------------------------------ */
 
-.creation-hero {
-    position: relative;
-
-    width: 100%;
-    max-width: 680px;
-
-    margin: 0 auto;
-
-    padding: 28px 22px 32px;
-
-    overflow: hidden;
-
-    text-align: center;
-
+.home-page {
     background:
         radial-gradient(
-            ellipse at 50% 20%,
-            rgba(255, 255, 255, 0.95),
-            transparent 65%
+            ellipse at 50% 0%,
+            rgba(214, 177, 92, 0.08),
+            transparent 45%
         ),
-        linear-gradient(
-            180deg,
-            #faf6ec 0%,
-            #f5eddd 100%
-        );
-
-    border: 1px solid #e4d5b9;
-    border-radius: 18px;
-
-    box-shadow:
-        0 8px 28px rgba(63, 44, 27, 0.06);
+        var(--color-white);
 }
 
-/* 内部装饰边框 */
 
-.creation-hero::before {
+/* ------------------------------
+   2. 顶部固定栏
+------------------------------ */
+
+.home-page .app-header {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 100;
+
+    height: var(--header-height);
+
+    padding:
+        0 max(18px, env(safe-area-inset-right))
+        0 max(18px, env(safe-area-inset-left));
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    color: var(--color-white);
+
+    background:
+        linear-gradient(
+            115deg,
+            var(--color-black-dark),
+            var(--color-black) 65%,
+            #30352F
+        );
+
+    border-bottom: 2px solid var(--color-yellow-dark);
+
+    box-shadow:
+        0 3px 12px rgba(25, 24, 19, 0.14);
+}
+
+
+/* 顶部装饰细线 */
+
+.home-page .app-header::after {
     content: "";
 
     position: absolute;
 
-    inset: 8px;
+    left: 0;
+    right: 0;
+    bottom: 2px;
 
-    border: 1px solid rgba(170, 135, 71, 0.22);
-    border-radius: 12px;
-
-    pointer-events: none;
-}
-
-/* 左上角与右下角装饰 */
-
-.creation-hero::after {
-    content: "❖";
-
-    position: absolute;
-
-    top: 15px;
-    right: 17px;
-
-    color: rgba(167, 47, 50, 0.45);
-    font-size: 14px;
-
-    pointer-events: none;
-}
-
-/* 装饰线 */
-
-.hero-ornament {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 12px;
-
-    color: #a72f32;
-}
-
-.hero-ornament span {
-    width: 40px;
     height: 1px;
 
     background:
         linear-gradient(
             90deg,
             transparent,
-            #c8a45a
+            var(--color-yellow-light),
+            transparent
         );
+
+    opacity: 0.6;
+
+    pointer-events: none;
 }
 
-.hero-ornament span:last-child {
-    transform: rotate(180deg);
+
+/* ------------------------------
+   3. 软件标志
+------------------------------ */
+
+.home-page .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
 }
 
-.hero-ornament i {
-    font-size: 12px;
-    font-style: normal;
-}
+.home-page .brand-seal {
+    position: relative;
 
-.ornament-top {
-    margin-bottom: 24px;
-}
+    width: 39px;
+    height: 39px;
 
-.ornament-bottom {
-    margin-top: 27px;
-}
-
-/* 朱红印记 */
-
-.hero-seal {
-    width: 45px;
-    height: 45px;
+    flex-shrink: 0;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    margin: 0 auto 18px;
-
-    color: #fff8e8;
+    color: var(--color-white);
 
     background:
         linear-gradient(
             145deg,
-            #bd4940,
-            #812529
+            var(--color-red-light),
+            var(--color-red-dark)
         );
 
-    border: 2px solid #d6b66c;
-    border-radius: 6px;
+    border: 1px solid var(--color-yellow);
 
-    box-shadow:
-        inset 0 0 0 2px rgba(255, 255, 255, 0.12),
-        0 4px 10px rgba(121, 33, 36, 0.12);
+    outline: 1px solid rgba(214, 177, 92, 0.25);
+    outline-offset: 2px;
 
+    border-radius: 5px;
+
+    font-family: var(--font-classical);
     font-size: 23px;
     font-weight: 700;
 }
 
-/* 英文小标题 */
+.home-page .brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
 
-.hero-kicker {
-    margin: 0 0 13px;
+.home-page .brand-title {
+    color: var(--color-white);
 
-    color: #8b6c39;
+    font-family: var(--font-classical);
+    font-size: 19px;
+    font-weight: 700;
 
-    font-family: Arial, sans-serif;
+    letter-spacing: 3px;
+}
+
+.home-page .brand-subtitle {
+    color: var(--color-yellow-light);
+
     font-size: 9px;
-    font-weight: 700;
-
-    letter-spacing: 2.5px;
-    line-height: 1.7;
+    letter-spacing: 1px;
 }
 
-/* 主标题 */
 
-.hero-title {
-    margin: 0;
+/* ------------------------------
+   4. 顶部操作按钮
+------------------------------ */
 
-    color: #29211e;
-
-    font-size: clamp(32px, 8vw, 43px);
-    font-weight: 700;
-
-    letter-spacing: 8px;
-    line-height: 1.5;
-
-    text-shadow:
-        0 2px 0 rgba(255, 255, 255, 0.65);
+.home-page .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* 标题下方诗句 */
-
-.hero-subtitle {
-    margin: 14px 0 0;
-
-    color: #4e5e50;
-
-    font-size: 14px;
-    line-height: 2.1;
-
-    letter-spacing: 2px;
+.home-page .button-symbol {
+    font-size: 19px;
+    line-height: 1;
 }
 
-/* 中间分隔线 */
+.home-page .button-setting {
+    color: var(--color-yellow-light);
 
-.hero-divider {
+    background: rgba(255, 255, 255, 0.035);
+
+    border-color: rgba(214, 177, 92, 0.55);
+}
+
+.home-page .button-setting:hover {
+    background: rgba(214, 177, 92, 0.12);
+}
+
+.home-page .setting-symbol {
+    font-size: 16px;
+}
+
+.home-page .setting-text {
+    font-size: 13px;
+}
+
+
+/* ------------------------------
+   5. 页面主体
+------------------------------ */
+
+.home-page .home-main {
+    width: 100%;
+    max-width: var(--content-width);
+
+    margin: 0 auto;
+
+    padding:
+        calc(var(--header-height) + 26px)
+        20px
+        calc(var(--nav-height) + 40px + env(safe-area-inset-bottom));
+}
+
+
+/* ------------------------------
+   6. 首页欢迎区域
+------------------------------ */
+
+.home-page .hero {
+    position: relative;
+
+    min-height: 225px;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
-    gap: 12px;
+    overflow: hidden;
 
-    margin: 22px 0 24px;
+    margin-bottom: 34px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.98),
+            rgba(241, 235, 221, 0.75)
+        );
+
+    border: 1px solid var(--color-border);
+
+    box-shadow: var(--shadow-card);
 }
 
-.hero-divider span {
-    width: 48px;
-    height: 1px;
+
+/* 传统装饰边框 */
+
+.home-page .hero::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 7px;
+
+    border: 1px solid rgba(156, 119, 49, 0.38);
+
+    pointer-events: none;
+}
+
+.home-page .hero::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 0;
+
+    width: 110px;
+    height: 3px;
+
+    transform: translateX(-50%);
 
     background:
         linear-gradient(
             90deg,
-            transparent,
-            #c9a65d
+            var(--color-red),
+            var(--color-yellow),
+            var(--color-blue)
         );
 }
 
-.hero-divider span:last-child {
-    transform: rotate(180deg);
-}
 
-.hero-divider i {
-    color: #a72f32;
-    font-size: 13px;
-    font-style: normal;
-}
+/* 装饰引号 */
 
-/* 鼓励创作文案 */
-
-.hero-message {
-    max-width: 410px;
-
-    margin: 0 auto;
-}
-
-.hero-message h2 {
-    margin: 0 0 14px;
-
-    color: #8f2e2d;
-
-    font-size: 17px;
-    font-weight: 700;
-
-    letter-spacing: 1px;
-    line-height: 1.8;
-}
-
-.hero-message p {
-    margin: 0 0 11px;
-
-    color: #71685d;
-
-    font-size: 12px;
-    line-height: 2.1;
-
-    letter-spacing: 0.5px;
-}
-
-/* 创作寄语 */
-
-.hero-writing-prompt {
-    position: relative;
-
-    max-width: 370px;
-
-    margin: 23px auto 25px;
-
-    padding: 16px 12px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(36, 94, 89, 0.055),
-            rgba(36, 94, 89, 0.015)
-        );
-
-    border-top: 1px solid rgba(36, 94, 89, 0.18);
-    border-bottom: 1px solid rgba(36, 94, 89, 0.18);
-}
-
-.hero-writing-prompt p {
-    margin: 0;
-
-    color: #36594f;
-
-    font-size: 13px;
-    line-height: 2.2;
-
-    letter-spacing: 1px;
-}
-
-.prompt-mark {
+.home-page .hero-decoration {
     position: absolute;
 
-    top: 1px;
-    left: 5px;
+    color: var(--color-red);
 
-    color: rgba(167, 47, 50, 0.55);
+    font-family: var(--font-classical);
+    font-size: 65px;
 
-    font-size: 22px;
+    opacity: 0.23;
+
+    pointer-events: none;
 }
 
-.prompt-mark-end {
-    top: auto;
-    left: auto;
-
-    right: 5px;
-    bottom: 1px;
+.home-page .hero-decoration-left {
+    top: 13px;
+    left: 19px;
 }
 
-/* 开始创作按钮 */
+.home-page .hero-decoration-right {
+    right: 19px;
+    bottom: 3px;
+}
 
-.hero-create-button {
-    width: 100%;
-    max-width: 235px;
 
-    min-height: 48px;
+/* 欢迎文字 */
+
+.home-page .hero-content {
+    position: relative;
+    z-index: 1;
+
+    padding: 28px 10px;
+
+    text-align: center;
+}
+
+.home-page .hero-kicker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    margin-bottom: 16px;
+
+    color: var(--color-blue-dark);
+
+    font-size: 11px;
+    letter-spacing: 3px;
+}
+
+.home-page .hero h1 {
+    margin: 0;
+
+    color: var(--color-black);
+
+    font-family: var(--font-classical);
+    font-size: clamp(30px, 8vw, 39px);
+    font-weight: 700;
+
+    letter-spacing: 7px;
+
+    text-shadow:
+        1px 1px 0 rgba(214, 177, 92, 0.22);
+}
+
+.home-page .hero-description {
+    margin: 13px 0 0;
+
+    color: var(--color-text-secondary);
+
+    font-family: var(--font-classical);
+    font-size: 14px;
+
+    letter-spacing: 3px;
+}
+
+
+/* 赤色印章 */
+
+.home-page .hero-seal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    margin-top: 19px;
+}
+
+.home-page .hero-seal span {
+    width: 19px;
+    height: 19px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    color: var(--color-red);
+
+    border: 1px solid rgba(168, 50, 50, 0.55);
+
+    font-family: var(--font-classical);
+    font-size: 10px;
+}
+
+
+/* ------------------------------
+   7. 通用区块标题
+------------------------------ */
+
+.home-page .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
 
-    margin: 0 auto;
+    margin-bottom: 16px;
+}
 
-    padding: 0 20px;
+.home-page .section-eyebrow {
+    display: block;
 
-    color: #fffaf0;
+    margin-bottom: 5px;
+
+    color: var(--color-blue);
+
+    font-size: 9px;
+    font-weight: 600;
+
+    letter-spacing: 1.8px;
+}
+
+.home-page .section-heading h2 {
+    margin: 0;
+
+    color: var(--color-black);
+
+    font-family: var(--font-classical);
+    font-size: 21px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+}
+
+.home-page .section-mark {
+    width: 31px;
+    height: 31px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--color-red);
+
+    border: 1px solid rgba(168, 50, 50, 0.4);
+
+    font-family: var(--font-classical);
+    font-size: 18px;
+}
+
+
+/* ------------------------------
+   8. 创作区域
+------------------------------ */
+
+.home-page .creation-section {
+    margin-bottom: 36px;
+}
+
+.home-page .creation-panel {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 19px 16px;
 
     background:
         linear-gradient(
             120deg,
-            #b9413a,
-            #8e272a 65%,
-            #742124
+            #FFFFFF,
+            #F2ECDD
         );
 
-    border: 1px solid #d8b96d;
-    border-radius: 8px;
+    border: 1px solid var(--color-border);
 
-    box-shadow:
-        inset 0 0 0 2px rgba(255, 255, 255, 0.06),
-        0 5px 14px rgba(121, 33, 36, 0.15);
+    border-left: 3px solid var(--color-red);
 
-    font-size: 14px;
+    box-shadow: var(--shadow-card);
+}
+
+
+/* 创作图章 */
+
+.home-page .creation-emblem {
+    width: 47px;
+    height: 47px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--color-yellow-light);
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--color-black-light),
+            var(--color-black-dark)
+        );
+
+    border: 1px solid var(--color-yellow-dark);
+
+    font-family: var(--font-classical);
+    font-size: 24px;
+}
+
+.home-page .creation-copy {
+    flex: 1;
+    min-width: 0;
+}
+
+.home-page .creation-copy h3 {
+    margin: 0 0 7px;
+
+    color: var(--color-black);
+
+    font-family: var(--font-classical);
+    font-size: 16px;
     font-weight: 700;
+}
 
-    letter-spacing: 3px;
+.home-page .creation-copy p {
+    margin: 0;
+
+    color: var(--color-text-secondary);
+
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+
+/* 开始创作按钮 */
+
+.home-page .creation-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    flex-shrink: 0;
+
+    padding: 10px 11px;
+
+    color: var(--color-white-pure);
+
+    background: var(--color-red);
+
+    border: 1px solid var(--color-red-dark);
+
+    font-size: 12px;
+    white-space: nowrap;
 
     transition:
-        transform 0.16s ease,
-        box-shadow 0.16s ease;
+        background-color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.hero-create-button:hover {
-    box-shadow:
-        inset 0 0 0 2px rgba(255, 255, 255, 0.08),
-        0 7px 18px rgba(121, 33, 36, 0.22);
+.home-page .creation-button:hover {
+    background: var(--color-red-dark);
 }
 
-.hero-create-button:active {
-    transform: scale(0.98);
+.home-page .creation-button:active {
+    transform: scale(0.96);
 }
 
-.hero-button-symbol {
-    color: #f0dca2;
-    font-size: 13px;
+.home-page .creation-button span {
+    color: var(--color-yellow-light);
 }
 
-.hero-button-arrow {
-    margin-left: 4px;
 
-    color: #f0dca2;
+/* ------------------------------
+   9. 最近作品
+------------------------------ */
 
-    font-family: Arial, sans-serif;
+.home-page .recent-section {
+    margin-bottom: 30px;
+}
+
+.home-page .text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    color: var(--color-blue);
+
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.home-page .text-link span {
+    color: var(--color-red);
+}
+
+.home-page .text-link:hover {
+    color: var(--color-red);
+}
+
+
+/* 空状态 */
+
+.home-page .empty-state {
+    position: relative;
+
+    min-height: 200px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px 15px;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.72);
+
+    border: 1px solid var(--color-border-light);
+
+    text-align: center;
+}
+
+.home-page .empty-state::before,
+.home-page .empty-state::after {
+    content: "";
+
+    position: absolute;
+
+    width: 45px;
+    height: 45px;
+
+    opacity: 0.65;
+
+    pointer-events: none;
+}
+
+.home-page .empty-state::before {
+    top: 7px;
+    left: 7px;
+
+    border-top: 1px solid var(--color-yellow-dark);
+    border-left: 1px solid var(--color-yellow-dark);
+}
+
+.home-page .empty-state::after {
+    right: 7px;
+    bottom: 7px;
+
+    border-right: 1px solid var(--color-yellow-dark);
+    border-bottom: 1px solid var(--color-yellow-dark);
+}
+
+.home-page .empty-decoration {
+    position: relative;
+
+    width: 53px;
+    height: 53px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 15px;
+
+    color: var(--color-blue);
+
+    background: rgba(55, 107, 104, 0.08);
+
+    border: 1px solid rgba(55, 107, 104, 0.2);
+}
+
+.home-page .empty-book {
+    font-family: var(--font-classical);
+    font-size: 25px;
+}
+
+.home-page .empty-cloud {
+    position: absolute;
+
+    top: -9px;
+    right: -11px;
+
+    color: var(--color-red);
+
+    font-size: 20px;
+}
+
+.home-page .empty-state h3 {
+    margin: 0 0 9px;
+
+    color: var(--color-black);
+
+    font-family: var(--font-classical);
     font-size: 16px;
 }
 
-/* 底部寄语 */
+.home-page .empty-state p {
+    margin: 0;
 
-.hero-footer-text {
-    margin: 18px 0 0;
+    color: var(--color-text-secondary);
 
-    color: #a18c69;
-
-    font-size: 10px;
-    letter-spacing: 3px;
+    font-size: 12px;
+    line-height: 1.8;
 }
 
-/* 手机屏幕 */
+.home-page .empty-action {
+    margin-top: 17px;
 
-@media (max-width: 480px) {
-    .main-content:has(.creation-hero) {
-        padding-top: calc(var(--header-height) + 16px);
-        padding-bottom: calc(var(--navigation-height) + 18px);
+    padding: 8px 14px;
+
+    color: var(--color-red);
+
+    border: 1px solid rgba(168, 50, 50, 0.4);
+
+    font-size: 12px;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.home-page .empty-action:hover {
+    color: white;
+    background: var(--color-red);
+}
+
+
+/* ------------------------------
+   10. 首页题记
+------------------------------ */
+
+.home-page .home-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 8px 0 0;
+}
+
+.home-page .home-footer p {
+    margin: 0;
+
+    color: var(--color-text-secondary);
+
+    font-family: var(--font-classical);
+    font-size: 12px;
+
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+.home-page .footer-rule {
+    width: 24px;
+    height: 1px;
+
+    background: var(--color-yellow-dark);
+    opacity: 0.65;
+}
+
+
+/* ------------------------------
+   11. 底部固定导航
+------------------------------ */
+
+.home-page .bottom-nav {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 100;
+
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+
+    height:
+        calc(var(--nav-height) + env(safe-area-inset-bottom));
+
+    padding:
+        0 10px env(safe-area-inset-bottom);
+
+    background:
+        linear-gradient(
+            105deg,
+            var(--color-black-dark),
+            var(--color-black) 50%,
+            #30352F
+        );
+
+    border-top: 2px solid var(--color-yellow-dark);
+
+    box-shadow:
+        0 -4px 15px rgba(25, 24, 19, 0.08);
+}
+
+
+/* 底部导航项目 */
+
+.home-page .nav-item {
+    position: relative;
+
+    flex: 1;
+    max-width: 220px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    color: rgba(248, 245, 237, 0.66);
+
+    transition: color 0.2s ease;
+}
+
+.home-page .nav-item:hover {
+    color: var(--color-white);
+}
+
+.home-page .nav-item.active {
+    color: var(--color-yellow-light);
+}
+
+
+/* 导航图标 */
+
+.home-page .nav-icon {
+    width: 23px;
+    height: 23px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-page .nav-icon svg {
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+
+    stroke: currentColor;
+    stroke-width: 1.5;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.home-page .nav-label {
+    font-family: var(--font-classical);
+    font-size: 12px;
+
+    letter-spacing: 2px;
+}
+
+
+/* 当前页面标记 */
+
+.home-page .nav-indicator {
+    position: absolute;
+
+    left: 50%;
+    bottom: 5px;
+
+    width: 17px;
+    height: 2px;
+
+    transform: translateX(-50%);
+
+    background: var(--color-red);
+
+    opacity: 0;
+
+    transition: opacity 0.2s ease;
+}
+
+.home-page .nav-item.active .nav-indicator {
+    opacity: 1;
+}
+
+
+/* ------------------------------
+   12. 平板与桌面适配
+------------------------------ */
+
+@media (min-width: 700px) {
+
+    .home-page .home-main {
+        padding-top: calc(var(--header-height) + 40px);
     }
 
-    .creation-hero {
-        padding: 23px 17px 25px;
+    .home-page .hero {
+        min-height: 270px;
     }
 
-    .hero-title {
-        letter-spacing: 5px;
+    .home-page .creation-panel {
+        padding: 24px;
     }
 
-    .hero-subtitle {
-        font-size: 13px;
-        letter-spacing: 1px;
-    }
-
-    .hero-message h2 {
-        font-size: 15px;
-    }
-
-    .hero-message p {
-        font-size: 12px;
-    }
-
-    .hero-writing-prompt p {
-        font-size: 12px;
+    .home-page .empty-state {
+        min-height: 230px;
     }
 }
 
-/* 小屏手机 */
 
-@media (max-width: 360px) {
-    .creation-hero {
+/* ------------------------------
+   13. 手机适配
+------------------------------ */
+
+@media (max-width: 420px) {
+
+    .home-page .app-header {
         padding-left: 13px;
         padding-right: 13px;
     }
 
-    .hero-title {
-        font-size: 29px;
-        letter-spacing: 4px;
+    .home-page .brand {
+        gap: 8px;
     }
 
-    .hero-kicker {
+    .home-page .brand-seal {
+        width: 34px;
+        height: 34px;
+
+        font-size: 20px;
+    }
+
+    .home-page .brand-title {
+        font-size: 17px;
+        letter-spacing: 2px;
+    }
+
+    .home-page .brand-subtitle {
         font-size: 8px;
-        letter-spacing: 1.5px;
+        letter-spacing: 0.5px;
     }
 
-    .hero-message h2 {
+    .home-page .header-actions {
+        gap: 6px;
+    }
+
+    .home-page .button {
+        min-height: 37px;
+        padding-left: 9px;
+        padding-right: 9px;
+
+        font-size: 12px;
+    }
+
+    .home-page .setting-text {
+        font-size: 12px;
+    }
+
+    .home-page .home-main {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .home-page .hero {
+        min-height: 205px;
+    }
+
+    .home-page .hero h1 {
+        letter-spacing: 5px;
+    }
+
+    .home-page .hero-kicker {
+        gap: 6px;
+        letter-spacing: 2px;
+    }
+
+    .home-page .creation-panel {
+        gap: 10px;
+        padding: 15px 11px;
+    }
+
+    .home-page .creation-emblem {
+        width: 39px;
+        height: 39px;
+
+        font-size: 20px;
+    }
+
+    .home-page .creation-copy h3 {
         font-size: 14px;
+    }
+
+    .home-page .creation-copy p {
+        font-size: 10px;
+    }
+
+    .home-page .creation-button {
+        gap: 4px;
+        padding: 9px 8px;
+
+        font-size: 11px;
+    }
+}
+
+
+/* ------------------------------
+   14. 极窄屏幕适配
+------------------------------ */
+
+@media (max-width: 340px) {
+
+    .home-page .brand-subtitle {
+        display: none;
+    }
+
+    .home-page .brand-title {
+        font-size: 15px;
+    }
+
+    .home-page .creation-panel {
+        flex-wrap: wrap;
+    }
+
+    .home-page .creation-copy {
+        flex-basis: calc(100% - 55px);
+    }
+
+    .home-page .creation-button {
+        width: 100%;
+        margin-top: 5px;
     }
 }
