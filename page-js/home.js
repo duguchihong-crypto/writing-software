@@ -1,698 +1,456 @@
 /* ======================================================
-   写作软件 · 首页书架逻辑
+   写作软件 · 首页书架
    文件：page-js/home.js
 
-   模块职责：
-   1. 读取作品列表
-   2. 判断书架是否为空
-   3. 显示或隐藏空书架提示
-   4. 生成作品卡片
-   5. 显示作品名称、简介、字数和修改时间
-   6. 监听作品数据变化
-   7. 通过公共导航接口打开作品
-
-   依赖：
-   js/storage.js
-   js/navigation.js
-   js/components.js
-
-   设计原则：
-   1. 只管理首页书架
-   2. 不直接操作 localStorage
-   3. 不修改其他模块的内部实现
-   4. 使用 DOM API 创建作品卡片
-   5. 用户输入的文本一律作为纯文本显示
+   功能：
+   1. 读取书籍列表
+   2. 显示空书架状态
+   3. 显示书籍封面
+   4. 显示书名、简介、字数、更新时间
+   5. 点击书籍进入编辑器
+   6. 监听书籍数据变化并刷新书架
 ====================================================== */
 
-
 (function () {
-  "use strict";
+    "use strict";
 
 
-  /* ====================================================
-     一、模块配置
-  ==================================================== */
+    /* ==================================================
+       一、页面元素
+    ================================================== */
 
-  const MODULE_NAME = "WritingHome";
+    const elements = {
+        emptyState: document.getElementById("empty-state"),
 
+        shelfContent: document.getElementById("shelf-content"),
 
-  /* ====================================================
-     二、页面元素
-  ==================================================== */
+        shelfCount: document.getElementById("shelf-count"),
 
-  const ELEMENTS = {
-    emptyState: null,
-
-    shelfContent: null,
-
-    shelfCount: null,
-
-    shelfList: null
-  };
+        shelfList: document.getElementById("shelf-list")
+    };
 
 
-  /* ====================================================
-     三、模块状态
-  ==================================================== */
+    /* ==================================================
+       二、检查页面
+    ================================================== */
 
-  let initialized = false;
-
-  let unsubscribeStorage = null;
-
-
-  /* ====================================================
-     四、获取页面元素
-  ==================================================== */
-
-
-  /**
-   * 获取首页需要使用的 DOM 元素。
-   *
-   * 这些元素由 index.html 提供。
-   *
-   * 本模块不负责创建首页整体结构。
-   */
-
-  function collectElements() {
-    ELEMENTS.emptyState = document.getElementById(
-      "empty-state"
-    );
-
-    ELEMENTS.shelfContent = document.getElementById(
-      "shelf-content"
-    );
-
-    ELEMENTS.shelfCount = document.getElementById(
-      "shelf-count"
-    );
-
-    ELEMENTS.shelfList = document.getElementById(
-      "shelf-list"
-    );
-
-    const missingElements = [];
-
-    if (!ELEMENTS.emptyState) {
-      missingElements.push("#empty-state");
-    }
-
-    if (!ELEMENTS.shelfContent) {
-      missingElements.push("#shelf-content");
-    }
-
-    if (!ELEMENTS.shelfCount) {
-      missingElements.push("#shelf-count");
-    }
-
-    if (!ELEMENTS.shelfList) {
-      missingElements.push("#shelf-list");
-    }
-
-    if (missingElements.length > 0) {
-      console.error(
-        "[WritingHome] 首页缺少必要的 HTML 元素：",
-        missingElements.join(", ")
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-
-  /* ====================================================
-     五、检查公共模块
-  ==================================================== */
-
-
-  /**
-   * 确认公共模块已经加载。
-   *
-   * 如果依赖没有加载，
-   * 显示明确错误，方便排查文件路径。
-   */
-
-  function checkDependencies() {
-    const missing = [];
-
-    if (
-      !window.WritingStorage ||
-      typeof window.WritingStorage.getBooks !== "function"
-    ) {
-      missing.push("js/storage.js");
-    }
-
-    if (
-      !window.WritingNavigation ||
-      typeof window.WritingNavigation.goEditor !== "function"
-    ) {
-      missing.push("js/navigation.js");
-    }
-
-    if (
-      !window.WritingComponents ||
-      typeof window.WritingComponents.createElement !== "function"
-    ) {
-      missing.push("js/components.js");
-    }
-
-    if (missing.length > 0) {
-      console.error(
-        "[WritingHome] 以下公共模块不可用：",
-        missing.join(", ")
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-
-  /* ====================================================
-     六、读取作品数据
-  ==================================================== */
-
-
-  /**
-   * 从公共存储模块读取作品。
-   *
-   * 首页不直接读取 localStorage。
-   */
-
-  function loadBooks() {
-    try {
-      const books = window.WritingStorage.getBooks();
-
-      if (!Array.isArray(books)) {
-        throw new Error(
-          "作品存储接口返回的数据不是数组。"
+    function validatePage() {
+        return Boolean(
+            elements.emptyState &&
+            elements.shelfContent &&
+            elements.shelfCount &&
+            elements.shelfList
         );
-      }
-
-      return books;
-
-    } catch (error) {
-      console.error(
-        "[WritingHome] 读取作品失败：",
-        error
-      );
-
-      showStorageError();
-
-      return null;
-    }
-  }
-
-
-  /* ====================================================
-     七、更新首页状态
-  ==================================================== */
-
-
-  /**
-   * 根据作品数量切换页面状态。
-   *
-   * 没有作品：
-   * 显示空书架。
-   *
-   * 有作品：
-   * 显示作品列表。
-   */
-
-  function updateShelfState(books) {
-    const hasBooks = books.length > 0;
-
-    ELEMENTS.emptyState.hidden = hasBooks;
-
-    ELEMENTS.shelfContent.hidden = !hasBooks;
-
-    updateBookCount(books.length);
-  }
-
-
-  /**
-   * 更新作品数量。
-   *
-   * 例如：
-   * 共 3 部作品
-   */
-
-  function updateBookCount(count) {
-    ELEMENTS.shelfCount.textContent =
-      "共 " + count + " 部作品";
-  }
-
-
-  /* ====================================================
-     八、创建作品卡片
-  ==================================================== */
-
-
-  /**
-   * 创建单部作品的卡片。
-   *
-   * 使用 DOM API 创建元素，
-   * 不将用户输入拼接进 HTML 字符串。
-   */
-
-  function createBookCard(book) {
-    const components = window.WritingComponents;
-
-    const card = components.createElement(
-      "article",
-      {
-        className: "shelf-card",
-
-        attributes: {
-          "data-book-id": book.id
-        }
-      }
-    );
-
-
-    /* -----------------------------------------------
-       作品标题
-    ----------------------------------------------- */
-
-    const title = components.createElement(
-      "h2",
-      {
-        className: "shelf-card__title",
-
-        text: book.title || "未命名作品"
-      }
-    );
-
-    card.appendChild(title);
-
-
-    /* -----------------------------------------------
-       作品简介
-    ----------------------------------------------- */
-
-    const description = components.createElement(
-      "p",
-      {
-        className: "shelf-card__description",
-
-        text: book.description || "尚未填写作品简介。"
-      }
-    );
-
-    card.appendChild(description);
-
-
-    /* -----------------------------------------------
-       作品信息
-    ----------------------------------------------- */
-
-    const meta = components.createElement(
-      "div",
-      {
-        className: "shelf-card__meta"
-      }
-    );
-
-
-    /* 作品字数 */
-
-    const wordCount = components.createElement(
-      "span",
-      {
-        className: "shelf-card__info",
-
-        text: components.formatWordCount(
-          book.wordCount
-        )
-      }
-    );
-
-
-    /* 最后修改时间 */
-
-    const updatedAt = components.createElement(
-      "span",
-      {
-        className: "shelf-card__info",
-
-        text: "更新于 " +
-          (
-            components.formatRelativeTime(
-              book.updatedAt
-            ) || "暂无记录"
-          )
-      }
-    );
-
-    meta.appendChild(wordCount);
-
-    meta.appendChild(updatedAt);
-
-    card.appendChild(meta);
-
-
-    /* -----------------------------------------------
-       作品操作区域
-    ----------------------------------------------- */
-
-    const actions = components.createElement(
-      "div",
-      {
-        className: "shelf-card__actions"
-      }
-    );
-
-
-    /* 打开作品按钮 */
-
-    const openButton = components.createElement(
-      "button",
-      {
-        className:
-          "shelf-card__button shelf-card__button--open",
-
-        text: "打开作品",
-
-        attributes: {
-          type: "button",
-          "aria-label": "打开作品：" +
-            (book.title || "未命名作品")
-        }
-      }
-    );
-
-
-    /*
-     * 点击按钮后通过公共导航接口打开编辑器。
-     */
-
-    openButton.addEventListener(
-      "click",
-      function () {
-        openBook(book.id);
-      }
-    );
-
-    actions.appendChild(openButton);
-
-    card.appendChild(actions);
-
-    return card;
-  }
-
-
-  /* ====================================================
-     九、打开作品
-  ==================================================== */
-
-
-  /**
-   * 打开指定作品。
-   *
-   * 跳转之前先检查作品是否存在，
-   * 避免跳转到无效的作品 ID。
-   */
-
-  function openBook(bookId) {
-    if (!bookId) {
-      window.WritingComponents.showMessage(
-        "无法打开作品：作品编号无效。"
-      );
-
-      return;
     }
 
-    try {
-      const book = window.WritingStorage.getBook(
-        bookId
-      );
-
-      if (!book) {
-        window.WritingComponents.showMessage(
-          "这部作品可能已被删除，请刷新书架后重试。"
-        );
-
-        refresh();
-
-        return;
-      }
-
-      window.WritingNavigation.goEditor(
-        book.id
-      );
-
-    } catch (error) {
-      console.error(
-        "[WritingHome] 打开作品失败：",
-        error
-      );
-
-      window.WritingComponents.showMessage(
-        "暂时无法打开作品，请稍后重试。"
-      );
-    }
-  }
-
-
-  /* ====================================================
-     十、渲染作品列表
-  ==================================================== */
-
-
-  /**
-   * 将作品数据转换成作品卡片。
-   *
-   * 先创建完整的新列表，
-   * 再统一替换旧列表。
-   *
-   * 避免逐张添加卡片时出现中间状态。
-   */
-
-  function renderBooks(books) {
-    const fragment = document.createDocumentFragment();
-
-    books.forEach(function (book) {
-      if (!book || !book.id) {
-        console.warn(
-          "[WritingHome] 跳过无效的作品数据：",
-          book
-        );
-
-        return;
-      }
-
-      try {
-        const card = createBookCard(book);
-
-        fragment.appendChild(card);
-
-      } catch (error) {
+    if (!validatePage()) {
         console.error(
-          "[WritingHome] 创建作品卡片失败：",
-          error
+            "[WritingHome] 找不到必要的书架页面元素。"
         );
-      }
+
+        return;
+    }
+
+
+    /* ==================================================
+       三、通用工具
+    ================================================== */
+
+    function escapeHTML(value) {
+        if (
+            window.WritingComponents &&
+            typeof window.WritingComponents.escapeHTML === "function"
+        ) {
+            return window.WritingComponents.escapeHTML(
+                String(value == null ? "" : value)
+            );
+        }
+
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+
+    function formatWordCount(count) {
+        const number = Number(count) || 0;
+
+        if (
+            window.WritingComponents &&
+            typeof window.WritingComponents.formatWordCount === "function"
+        ) {
+            return window.WritingComponents.formatWordCount(number);
+        }
+
+        return number.toLocaleString("zh-CN") + " 字";
+    }
+
+
+    function formatDate(dateValue) {
+        if (
+            window.WritingComponents &&
+            typeof window.WritingComponents.formatRelativeTime === "function"
+        ) {
+            return window.WritingComponents.formatRelativeTime(dateValue);
+        }
+
+        if (!dateValue) {
+            return "尚未编辑";
+        }
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return "尚未编辑";
+        }
+
+        return date.toLocaleDateString("zh-CN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        });
+    }
+
+
+    function getBookTitle(book) {
+        const title =
+            typeof book.title === "string"
+                ? book.title.trim()
+                : "";
+
+        return title || "未命名书籍";
+    }
+
+
+    function getBookDescription(book) {
+        const description =
+            typeof book.description === "string"
+                ? book.description.trim()
+                : "";
+
+        return description || "尚未添加简介";
+    }
+
+
+    function getBookCover(book) {
+        if (
+            book &&
+            typeof book.cover === "string" &&
+            book.cover.startsWith("data:image/")
+        ) {
+            return book.cover;
+        }
+
+        // 兼容旧版独立封面存储。
+        // 如果旧数据尚未迁移，也尝试读取。
+        try {
+            const legacyData = localStorage.getItem(
+                "writing-software-book-covers"
+            );
+
+            if (legacyData) {
+                const covers = JSON.parse(legacyData);
+
+                const entry = covers && covers[book.id];
+
+                if (
+                    entry &&
+                    typeof entry.data === "string" &&
+                    entry.data.startsWith("data:image/")
+                ) {
+                    return entry.data;
+                }
+            }
+        } catch (error) {
+            // 旧封面数据无法读取时，显示默认封面。
+        }
+
+        return "";
+    }
+
+
+    /* ==================================================
+       四、创建默认封面
+    ================================================== */
+
+    function createDefaultCover(title) {
+        const firstCharacter = Array.from(title)[0] || "书";
+
+        return `
+            <div class="shelf-card__cover shelf-card__cover--default"
+                 aria-label="默认封面">
+                <span class="shelf-card__cover-decoration"
+                      aria-hidden="true">卷</span>
+
+                <span class="shelf-card__cover-character">
+                    ${escapeHTML(firstCharacter)}
+                </span>
+
+                <span class="shelf-card__cover-title">
+                    ${escapeHTML(title)}
+                </span>
+            </div>
+        `;
+    }
+
+
+    /* ==================================================
+       五、创建书籍封面
+    ================================================== */
+
+    function createCoverHTML(book) {
+        const title = getBookTitle(book);
+
+        const cover = getBookCover(book);
+
+        if (!cover) {
+            return createDefaultCover(title);
+        }
+
+        return `
+            <div class="shelf-card__cover">
+                <img
+                    class="shelf-card__cover-image"
+                    src="${escapeHTML(cover)}"
+                    alt="${escapeHTML(title)}的封面"
+                    loading="lazy"
+                >
+
+                <div class="shelf-card__cover-fallback"
+                     hidden>
+                    ${createDefaultCover(title)}
+                </div>
+            </div>
+        `;
+    }
+
+
+    /* ==================================================
+       六、创建书籍卡片
+    ================================================== */
+
+    function createBookCard(book) {
+        const card = document.createElement("article");
+
+        card.className = "shelf-card";
+
+        card.dataset.bookId = book.id;
+
+        const title = getBookTitle(book);
+
+        const description = getBookDescription(book);
+
+        const wordCount = formatWordCount(book.wordCount);
+
+        const updatedAt = formatDate(book.updatedAt);
+
+        card.innerHTML = `
+            <button
+                class="shelf-card__open"
+                type="button"
+                aria-label="打开《${escapeHTML(title)}》"
+            >
+                ${createCoverHTML(book)}
+
+                <div class="shelf-card__body">
+                    <h3 class="shelf-card__title">
+                        ${escapeHTML(title)}
+                    </h3>
+
+                    <p class="shelf-card__description">
+                        ${escapeHTML(description)}
+                    </p>
+
+                    <div class="shelf-card__meta">
+                        <span class="shelf-card__word-count">
+                            ${escapeHTML(wordCount)}
+                        </span>
+
+                        <span class="shelf-card__updated-at">
+                            ${escapeHTML(updatedAt)}
+                        </span>
+                    </div>
+                </div>
+            </button>
+        `;
+
+        const openButton = card.querySelector(
+            ".shelf-card__open"
+        );
+
+        openButton.addEventListener("click", function () {
+            openBook(book.id);
+        });
+
+        const coverImage = card.querySelector(
+            ".shelf-card__cover-image"
+        );
+
+        if (coverImage) {
+            coverImage.addEventListener("error", function () {
+                const coverContainer = coverImage.closest(
+                    ".shelf-card__cover"
+                );
+
+                if (!coverContainer) {
+                    return;
+                }
+
+                coverContainer.innerHTML = createDefaultCover(title);
+            });
+        }
+
+        return card;
+    }
+
+
+    /* ==================================================
+       七、打开书籍
+    ================================================== */
+
+    function openBook(bookId) {
+        if (
+            window.WritingNavigation &&
+            typeof window.WritingNavigation.goEditor === "function"
+        ) {
+            window.WritingNavigation.goEditor(bookId);
+
+            return;
+        }
+
+        const url = new URL(
+            "./pages/editor.html",
+            window.location.href
+        );
+
+        url.searchParams.set("id", bookId);
+
+        window.location.href = url.href;
+    }
+
+
+    /* ==================================================
+       八、显示空书架
+    ================================================== */
+
+    function showEmptyState() {
+        elements.emptyState.hidden = false;
+
+        elements.shelfContent.hidden = true;
+
+        elements.shelfCount.textContent = "0 本";
+    }
+
+
+    /* ==================================================
+       九、显示书籍列表
+    ================================================== */
+
+    function showBooks(books) {
+        elements.emptyState.hidden = true;
+
+        elements.shelfContent.hidden = false;
+
+        elements.shelfCount.textContent =
+            books.length + " 本";
+
+        const fragment = document.createDocumentFragment();
+
+        books.forEach(function (book) {
+            fragment.appendChild(
+                createBookCard(book)
+            );
+        });
+
+        elements.shelfList.replaceChildren(fragment);
+    }
+
+
+    /* ==================================================
+       十、刷新书架
+    ================================================== */
+
+    function renderShelf() {
+        if (
+            !window.WritingStorage ||
+            typeof window.WritingStorage.getBooks !== "function"
+        ) {
+            console.error(
+                "[WritingHome] WritingStorage 尚未加载。"
+            );
+
+            return;
+        }
+
+        try {
+            const books = window.WritingStorage.getBooks();
+
+            if (!books.length) {
+                elements.shelfList.replaceChildren();
+
+                showEmptyState();
+
+                return;
+            }
+
+            showBooks(books);
+
+        } catch (error) {
+            console.error(
+                "[WritingHome] 读取书架失败：",
+                error
+            );
+        }
+    }
+
+
+    /* ==================================================
+       十一、监听书籍数据变化
+    ================================================== */
+
+    function listenForChanges() {
+        if (
+            window.WritingStorage &&
+            typeof window.WritingStorage.onChange === "function"
+        ) {
+            window.WritingStorage.onChange(function () {
+                renderShelf();
+            });
+
+            return;
+        }
+
+        window.addEventListener(
+            "writing-storage-change",
+            renderShelf
+        );
+    }
+
+
+    /* ==================================================
+       十二、初始化
+    ================================================== */
+
+    function initialize() {
+        renderShelf();
+
+        listenForChanges();
+    }
+
+
+    /* ==================================================
+       十三、公开接口
+    ================================================== */
+
+    window.WritingHome = Object.freeze({
+        render: renderShelf,
+        openBook: openBook
     });
 
-    ELEMENTS.shelfList.replaceChildren(fragment);
-  }
 
-
-  /* ====================================================
-     十一、刷新书架
-  ==================================================== */
-
-
-  /**
-   * 重新读取作品并更新页面。
-   *
-   * 创建、修改或删除作品后，
-   * 都可以调用此方法刷新首页。
-   */
-
-  function refresh() {
-    if (
-      !ELEMENTS.shelfList ||
-      !ELEMENTS.emptyState ||
-      !ELEMENTS.shelfContent
-    ) {
-      return false;
-    }
-
-    const books = loadBooks();
-
-    if (books === null) {
-      return false;
-    }
-
-    updateShelfState(books);
-
-    renderBooks(books);
-
-    return true;
-  }
-
-
-  /* ====================================================
-     十二、存储错误提示
-  ==================================================== */
-
-
-  /**
-   * 显示存储错误。
-   *
-   * 不清空原有作品列表，
-   * 避免读取失败时误导用户认为作品已丢失。
-   */
-
-  function showStorageError() {
-    if (ELEMENTS.emptyState) {
-      ELEMENTS.emptyState.hidden = true;
-    }
-
-    if (ELEMENTS.shelfContent) {
-      ELEMENTS.shelfContent.hidden = false;
-    }
-
-    if (ELEMENTS.shelfCount) {
-      ELEMENTS.shelfCount.textContent =
-        "作品读取失败";
-    }
-
-    if (ELEMENTS.shelfList) {
-      const message = window.WritingComponents
-        ? window.WritingComponents.createElement(
-            "p",
-            {
-              className: "shelf-error",
-
-              text:
-                "暂时无法读取作品。请检查浏览器存储权限，然后刷新页面。"
-            }
-          )
-        : document.createTextNode(
-            "暂时无法读取作品，请检查浏览器存储权限。"
-          );
-
-      ELEMENTS.shelfList.replaceChildren(message);
-    }
-  }
-
-
-  /* ====================================================
-     十三、监听作品数据变化
-  ==================================================== */
-
-
-  /**
-   * 当作品发生变化时自动刷新书架。
-   *
-   * 例如：
-   * book-created
-   * book-updated
-   * book-deleted
-   * book-touched
-   * external-change
-   */
-
-  function subscribeToStorageChanges() {
-    if (unsubscribeStorage) {
-      unsubscribeStorage();
-
-      unsubscribeStorage = null;
-    }
-
-    unsubscribeStorage =
-      window.WritingStorage.onChange(
-        function () {
-          refresh();
-        }
-      );
-  }
-
-
-  /* ====================================================
-     十四、初始化首页
-  ==================================================== */
-
-
-  /**
-   * 初始化首页书架。
-   *
-   * 初始化顺序：
-   * 1. 检查公共模块
-   * 2. 获取页面元素
-   * 3. 读取作品数据
-   * 4. 渲染书架
-   * 5. 监听数据变化
-   */
-
-  function init() {
-    if (initialized) {
-      return;
-    }
-
-    if (!checkDependencies()) {
-      return;
-    }
-
-    if (!collectElements()) {
-      return;
-    }
-
-    initialized = true;
-
-    refresh();
-
-    subscribeToStorageChanges();
-
-    console.log(
-      "[WritingHome] 首页书架初始化完成。"
-    );
-  }
-
-
-  /* ====================================================
-     十五、公开接口
-  ==================================================== */
-
-
-  /**
-   * 公开少量必要的方法。
-   *
-   * 其他模块可以请求刷新首页，
-   * 但不应直接修改本模块内部状态。
-   */
-
-  window[MODULE_NAME] = Object.freeze({
-
-    init: init,
-
-    refresh: refresh,
-
-    openBook: openBook
-
-  });
-
-
-  /* ====================================================
-     十六、自动启动
-  ==================================================== */
-
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      init,
-      {
-        once: true
-      }
-    );
-
-  } else {
-    init();
-  }
-
+    initialize();
 
 })();
