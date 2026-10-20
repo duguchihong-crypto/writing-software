@@ -1,6 +1,12 @@
 /* ======================================================
    新建分组页面
    文件：page-css/create-group.css
+
+   页面风格：
+   1. 国风朱红、鎏金、玄黑、宣纸白
+   2. 桌面端与移动端自适应
+   3. 与 create-group.html 的 class 保持一致
+   4. 不影响其他页面的公共样式
 ====================================================== */
 
 
@@ -12,10 +18,13 @@
     width: 100%;
     max-width: 760px;
     min-height: calc(100vh - 132px);
+    min-height: calc(100dvh - 132px);
     margin: 0 auto;
     padding: 36px 24px 48px;
     box-sizing: border-box;
+
     color: var(--color-black);
+    overflow-wrap: anywhere;
 }
 
 
@@ -31,6 +40,7 @@
 .create-group-heading__ornament {
     display: block;
     margin-bottom: 12px;
+
     color: var(--color-yellow-dark);
     font-size: 23px;
     line-height: 1;
@@ -38,16 +48,20 @@
 
 .create-group-heading__title {
     margin: 0;
+
     color: var(--color-red);
-    font-family: "Noto Serif SC", "Songti SC", serif;
+    font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
     font-size: 29px;
     font-weight: 700;
     line-height: 1.5;
     letter-spacing: 3px;
+
+    overflow-wrap: anywhere;
 }
 
 .create-group-heading__subtitle {
     margin: 10px 0 0;
+
     color: var(--color-black-soft);
     font-size: 14px;
     line-height: 1.8;
@@ -58,6 +72,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
+
     margin: 22px auto 0;
 }
 
@@ -65,6 +80,8 @@
 .create-group-heading__divider::after {
     width: 54px;
     height: 1px;
+    flex-shrink: 0;
+
     background: var(--color-yellow);
     content: "";
 }
@@ -72,6 +89,7 @@
 .create-group-heading__divider span {
     color: var(--color-yellow-dark);
     font-size: 12px;
+    line-height: 1;
 }
 
 
@@ -81,11 +99,14 @@
 
 .create-group-form {
     width: 100%;
+    min-width: 0;
     padding: 32px;
     box-sizing: border-box;
+
     background: var(--color-white-pure);
     border: 1px solid var(--color-white-deep);
     border-radius: 12px;
+
     box-shadow: 0 6px 24px rgb(33 31 28 / 5%);
 }
 
@@ -98,21 +119,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 76px;
     height: 76px;
     margin: 0 auto 28px;
     box-sizing: border-box;
+    flex-shrink: 0;
+
     color: var(--color-red);
     background: var(--color-white);
+
     border: 1px solid var(--color-yellow);
     border-radius: 50%;
+
     box-shadow:
         inset 0 0 0 5px var(--color-white-pure),
         inset 0 0 0 6px var(--color-yellow-soft);
 }
 
 .create-group-emblem__character {
-    font-family: "Noto Serif SC", "Songti SC", serif;
+    font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
     font-size: 32px;
     font-weight: 700;
     line-height: 1;
@@ -124,6 +150,7 @@
 ====================================================== */
 
 .create-group-field {
+    min-width: 0;
     margin-bottom: 24px;
 }
 
@@ -132,71 +159,112 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+
     margin-bottom: 10px;
 }
 
 .create-group-field__label {
+    min-width: 0;
+
     color: var(--color-black);
     font-size: 15px;
     font-weight: 700;
+    line-height: 1.6;
 }
 
 .create-group-field__required {
     margin-left: 4px;
+
     color: var(--color-red);
     font-size: 14px;
 }
 
 .create-group-field__counter {
     flex-shrink: 0;
+
     color: var(--color-black-soft);
     font-size: 12px;
+    line-height: 1.6;
     font-variant-numeric: tabular-nums;
 }
 
+/* 名称达到上限时的提示状态 */
+.create-group-field__counter[data-limit="true"] {
+    color: var(--color-red);
+    font-weight: 700;
+}
+
+
+/* ======================================================
+   六、名称输入框
+====================================================== */
+
 .create-group-field__input {
     display: block;
+
     width: 100%;
+    min-width: 0;
     min-height: 50px;
-    padding: 0 15px;
+
+    padding: 12px 15px;
     box-sizing: border-box;
+
     color: var(--color-black);
     background: var(--color-white-pure);
+
     border: 1px solid var(--color-white-deep);
     border-radius: 6px;
     outline: none;
+
     font-family: inherit;
     font-size: 15px;
     line-height: 1.5;
+
     transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease,
         background-color 0.2s ease;
+
     -webkit-appearance: none;
     appearance: none;
 }
 
 .create-group-field__input::placeholder {
     color: #A7A095;
+    opacity: 1;
 }
 
-.create-group-field__input:hover {
+.create-group-field__input:hover:not(:disabled) {
     border-color: var(--color-yellow-dark);
 }
 
 .create-group-field__input:focus {
     background: var(--color-white-pure);
     border-color: var(--color-cyan);
+
     box-shadow: 0 0 0 3px rgb(40 124 115 / 12%);
 }
 
 .create-group-field__input[aria-invalid="true"] {
     border-color: var(--color-red);
+
     box-shadow: 0 0 0 3px rgb(158 36 40 / 8%);
 }
 
+.create-group-field__input:disabled {
+    color: var(--color-black-soft);
+    background: var(--color-white);
+    cursor: not-allowed;
+}
+
+
+/* ======================================================
+   七、输入说明与错误提示
+====================================================== */
+
 .create-group-field__help {
     margin: 10px 0 0;
+
     color: var(--color-black-soft);
     font-size: 12px;
     line-height: 1.8;
@@ -204,40 +272,53 @@
 
 .create-group-field__error {
     margin: 8px 0 0;
+
     color: var(--color-red);
     font-size: 12px;
     line-height: 1.7;
+    overflow-wrap: anywhere;
 }
 
 .create-group-field__error[hidden] {
-    display: none;
+    display: none !important;
 }
 
 
 /* ======================================================
-   六、操作反馈消息
+   八、操作反馈消息
 ====================================================== */
 
 .create-group-message {
     margin: 0 0 20px;
     padding: 12px 14px;
+    box-sizing: border-box;
+
     color: var(--color-black);
     background: var(--color-white);
+
     border: 1px solid var(--color-white-deep);
     border-radius: 6px;
+
     font-size: 13px;
     line-height: 1.8;
+    overflow-wrap: anywhere;
 }
 
 .create-group-message[hidden] {
-    display: none;
+    display: none !important;
 }
+
+
+/* 创建成功 */
 
 .create-group-message--success {
     color: var(--color-cyan-dark);
     background: rgb(40 124 115 / 7%);
     border-color: rgb(40 124 115 / 25%);
 }
+
+
+/* 创建失败 */
 
 .create-group-message--error {
     color: var(--color-red);
@@ -247,110 +328,148 @@
 
 
 /* ======================================================
-   七、按钮区域
+   九、按钮区域
 ====================================================== */
 
 .create-group-form__actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 12px;
+
     margin-top: 30px;
     padding-top: 24px;
+
     border-top: 1px solid var(--color-white-dark);
 }
+
+
+/* ======================================================
+   十、按钮基础样式
+====================================================== */
 
 .create-group-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+
     min-width: 112px;
     min-height: 44px;
-    padding: 0 20px;
+    padding: 10px 20px;
     box-sizing: border-box;
+
     border: 1px solid transparent;
     border-radius: 6px;
+
     font-family: inherit;
     font-size: 14px;
     font-weight: 600;
+    line-height: 1.5;
     text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease,
         box-shadow 0.2s ease,
         transform 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
 }
+
+
+/* 键盘操作时显示焦点 */
 
 .create-group-button:focus-visible {
     outline: 3px solid rgb(214 177 94 / 55%);
     outline-offset: 3px;
 }
 
-.create-group-button:active {
+
+/* 点击反馈 */
+
+.create-group-button:active:not(:disabled) {
     transform: translateY(1px);
 }
+
+
+/* 禁用状态 */
 
 .create-group-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
 
-/* 取消按钮 */
+/* ======================================================
+   十一、取消按钮
+====================================================== */
 
 .create-group-button--cancel {
     color: var(--color-black-soft);
     background: var(--color-white-pure);
+
     border-color: var(--color-white-deep);
 }
 
-.create-group-button--cancel:hover {
+.create-group-button--cancel:hover:not(:disabled) {
     color: var(--color-red);
     background: var(--color-white);
+
     border-color: var(--color-yellow);
 }
 
 
-/* 创建按钮 */
+/* ======================================================
+   十二、创建按钮
+====================================================== */
 
 .create-group-button--submit {
     color: var(--color-white-pure);
     background: var(--color-cyan);
+
     border-color: var(--color-cyan);
 }
 
-.create-group-button--submit:hover {
+.create-group-button--submit:hover:not(:disabled) {
+    color: var(--color-white-pure);
     background: var(--color-cyan-dark);
+
     border-color: var(--color-cyan-dark);
     box-shadow: 0 3px 10px rgb(40 124 115 / 18%);
 }
 
 
 /* ======================================================
-   八、底部说明
+   十三、底部说明
 ====================================================== */
 
 .create-group-note {
     margin: 22px 0 0;
+
     color: var(--color-black-soft);
     font-size: 12px;
     line-height: 1.9;
     text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .create-group-note__icon {
     margin-right: 5px;
+
     color: var(--color-yellow-dark);
 }
 
 
 /* ======================================================
-   九、平板适配
+   十四、平板适配
 ====================================================== */
 
 @media (max-width: 768px) {
@@ -366,12 +485,14 @@
 
 
 /* ======================================================
-   十、手机适配
+   十五、手机适配
 ====================================================== */
 
 @media (max-width: 480px) {
     .create-group-page {
         min-height: calc(100vh - 120px);
+        min-height: calc(100dvh - 120px);
+
         padding: 24px 16px 32px;
     }
 
@@ -395,11 +516,18 @@
     }
 
     .create-group-heading__divider {
+        gap: 10px;
         margin-top: 18px;
+    }
+
+    .create-group-heading__divider::before,
+    .create-group-heading__divider::after {
+        width: 42px;
     }
 
     .create-group-form {
         padding: 24px 18px;
+
         border-radius: 10px;
     }
 
@@ -428,7 +556,7 @@
         flex: 1;
         min-width: 0;
         min-height: 46px;
-        padding: 0 12px;
+        padding: 10px 12px;
     }
 
     .create-group-note {
@@ -439,7 +567,7 @@
 
 
 /* ======================================================
-   十一、小屏手机适配
+   十六、小屏手机适配
 ====================================================== */
 
 @media (max-width: 360px) {
@@ -454,14 +582,26 @@
 
     .create-group-heading__title {
         font-size: 23px;
+        letter-spacing: 1px;
+    }
+
+    .create-group-heading__divider::before,
+    .create-group-heading__divider::after {
+        width: 32px;
     }
 
     .create-group-field__label-row {
         align-items: flex-start;
+        gap: 8px;
+    }
+
+    .create-group-field__counter {
+        font-size: 11px;
     }
 
     .create-group-form__actions {
         flex-direction: column-reverse;
+        align-items: stretch;
     }
 
     .create-group-button {
@@ -472,12 +612,16 @@
 
 
 /* ======================================================
-   十二、减少动态效果
+   十七、减少动态效果
 ====================================================== */
 
 @media (prefers-reduced-motion: reduce) {
     .create-group-field__input,
     .create-group-button {
         transition: none;
+    }
+
+    .create-group-button:active:not(:disabled) {
+        transform: none;
     }
 }
