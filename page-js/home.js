@@ -10,6 +10,7 @@
    5. 显示首页分组列表
    6. 显示分组名称和分组数量
    7. 监听书籍与分组数据变化
+   8. 检查分组卡片渲染结果
 ====================================================== */
 
 (function () {
@@ -38,29 +39,7 @@
 
 
     /* ==================================================
-       二、检查页面
-    ================================================== */
-
-    function validatePage() {
-        return Boolean(
-            elements.emptyState &&
-            elements.shelfContent &&
-            elements.shelfCount &&
-            elements.shelfList
-        );
-    }
-
-    if (!validatePage()) {
-        console.error(
-            "[WritingHome] 找不到必要的书架页面元素。"
-        );
-
-        return;
-    }
-
-
-    /* ==================================================
-       三、通用工具
+       二、通用工具
     ================================================== */
 
     function escapeHTML(value) {
@@ -122,6 +101,10 @@
     }
 
 
+    /* ==================================================
+       三、书籍数据工具
+    ================================================== */
+
     function getBookTitle(book) {
         const title =
             typeof book.title === "string"
@@ -151,7 +134,6 @@
             return book.cover;
         }
 
-        // 兼容旧版独立封面存储。
         try {
             const legacyData = localStorage.getItem(
                 "writing-software-book-covers"
@@ -171,7 +153,10 @@
                 }
             }
         } catch (error) {
-            // 旧封面数据无法读取时，显示默认封面。
+            console.warn(
+                "[WritingHome] 读取旧版封面失败：",
+                error
+            );
         }
 
         return "";
@@ -240,7 +225,31 @@
 
 
     /* ==================================================
-       六、创建书籍卡片
+       六、打开书籍
+    ================================================== */
+
+    function openBook(bookId) {
+        if (
+            window.WritingNavigation &&
+            typeof window.WritingNavigation.goEditor === "function"
+        ) {
+            window.WritingNavigation.goEditor(bookId);
+            return;
+        }
+
+        const url = new URL(
+            "./pages/editor.html",
+            window.location.href
+        );
+
+        url.searchParams.set("id", bookId);
+
+        window.location.href = url.href;
+    }
+
+
+    /* ==================================================
+       七、创建书籍卡片
     ================================================== */
 
     function createBookCard(book) {
@@ -288,9 +297,11 @@
             ".shelf-card__open"
         );
 
-        openButton.addEventListener("click", function () {
-            openBook(book.id);
-        });
+        if (openButton) {
+            openButton.addEventListener("click", function () {
+                openBook(book.id);
+            });
+        }
 
         const coverImage = card.querySelector(
             ".shelf-card__cover-image"
@@ -314,37 +325,21 @@
 
 
     /* ==================================================
-       七、打开书籍
-    ================================================== */
-
-    function openBook(bookId) {
-        if (
-            window.WritingNavigation &&
-            typeof window.WritingNavigation.goEditor === "function"
-        ) {
-            window.WritingNavigation.goEditor(bookId);
-            return;
-        }
-
-        const url = new URL(
-            "./pages/editor.html",
-            window.location.href
-        );
-
-        url.searchParams.set("id", bookId);
-
-        window.location.href = url.href;
-    }
-
-
-    /* ==================================================
        八、显示空书架
     ================================================== */
 
     function showEmptyState() {
-        elements.emptyState.hidden = false;
-        elements.shelfContent.hidden = true;
-        elements.shelfCount.textContent = "0 本";
+        if (elements.emptyState) {
+            elements.emptyState.hidden = false;
+        }
+
+        if (elements.shelfContent) {
+            elements.shelfContent.hidden = true;
+        }
+
+        if (elements.shelfCount) {
+            elements.shelfCount.textContent = "0 本";
+        }
     }
 
 
@@ -353,6 +348,19 @@
     ================================================== */
 
     function showBooks(books) {
+        if (
+            !elements.emptyState ||
+            !elements.shelfContent ||
+            !elements.shelfCount ||
+            !elements.shelfList
+        ) {
+            console.warn(
+                "[WritingHome] 书架区域不完整，跳过书籍渲染。"
+            );
+
+            return;
+        }
+
         elements.emptyState.hidden = true;
         elements.shelfContent.hidden = false;
 
@@ -362,6 +370,10 @@
         const fragment = document.createDocumentFragment();
 
         books.forEach(function (book) {
+            if (!book || typeof book !== "object") {
+                return;
+            }
+
             fragment.appendChild(
                 createBookCard(book)
             );
@@ -388,10 +400,26 @@
         }
 
         try {
-            const books = window.WritingStorage.getBooks();
+            const result = window.WritingStorage.getBooks();
+
+            if (!Array.isArray(result)) {
+                console.error(
+                    "[WritingHome] 书籍接口没有返回数组。",
+                    result
+                );
+
+                return;
+            }
+
+            const books = result.filter(function (book) {
+                return book && typeof book === "object";
+            });
 
             if (!books.length) {
-                elements.shelfList.replaceChildren();
+                if (elements.shelfList) {
+                    elements.shelfList.replaceChildren();
+                }
+
                 showEmptyState();
                 return;
             }
@@ -415,7 +443,6 @@
         const groupStorage = window.WritingGroupsStorage;
         const writingStorage = window.WritingStorage;
 
-        // 优先使用独立的分组存储接口。
         if (
             groupStorage &&
             typeof groupStorage.getGroups === "function"
@@ -423,7 +450,6 @@
             return groupStorage;
         }
 
-        // 兼容挂载到 WritingStorage 的分组接口。
         if (
             writingStorage &&
             typeof writingStorage.getGroups === "function"
@@ -444,14 +470,7 @@
 
         if (!storage) {
             console.error(
-                "[WritingHome] 未找到分组读取接口。",
-                {
-                    WritingGroupsStorage:
-                        Boolean(window.WritingGroupsStorage),
-
-                    WritingStorage:
-                        Boolean(window.WritingStorage)
-                }
+                "[WritingHome] 未找到分组读取接口。"
             );
 
             return null;
@@ -460,12 +479,10 @@
         try {
             const result = storage.getGroups();
 
-            // 兼容 getGroups() 直接返回数组。
             if (Array.isArray(result)) {
                 return result;
             }
 
-            // 兼容返回 { groups: [...] } 的格式。
             if (
                 result &&
                 typeof result === "object" &&
@@ -475,7 +492,7 @@
             }
 
             console.error(
-                "[WritingHome] 分组接口返回的数据不是有效数组。",
+                "[WritingHome] 分组接口返回的数据格式不正确。",
                 result
             );
 
@@ -543,6 +560,13 @@
             }
         }
 
+        if (
+            typeof group.id === "number" ||
+            typeof group.groupId === "number"
+        ) {
+            return String(group.id ?? group.groupId);
+        }
+
         return "";
     }
 
@@ -563,13 +587,26 @@
             card.dataset.groupId = groupId;
         }
 
+        /*
+         * 同时兼容两套 CSS 类名：
+         *
+         * 旧类名：
+         * home-group-card__icon
+         * home-group-card__name
+         *
+         * 兼容类名：
+         * home-group-card__decoration
+         * home-group-card__title
+         */
+
         card.innerHTML = `
-            <div class="home-group-card__icon" aria-hidden="true">
-                卷
-            </div>
+            <div
+                class="home-group-card__icon home-group-card__decoration"
+                aria-hidden="true"
+            >卷</div>
 
             <div class="home-group-card__body">
-                <h3 class="home-group-card__name">
+                <h3 class="home-group-card__name home-group-card__title">
                     ${escapeHTML(groupName)}
                 </h3>
 
@@ -598,39 +635,105 @@
             !elements.groupsCount ||
             !elements.groupsList
         ) {
-            console.warn(
-                "[WritingHome] 首页没有分组展示区域，请检查 index.html。"
+            console.error(
+                "[WritingHome] 找不到首页分组区域。",
+                {
+                    groupsContent: Boolean(elements.groupsContent),
+                    groupsCount: Boolean(elements.groupsCount),
+                    groupsList: Boolean(elements.groupsList)
+                }
             );
 
             return;
         }
 
-        // 只显示有效的分组对象。
+        if (!Array.isArray(groups)) {
+            console.error(
+                "[WritingHome] showGroups 收到的不是数组。",
+                groups
+            );
+
+            return;
+        }
+
         const validGroups = groups.filter(function (group) {
             return group && typeof group === "object";
         });
 
+        console.log(
+            "[WritingHome] 准备渲染分组：",
+            validGroups.length,
+            validGroups
+        );
+
+        /*
+         * 没有分组时清空卡片并隐藏分组区域。
+         */
+
         if (!validGroups.length) {
             elements.groupsList.replaceChildren();
-            elements.groupsContent.hidden = true;
+
             elements.groupsCount.textContent = "0 个分组";
+
+            elements.groupsContent.hidden = true;
+
             return;
         }
+
+        /*
+         * 有分组时显示分组区域。
+         */
 
         elements.groupsContent.hidden = false;
 
         elements.groupsCount.textContent =
             validGroups.length + " 个分组";
 
+        /*
+         * 创建卡片。
+         */
+
         const fragment = document.createDocumentFragment();
 
         validGroups.forEach(function (group, index) {
-            fragment.appendChild(
-                createGroupCard(group, index)
-            );
+            const card = createGroupCard(group, index);
+
+            fragment.appendChild(card);
         });
 
+        /*
+         * 将卡片放进首页分组列表。
+         */
+
         elements.groupsList.replaceChildren(fragment);
+
+        /*
+         * 检查卡片是否确实插入页面。
+         */
+
+        const renderedCards = elements.groupsList.querySelectorAll(
+            ".home-group-card"
+        );
+
+        console.log(
+            "[WritingHome] 分组卡片渲染完成：",
+            renderedCards.length,
+            "张"
+        );
+
+        /*
+         * 数量不匹配时输出警告，方便进一步排查。
+         */
+
+        if (renderedCards.length !== validGroups.length) {
+            console.error(
+                "[WritingHome] 分组数量与卡片数量不一致。",
+                {
+                    expected: validGroups.length,
+                    actual: renderedCards.length
+                }
+            );
+        }
     }
 
 
@@ -642,7 +745,10 @@
         const groups = readGroups();
 
         if (groups === null) {
-            // 接口异常时不清空页面已有的分组内容。
+            console.error(
+                "[WritingHome] 本次无法刷新分组。"
+            );
+
             return;
         }
 
@@ -678,7 +784,6 @@
     ================================================== */
 
     function listenForGroupChanges() {
-        // 独立分组存储模块的变化监听接口。
         const groupStorage = getGroupsStorage();
 
         if (
@@ -688,11 +793,13 @@
             groupStorage.onChange(function () {
                 renderGroups();
             });
-
-            return;
         }
 
-        // 兼容可能使用的分组事件名称。
+        /*
+         * 无论是否存在 onChange，都监听事件。
+         * 避免存储接口没有提供监听函数时无法刷新。
+         */
+
         window.addEventListener(
             "writing-groups-change",
             renderGroups
@@ -730,6 +837,13 @@
     ================================================== */
 
     function initialize() {
+        console.log("[WritingHome] 首页初始化。");
+
+        /*
+         * 书架和分组分别初始化。
+         * 即使书架区域有问题，也不应阻止分组渲染。
+         */
+
         renderShelf();
 
         renderGroups();
@@ -746,10 +860,16 @@
 
     window.WritingHome = Object.freeze({
         render: renderShelf,
+
         renderGroups: renderGroups,
+
         openBook: openBook
     });
 
+
+    /* ==================================================
+       二十三、启动
+    ================================================== */
 
     initialize();
 
