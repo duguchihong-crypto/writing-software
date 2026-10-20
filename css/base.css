@@ -1,60 +1,84 @@
 /* ==================================================
-   写作软件 · 公共基础样式
-   职责：基础色彩、字体、布局、安全区域
+   文墨写作软件
+   公共设计系统
 ================================================== */
+
+
+/* ------------------------------
+   1. 传统五色设计规范
+------------------------------ */
 
 :root {
     /* 五色体系 */
-    --color-red: #a72f32;
-    --color-red-dark: #792124;
-    --color-red-light: #d46b5f;
 
-    --color-blue: #245e59;
-    --color-blue-light: #8bb9a9;
-    --color-blue-pale: #e4eee8;
+    --color-red: #A83232;
+    --color-red-light: #C65A4A;
+    --color-red-dark: #762424;
 
-    --color-yellow: #d3ad57;
-    --color-yellow-light: #f0dca2;
-    --color-yellow-dark: #8e6d2d;
+    --color-blue: #376B68;
+    --color-blue-light: #6D9990;
+    --color-blue-dark: #254B49;
 
-    --color-black: #241c1a;
-    --color-black-soft: #382c28;
-    --color-ink: #352d29;
+    --color-yellow: #D6B15C;
+    --color-yellow-light: #E9D59B;
+    --color-yellow-dark: #9C7731;
 
-    --color-white: #fffdf7;
-    --color-paper: #f7f1e5;
-    --color-paper-dark: #e9dfcc;
+    --color-black: #242522;
+    --color-black-light: #353630;
+    --color-black-dark: #171815;
 
-    /* 文字 */
-    --text-primary: #352d29;
-    --text-secondary: #82776a;
-    --text-muted: #a69a89;
-    --text-light: #fffaf0;
+    --color-white: #F8F5ED;
+    --color-white-pure: #FFFFFF;
+    --color-paper: #F1EBDD;
 
-    /* 边框 */
-    --border-paper: #e6dac4;
-    --border-gold: rgba(211, 173, 87, 0.55);
+    /* 辅助色 */
 
-    /* 阴影 */
-    --shadow-soft:
-        0 5px 18px rgba(52, 36, 24, 0.06);
+    --color-text: #302F2A;
+    --color-text-secondary: #77746B;
+    --color-border: #DED5C3;
+    --color-border-light: #EAE3D6;
 
-    --shadow-card:
-        0 8px 24px rgba(52, 36, 24, 0.08);
+    /* 字体 */
+
+    --font-main:
+        -apple-system,
+        BlinkMacSystemFont,
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        sans-serif;
+
+    --font-classical:
+        "Songti SC",
+        "STSong",
+        "SimSun",
+        serif;
 
     /* 布局 */
-    --header-height: 76px;
-    --navigation-height: 72px;
 
-    --page-width: 900px;
+    --header-height: 68px;
+    --nav-height: 72px;
+    --content-width: 760px;
 
     /* 圆角 */
+
     --radius-small: 8px;
     --radius-medium: 14px;
     --radius-large: 20px;
+
+    /* 阴影 */
+
+    --shadow-card:
+        0 5px 18px rgba(51, 42, 26, 0.055);
+
+    --shadow-raised:
+        0 8px 24px rgba(35, 31, 22, 0.12);
 }
 
-/* 基础重置 */
+
+/* ------------------------------
+   2. 基础重置
+------------------------------ */
 
 * {
     box-sizing: border-box;
@@ -62,32 +86,20 @@
 
 html {
     min-height: 100%;
-    background: var(--color-paper);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
 }
 
 body {
-    margin: 0;
     min-height: 100vh;
-    min-height: 100dvh;
+    margin: 0;
 
-    color: var(--text-primary);
+    font-family: var(--font-main);
 
-    font-family:
-        "Noto Serif SC",
-        "Songti SC",
-        "STSong",
-        "SimSun",
-        serif;
+    color: var(--color-text);
+    background: var(--color-white);
 
-    background:
-        radial-gradient(
-            ellipse at 50% 0%,
-            rgba(255, 255, 255, 0.85),
-            transparent 60%
-        ),
-        var(--color-paper);
+    -webkit-tap-highlight-color: transparent;
 }
 
 button,
@@ -102,98 +114,136 @@ a {
     -webkit-tap-highlight-color: transparent;
 }
 
+button {
+    cursor: pointer;
+}
+
 a {
     color: inherit;
     text-decoration: none;
 }
 
-button {
-    cursor: pointer;
+img,
+svg {
+    display: block;
+    max-width: 100%;
 }
 
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-    outline: 2px solid var(--color-yellow-dark);
+    outline: 2px solid var(--color-blue);
     outline-offset: 3px;
 }
 
-img,
-svg {
-    max-width: 100%;
-}
 
-/* 应用整体 */
+/* ------------------------------
+   3. 公共按钮
+------------------------------ */
 
-.app-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
-}
-
-/* 中间内容区独立滚动 */
-
-.main-content {
-    width: 100%;
-    max-width: var(--page-width);
-
-    min-height: calc(
-        100vh -
-        var(--header-height) -
-        var(--navigation-height)
-    );
-
-    margin: 0 auto;
-
-    padding:
-        calc(var(--header-height) + 22px)
-        22px
-        calc(var(--navigation-height) + 30px);
-}
-
-/* 通用标题 */
-
-.section-heading {
-    display: flex;
+.button {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    justify-content: center;
+    gap: 5px;
 
-    margin-bottom: 18px;
+    min-height: 40px;
+    padding: 0 13px;
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-small);
+
+    font-size: 14px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.section-heading h2 {
-    margin: 5px 0 0;
-
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: 1px;
+.button:active {
+    transform: scale(0.97);
 }
 
-.section-eyebrow {
-    color: var(--color-red);
+.button-primary {
+    color: var(--color-white-pure);
 
-    font-family: Arial, sans-serif;
-    font-size: 9px;
-    font-weight: 700;
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-red-light),
+            var(--color-red)
+        );
 
-    letter-spacing: 2px;
+    border-color: var(--color-red-dark);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 2px 5px rgba(118, 36, 36, 0.15);
 }
 
-/* 传统装饰细线 */
+.button-primary:hover {
+    background: var(--color-red-dark);
+}
 
-.classical-line {
+
+/* ------------------------------
+   4. 公共分隔装饰
+------------------------------ */
+
+.ornament-line {
+    display: inline-block;
+
+    width: 24px;
     height: 1px;
 
-    background: linear-gradient(
-        90deg,
-        transparent,
-        var(--color-yellow),
-        transparent
-    );
+    background: var(--color-yellow-dark);
 }
 
-/* 减少动态效果 */
+.classical-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.classical-divider::before,
+.classical-divider::after {
+    content: "";
+
+    flex: 1;
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--color-border),
+            transparent
+        );
+}
+
+
+/* ------------------------------
+   5. 公共文字
+------------------------------ */
+
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.classical-title {
+    font-family: var(--font-classical);
+    font-weight: 600;
+}
+
+
+/* ------------------------------
+   6. 减少动态效果
+------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -202,19 +252,5 @@ svg {
         scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
-    }
-}
-
-/* 手机适配 */
-
-@media (max-width: 480px) {
-    :root {
-        --header-height: 68px;
-        --navigation-height: 68px;
-    }
-
-    .main-content {
-        padding-left: 17px;
-        padding-right: 17px;
     }
 }
