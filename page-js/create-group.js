@@ -11,7 +11,9 @@
    6. 取消创建及返回操作
    7. 提示未保存内容
    8. 防止重复提交
-   9. 兼容 WritingStorage 和 WritingNavigation
+   9. 兼容 WritingGroupsStorage
+   10. 兼容 WritingStorage
+   11. 兼容 WritingNavigation
 ====================================================== */
 
 (function () {
@@ -113,7 +115,9 @@
             message.classList.add(
                 "create-group-message--success"
             );
-        } else if (type === "error") {
+        }
+
+        if (type === "error") {
             message.classList.add(
                 "create-group-message--error"
             );
@@ -186,10 +190,6 @@
         nameCounter.textContent =
             length + " / " + maxLength;
 
-        /*
-         * 接近字数上限时增加提示状态。
-         */
-
         if (length >= maxLength) {
             nameCounter.setAttribute(
                 "data-limit",
@@ -250,13 +250,8 @@
         }
 
         if (submitting) {
-            /*
-             * 保留按钮结构，避免丢失原有图标。
-             */
-
             submitButton.innerHTML =
-                '<span class="create-group-actions__icon" ' +
-                'aria-hidden="true">…</span>' +
+                '<span aria-hidden="true">…</span>' +
                 '<span>正在创建</span>';
 
             submitButton.setAttribute(
@@ -276,27 +271,59 @@
 
     /* ==================================================
        十、获取分组存储模块
+
+       优先使用独立的分组接口。
+
+       如果独立接口不存在，再尝试
+       WritingStorage 中的兼容接口。
     ================================================== */
 
     function getStorage() {
-        const storage = window.WritingStorage;
+        const groupStorage =
+            window.WritingGroupsStorage;
 
-        if (!storage) {
-            throw new Error(
-                "书籍存储模块尚未加载，请刷新页面后重试。"
-            );
-        }
+        const writingStorage =
+            window.WritingStorage;
+
+        /*
+         * 优先检查独立分组存储接口。
+         */
 
         if (
-            typeof storage.createGroup !== "function" ||
-            typeof storage.getGroups !== "function"
+            groupStorage &&
+            typeof groupStorage.createGroup === "function" &&
+            typeof groupStorage.getGroups === "function"
         ) {
+            return groupStorage;
+        }
+
+        /*
+         * 其次检查兼容接口。
+         */
+
+        if (
+            writingStorage &&
+            typeof writingStorage.createGroup === "function" &&
+            typeof writingStorage.getGroups === "function"
+        ) {
+            return writingStorage;
+        }
+
+        /*
+         * 尝试明确判断加载问题。
+         */
+
+        if (!window.WritingGroupsStorage) {
             throw new Error(
-                "分组存储模块尚未正确加载，请检查 js/groups-storage.js。"
+                "未找到独立分组存储接口。请检查 " +
+                "js/groups-storage.js 是否加载成功，以及文件路径是否正确。"
             );
         }
 
-        return storage;
+        throw new Error(
+            "分组存储接口缺少必要的方法。请检查 " +
+            "js/groups-storage.js 中的 createGroup 和 getGroups 方法。"
+        );
     }
 
 
@@ -306,7 +333,7 @@
 
     function hasDuplicateName(storage, name) {
         /*
-         * 优先调用存储模块提供的方法。
+         * 优先使用存储模块提供的方法。
          */
 
         if (
@@ -316,7 +343,7 @@
         }
 
         /*
-         * 兼容其他版本的存储接口。
+         * 兼容没有 hasGroupName 的旧版本。
          */
 
         const groups = storage.getGroups();
@@ -354,9 +381,7 @@
             window.WritingNavigation &&
             typeof window.WritingNavigation.navigate === "function"
         ) {
-            window.WritingNavigation.navigate(
-                "create"
-            );
+            window.WritingNavigation.navigate("create");
 
             return;
         }
@@ -373,7 +398,7 @@
         event.preventDefault();
 
         /*
-         * 阻止重复提交。
+         * 防止重复提交。
          */
 
         if (isSubmitting || isSaved) {
@@ -404,13 +429,13 @@
 
         try {
             /*
-             * 获取存储接口。
+             * 获取正确的分组存储接口。
              */
 
             const storage = getStorage();
 
             /*
-             * 检查名称重复。
+             * 检查重复名称。
              */
 
             if (hasDuplicateName(storage, name)) {
@@ -426,7 +451,7 @@
             }
 
             /*
-             * 保存分组。
+             * 创建并保存分组。
              */
 
             const group = storage.createGroup({
@@ -434,7 +459,7 @@
             });
 
             /*
-             * 检查返回结果。
+             * 验证返回结果。
              */
 
             if (
@@ -448,7 +473,7 @@
             }
 
             /*
-             * 创建成功。
+             * 标记创建成功。
              */
 
             isSaved = true;
@@ -456,13 +481,14 @@
             originalName = name;
 
             showMessage(
-                "分组「" + group.name +
+                "分组「" +
+                group.name +
                 "」创建成功！正在返回……",
                 "success"
             );
 
             /*
-             * 延迟返回，让成功提示可以显示。
+             * 创建成功后延迟返回。
              */
 
             redirectTimer = window.setTimeout(
@@ -505,7 +531,7 @@
             currentName !== originalName.trim();
 
         /*
-         * 有未保存的输入内容时询问用户。
+         * 输入内容发生变化时，提示用户。
          */
 
         if (hasChanged && !isSaved) {
@@ -534,6 +560,7 @@
         hideMessage();
     }
 
+
     nameInput.addEventListener(
         "input",
         handleInput
@@ -547,11 +574,6 @@
     nameInput.addEventListener(
         "blur",
         function () {
-            /*
-             * 空名称不在失去焦点时立即报错，
-             * 提交时再显示必填提示。
-             */
-
             if (nameInput.value.trim()) {
                 validateName();
             }
@@ -595,10 +617,6 @@
     window.addEventListener(
         "beforeunload",
         function (event) {
-            /*
-             * 正在保存或已经保存成功时不提示。
-             */
-
             if (isSubmitting || isSaved) {
                 return;
             }
@@ -636,7 +654,22 @@
         console.log(
             "[新建分组] 页面初始化成功。"
         );
+
+        /*
+         * 输出接口加载情况，便于排查问题。
+         */
+
+        console.log(
+            "[新建分组] WritingGroupsStorage：",
+            Boolean(window.WritingGroupsStorage)
+        );
+
+        console.log(
+            "[新建分组] WritingStorage：",
+            Boolean(window.WritingStorage)
+        );
     }
+
 
     init();
 
