@@ -8,10 +8,10 @@
    2. 控制首页主体与底部导航的位置。
    3. 展示空书架提示。
    4. 展示分组列表与分组卡片。
-   5. 分组卡片只显示组名字。
+   5. 展示分组名称与独立的删除按钮。
    6. 展示书籍封面、书名、简介与作品信息。
    7. 提供没有封面时的传统国风默认封面。
-   8. 保留书籍卡片按钮样式。
+   8. 提供独立的书籍删除按钮样式。
    9. 适配手机、平板与电脑。
 
    注意：
@@ -331,22 +331,6 @@
    十一、分组卡片
 ============================================================ */
 
-/*
- * 每张分组卡片只显示组名字。
- *
- * 不显示：
- * - 分组数量
- * - 分组简介
- * - 分组编号
- * - 图标
- * - 右侧箭头
- *
- * 对应 home.js：
- *
- * .home-group-card
- * .home-group-card__name
- */
-
 .home-group-card {
     position: relative;
 
@@ -407,6 +391,8 @@
             var(--color-yellow),
             var(--color-yellow-dark)
         );
+
+    pointer-events: none;
 }
 
 
@@ -426,6 +412,8 @@
     background-color: var(--color-red);
 
     opacity: 0.55;
+
+    pointer-events: none;
 }
 
 
@@ -517,7 +505,89 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十四、作品区域
+   十四、分组删除按钮
+============================================================ */
+
+/*
+ * 对应独立模块：
+ * page-js/home-group-delete.js
+ *
+ * 职责：
+ * 1. 只控制分组删除按钮的外观。
+ * 2. 不负责删除分组。
+ * 3. 不负责读取或修改分组数据。
+ * 4. 不干扰分组名称。
+ */
+
+.home-group-card__delete {
+    position: relative;
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+
+    flex: 0 0 auto;
+
+    min-width: 64px;
+    min-height: 34px;
+
+    margin-top: 14px;
+    padding: 7px 14px;
+
+    color: var(--color-red);
+
+    background-color: transparent;
+
+    border: 1px solid var(--color-red);
+    border-radius: 5px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1.5;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+@media (hover: hover) {
+
+    .home-group-card__delete:hover {
+        color: var(--theme-text-inverse);
+
+        background-color: var(--color-red);
+
+        border-color: var(--color-red);
+    }
+
+}
+
+
+.home-group-card__delete:active {
+    opacity: 0.8;
+}
+
+
+.home-group-card__delete:focus-visible {
+    outline: 2px solid var(--color-cyan);
+
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   十五、作品区域
 ============================================================ */
 
 .shelf-content {
@@ -533,7 +603,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十五、作品区域标题栏
+   十六、作品区域标题栏
 ============================================================ */
 
 .shelf-content__header {
@@ -583,7 +653,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十六、作品列表
+   十七、作品列表
 ============================================================ */
 
 .shelf-list {
@@ -607,7 +677,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十七、作品卡片
+   十八、作品卡片
 ============================================================ */
 
 .shelf-card {
@@ -651,11 +721,13 @@ a.home-group-card:focus-visible {
     content: "";
 
     background-color: var(--color-yellow);
+
+    pointer-events: none;
 }
 
 
 /* ============================================================
-   十八、卡片点击区域
+   十九、卡片点击区域
 ============================================================ */
 
 .shelf-card__open {
@@ -699,7 +771,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十九、卡片悬停效果
+   二十、卡片悬停效果
 ============================================================ */
 
 @media (hover: hover) {
@@ -726,7 +798,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十、书籍封面容器
+   二十一、书籍封面容器
 ============================================================ */
 
 .shelf-card__cover {
@@ -751,7 +823,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十一、真实封面图片
+   二十二、真实封面图片
 ============================================================ */
 
 .shelf-card__cover-image {
@@ -772,7 +844,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十二、默认封面
+   二十三、默认封面
 ============================================================ */
 
 .shelf-card__cover--default {
@@ -806,7 +878,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十三、默认封面外框
+   二十四、默认封面外框
 ============================================================ */
 
 .shelf-card__cover--default::before {
@@ -836,7 +908,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十四、默认封面角落装饰
+   二十五、默认封面角落装饰
 ============================================================ */
 
 .shelf-card__cover-decoration {
@@ -871,7 +943,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十五、默认封面中心文字
+   二十六、默认封面中心文字
 ============================================================ */
 
 .shelf-card__cover-character {
@@ -909,7 +981,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十六、默认封面书名
+   二十七、默认封面书名
 ============================================================ */
 
 .shelf-card__cover-title {
@@ -946,7 +1018,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十七、封面备用容器
+   二十八、封面备用容器
 ============================================================ */
 
 .shelf-card__cover-fallback {
@@ -962,7 +1034,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十八、书籍信息区域
+   二十九、书籍信息区域
 ============================================================ */
 
 .shelf-card__body {
@@ -978,7 +1050,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十九、书籍标题
+   三十、书籍标题
 ============================================================ */
 
 .shelf-card__title {
@@ -1010,7 +1082,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十、书籍简介
+   三十一、书籍简介
 ============================================================ */
 
 .shelf-card__description {
@@ -1036,7 +1108,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十一、书籍信息区域
+   三十二、书籍信息区域
 ============================================================ */
 
 .shelf-card__meta {
@@ -1057,7 +1129,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十二、字数信息
+   三十三、字数信息
 ============================================================ */
 
 .shelf-card__word-count {
@@ -1082,7 +1154,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十三、更新时间
+   三十四、更新时间
 ============================================================ */
 
 .shelf-card__updated-at {
@@ -1097,10 +1169,19 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十四、卡片操作区域
+   三十五、书籍卡片操作区域
 ============================================================ */
 
-.shelf-card__actions {
+/*
+ * 兼容现有 .shelf-card__actions 类名。
+ * 书籍操作区域独立于打开作品的按钮。
+ */
+
+.shelf-card__actions,
+.shelf-card__manage {
+    position: relative;
+    z-index: 3;
+
     display: flex;
     align-items: center;
 
@@ -1108,12 +1189,22 @@ a.home-group-card:focus-visible {
 
     gap: 8px;
 
+    margin: 0;
+    padding: 12px 14px 14px;
+}
+
+
+/* 如果操作区域位于书籍信息区域内部 */
+
+.shelf-card__body > .shelf-card__actions,
+.shelf-card__body > .shelf-card__manage {
     margin-top: 14px;
+    padding: 0;
 }
 
 
 /* ============================================================
-   三十五、通用卡片按钮
+   三十六、通用卡片按钮
 ============================================================ */
 
 .shelf-card__button {
@@ -1148,7 +1239,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十六、打开作品按钮
+   三十七、打开作品按钮
 ============================================================ */
 
 .shelf-card__button--open {
@@ -1178,7 +1269,84 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十七、底部导航布局保障
+   三十八、书籍删除按钮
+============================================================ */
+
+/*
+ * 对应独立模块：
+ * page-js/home-book-delete.js
+ *
+ * 职责：
+ * 1. 只控制书籍删除按钮的外观。
+ * 2. 不负责删除书籍。
+ * 3. 不负责读取或修改书籍数据。
+ * 4. 不干扰打开作品按钮。
+ */
+
+.shelf-card__delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    min-width: 64px;
+    min-height: 34px;
+
+    padding: 7px 14px;
+
+    color: var(--color-red);
+
+    background-color: transparent;
+
+    border: 1px solid var(--color-red);
+    border-radius: 5px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1.5;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+@media (hover: hover) {
+
+    .shelf-card__delete:hover {
+        color: var(--theme-text-inverse);
+
+        background-color: var(--color-red);
+
+        border-color: var(--color-red);
+    }
+
+}
+
+
+.shelf-card__delete:active {
+    opacity: 0.8;
+}
+
+
+.shelf-card__delete:focus-visible {
+    outline: 2px solid var(--color-cyan);
+
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   三十九、底部导航布局保障
 ============================================================ */
 
 .app-footer {
@@ -1194,7 +1362,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十八、平板适配
+   四十、平板适配
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -1225,11 +1393,17 @@ a.home-group-card:focus-visible {
     .home-group-card {
         min-height: 82px;
 
-        padding: 18px 18px;
+        padding: 18px;
     }
 
     .home-group-card__name {
         font-size: 17px;
+    }
+
+    .home-group-card__delete {
+        min-height: 36px;
+
+        margin-top: 12px;
     }
 
     .shelf-content {
@@ -1255,11 +1429,16 @@ a.home-group-card:focus-visible {
         font-size: 16px;
     }
 
+    .shelf-card__actions,
+    .shelf-card__manage {
+        padding: 10px 12px 12px;
+    }
+
 }
 
 
 /* ============================================================
-   三十九、手机适配
+   四十一、手机适配
 ============================================================ */
 
 @media (max-width: 480px) {
@@ -1328,6 +1507,12 @@ a.home-group-card:focus-visible {
         font-size: 17px;
     }
 
+    .home-group-card__delete {
+        min-height: 38px;
+
+        padding: 8px 14px;
+    }
+
     .shelf-content {
         padding: 24px 16px 32px;
     }
@@ -1394,11 +1579,24 @@ a.home-group-card:focus-visible {
         inset: 10px;
     }
 
+    .shelf-card__actions,
+    .shelf-card__manage {
+        gap: 8px;
+
+        padding: 10px 12px 12px;
+    }
+
+    .shelf-card__delete {
+        min-height: 38px;
+
+        padding: 8px 14px;
+    }
+
 }
 
 
 /* ============================================================
-   四十、超小屏幕适配
+   四十二、超小屏幕适配
 ============================================================ */
 
 @media (max-width: 360px) {
@@ -1440,6 +1638,10 @@ a.home-group-card:focus-visible {
         font-size: 16px;
     }
 
+    .home-group-card__delete {
+        max-width: 100%;
+    }
+
     .shelf-content {
         padding-right: 12px;
         padding-left: 12px;
@@ -1458,19 +1660,31 @@ a.home-group-card:focus-visible {
         left: 12px;
     }
 
+    .shelf-card__actions,
+    .shelf-card__manage {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .shelf-card__delete {
+        max-width: 100%;
+    }
+
 }
 
 
 /* ============================================================
-   四十一、减少动态效果
+   四十三、减少动态效果
 ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
 
     .home-group-card,
+    .home-group-card__delete,
     .shelf-card,
     .shelf-card__open,
-    .shelf-card__button {
+    .shelf-card__button,
+    .shelf-card__delete {
         transition: none;
     }
 
