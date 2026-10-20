@@ -1,407 +1,488 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#9E2428"
-    >
-
-    <meta
-        name="description"
-        content="创建新的写作分组，整理你的书籍与作品。"
-    >
-
-    <title>新建分组 · 写作软件</title>
-
-
-    <!-- ==================================================
-         一、公共主题样式
-    ================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="../css/theme.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/base.css"
-    >
-
-
-    <!-- ==================================================
-         二、公共导航样式
-    ================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="../css/header.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/footer.css"
-    >
-
-
-    <!-- ==================================================
-         三、当前页面样式
-    ================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="../page-css/create-group.css"
-    >
-
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+<meta
+    name="theme-color"
+    content="#9E2428"
+>
+<meta
+    name="description"
+    content="创建新的写作分组，整理你的书籍与作品。"
+>
+<title>新建分组 · 写作软件</title>
+<!-- ==================================================
+     一、公共主题样式
+================================================== -->
+<link
+    rel="stylesheet"
+    href="../css/theme.css"
+>
+<link
+    rel="stylesheet"
+    href="../css/base.css"
+>
+<!-- ==================================================
+     二、公共导航样式
+================================================== -->
+<link
+    rel="stylesheet"
+    href="../css/header.css"
+>
+<link
+    rel="stylesheet"
+    href="../css/footer.css"
+>
+<!-- ==================================================
+     三、当前页面样式
+================================================== -->
+<link
+    rel="stylesheet"
+    href="../page-css/create-group.css"
+>
+<!-- ==================================================
+     四、页面附加样式
+================================================== -->
+<style>
+    .create-group-header__label {
+        color: var(--color-white-pure);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    .create-group-field__input-wrap {
+        position: relative;
+        width: 100%;
+    }
+    .create-group-field__input-wrap .create-group-field__input {
+        padding-right: 76px;
+    }
+    .create-group-field__counter {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        color: var(--color-black-soft);
+        font-size: 12px;
+        pointer-events: none;
+    }
+    .create-group-emblem__outer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--color-yellow);
+        border-radius: 50%;
+    }
+    .create-group-emblem__inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 82%;
+        height: 82%;
+        border: 1px solid var(--color-yellow-soft);
+        border-radius: 50%;
+    }
+    .create-group-emblem__inner span {
+        color: var(--color-red);
+        font-family: "Noto Serif SC", "Songti SC", serif;
+        font-size: 30px;
+        font-weight: 700;
+    }
+    .create-group-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 24px;
+        border-top: 1px solid var(--color-white-dark);
+    }
+    .create-group-actions__button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 112px;
+        min-height: 44px;
+        padding: 0 20px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .create-group-actions__button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .create-group-actions__button--cancel {
+        color: var(--color-black-soft);
+        background: var(--color-white-pure);
+        border-color: var(--color-white-deep);
+    }
+    .create-group-actions__button--cancel:hover {
+        color: var(--color-red);
+        border-color: var(--color-yellow);
+    }
+    .create-group-actions__button--submit {
+        color: var(--color-white-pure);
+        background: var(--color-cyan);
+        border-color: var(--color-cyan);
+    }
+    .create-group-actions__button--submit:hover {
+        background: var(--color-cyan-dark);
+        border-color: var(--color-cyan-dark);
+    }
+    .create-group-actions__button:focus-visible {
+        outline: 3px solid var(--color-yellow);
+        outline-offset: 3px;
+    }
+    .create-group-actions__icon {
+        font-size: 18px;
+        line-height: 1;
+    }
+    .create-group-note {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 22px;
+        color: var(--color-black-soft);
+        font-size: 12px;
+        line-height: 1.9;
+        text-align: center;
+    }
+    .create-group-note p {
+        margin: 0;
+    }
+    .create-group-note__icon {
+        flex-shrink: 0;
+        color: var(--color-yellow-dark);
+    }
+    .create-group-field__input[aria-invalid="true"] {
+        border-color: var(--color-red);
+        box-shadow: 0 0 0 3px rgb(158 36 40 / 8%);
+    }
+    .create-group-message--success {
+        color: var(--color-cyan-dark);
+        background: rgb(40 124 115 / 7%);
+        border-color: rgb(40 124 115 / 25%);
+    }
+    .create-group-message--error {
+        color: var(--color-red);
+        background: rgb(158 36 40 / 5%);
+        border-color: rgb(158 36 40 / 20%);
+    }
+    @media (max-width: 480px) {
+        .create-group-actions {
+            gap: 10px;
+        }
+        .create-group-actions__button {
+            flex: 1;
+            min-width: 0;
+            min-height: 46px;
+            padding: 0 12px;
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .create-group-actions__button {
+            transition: none;
+        }
+    }
+</style>
 </head>
-
-
 <body>
-
-    <div id="app">
-
-
-        <!-- ==============================================
-             一、顶部导航栏
-        ============================================== -->
-
-        <header class="app-header">
-
-            <!-- 返回按钮 -->
-
-            <div class="app-header__brand">
-
-                <button
-                    class="app-header__button app-header__button--settings"
-                    id="cancel-create-group-top"
-                    type="button"
-                    aria-label="返回新建选择页"
+<div id="app">
+    <!-- ==============================================
+         一、顶部导航栏
+    ============================================== -->
+    <header
+        class="app-header"
+        id="app-header"
+    >
+        <div class="app-header__brand">
+            <span class="app-header__brand-name">
+                写作软件
+            </span>
+        </div>
+        <div class="app-header__actions">
+            <button
+                class="app-header__button app-header__button--settings"
+                id="cancel-create-group-top"
+                type="button"
+                aria-label="返回新建选择页"
+            >
+                <span aria-hidden="true">←</span>
+                <span>返回</span>
+            </button>
+        </div>
+    </header>
+    <!-- ==============================================
+         二、页面主体
+    ============================================== -->
+    <main class="app-main">
+        <section
+            class="create-group-page"
+            aria-labelledby="create-group-title"
+        >
+            <!-- 页面标题 -->
+            <header class="create-group-heading">
+                <div
+                    class="create-group-heading__ornament"
+                    aria-hidden="true"
                 >
-                    <span aria-hidden="true">←</span>
-
-                    <span>返回</span>
-                </button>
-
-            </div>
-
-
-            <!-- 页面操作 -->
-
-            <div class="app-header__actions">
-
-                <span class="create-group-header__label">
+                    ✦
+                </div>
+                <h1
+                    class="create-group-heading__title"
+                    id="create-group-title"
+                >
                     新建分组
-                </span>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- ==============================================
-             二、页面主体
-        ============================================== -->
-
-        <main class="app-main">
-
-            <section class="create-group-page">
-
-
-                <!-- ======================================
-                     2.1 页面标题
-                ====================================== -->
-
-                <header class="create-group-heading">
-
-                    <div
-                        class="create-group-heading__ornament"
-                        aria-hidden="true"
-                    >
-                        ✦
-                    </div>
-
-                    <h1 class="create-group-heading__title">
-                        新建分组
-                    </h1>
-
-                    <p class="create-group-heading__subtitle">
-                        分类整理，让每一部作品各有归处。
-                    </p>
-
-                    <div
-                        class="create-group-heading__divider"
-                        aria-hidden="true"
-                    ></div>
-
-                </header>
-
-
-
-                <!-- ======================================
-                     2.2 分组表单
-                ====================================== -->
-
-                <form
-                    class="create-group-form"
-                    id="create-group-form"
-                    novalidate
+                </h1>
+                <p class="create-group-heading__subtitle">
+                    分类整理，让每一部作品各有归处。
+                </p>
+                <div
+                    class="create-group-heading__divider"
+                    aria-hidden="true"
                 >
-
-
-                    <!-- 分组图标 -->
-
-                    <div
-                        class="create-group-emblem"
-                        aria-hidden="true"
-                    >
-
-                        <div class="create-group-emblem__outer">
-
-                            <div class="create-group-emblem__inner">
-
-                                <span>卷</span>
-
-                            </div>
-
+                    <span></span>
+                </div>
+            </header>
+            <!-- ======================================
+                 新建分组表单
+            ====================================== -->
+            <form
+                class="create-group-form"
+                id="create-group-form"
+                novalidate
+            >
+                <!-- 分组图标 -->
+                <div
+                    class="create-group-emblem"
+                    aria-hidden="true"
+                >
+                    <div class="create-group-emblem__outer">
+                        <div class="create-group-emblem__inner">
+                            <span>卷</span>
                         </div>
-
                     </div>
-
-
-
-                    <!-- 分组名称 -->
-
-                    <div class="create-group-field">
-
+                </div>
+                <!-- 分组名称 -->
+                <div class="create-group-field">
+                    <div class="create-group-field__label-row">
                         <label
                             class="create-group-field__label"
                             for="group-name"
                         >
                             分组名称
-
                             <span
                                 class="create-group-field__required"
-                                aria-label="必填"
+                                aria-hidden="true"
                             >
                                 *
                             </span>
-
                         </label>
-
-
-                        <div class="create-group-field__input-wrap">
-
-                            <input
-                                class="create-group-field__input"
-                                id="group-name"
-                                name="groupName"
-                                type="text"
-                                placeholder="请输入分组名称"
-                                maxlength="50"
-                                autocomplete="off"
-                                required
-                                aria-describedby="group-name-help group-name-error"
-                            >
-
-                            <span
-                                class="create-group-field__counter"
-                                id="group-name-counter"
-                                aria-live="polite"
-                            >
-                                0 / 50
-                            </span>
-
-                        </div>
-
-
-                        <p
-                            class="create-group-field__help"
-                            id="group-name-help"
-                        >
-                            为你的作品分类，例如：奇幻小说、历史架空、短篇集。
-                        </p>
-
-
-                        <p
-                            class="create-group-field__error"
-                            id="group-name-error"
-                            role="alert"
-                            hidden
-                        ></p>
-
                     </div>
-
-
-
-                    <!-- 提示信息 -->
-
-                    <div
-                        class="create-group-message"
-                        id="create-group-message"
-                        role="status"
-                        aria-live="polite"
-                        hidden
-                    ></div>
-
-
-
-                    <!-- ==================================
-                         2.3 操作按钮
-                    ================================== -->
-
-                    <div class="create-group-actions">
-
-
-                        <!-- 取消 -->
-
-                        <button
-                            class="create-group-actions__button create-group-actions__button--cancel"
-                            id="cancel-create-group"
-                            type="button"
+                    <div class="create-group-field__input-wrap">
+                        <input
+                            class="create-group-field__input"
+                            id="group-name"
+                            name="groupName"
+                            type="text"
+                            placeholder="请输入分组名称"
+                            maxlength="50"
+                            autocomplete="off"
+                            required
+                            aria-describedby="group-name-help group-name-error"
                         >
-                            取消
-                        </button>
-
-
-                        <!-- 创建 -->
-
-                        <button
-                            class="create-group-actions__button create-group-actions__button--submit"
-                            id="create-group-submit"
-                            type="submit"
+                        <span
+                            class="create-group-field__counter"
+                            id="group-name-counter"
+                            aria-live="polite"
                         >
-                            <span
-                                class="create-group-actions__icon"
-                                aria-hidden="true"
-                            >
-                                ＋
-                            </span>
-
-                            <span>创建分组</span>
-                        </button>
-
+                            0 / 50
+                        </span>
                     </div>
-
-
-                </form>
-
-
-
-                <!-- ======================================
-                     2.4 页面底部说明
-                ====================================== -->
-
-                <aside class="create-group-note">
-
-                    <span
-                        class="create-group-note__icon"
-                        aria-hidden="true"
+                    <p
+                        class="create-group-field__help"
+                        id="group-name-help"
                     >
-                        ◈
-                    </span>
-
-                    <p>
-                        分组用于整理书籍，不会改变作品本身的内容。
+                        为你的作品分类，例如：奇幻小说、历史架空、短篇集。
                     </p>
-
-                </aside>
-
-
-            </section>
-
-        </main>
-
-
-
-        <!-- ==============================================
-             三、底部导航栏
-        ============================================== -->
-
-        <footer class="app-footer">
-
-            <nav
-                class="bottom-nav"
-                aria-label="主导航"
+                    <p
+                        class="create-group-field__error"
+                        id="group-name-error"
+                        role="alert"
+                        hidden
+                    ></p>
+                </div>
+                <!-- 操作反馈 -->
+                <div
+                    class="create-group-message"
+                    id="create-group-message"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></div>
+                <!-- 操作按钮 -->
+                <div class="create-group-actions">
+                    <button
+                        class="create-group-actions__button create-group-actions__button--cancel"
+                        id="cancel-create-group"
+                        type="button"
+                    >
+                        取消
+                    </button>
+                    <button
+                        class="create-group-actions__button create-group-actions__button--submit"
+                        id="create-group-submit"
+                        type="submit"
+                    >
+                        <span
+                            class="create-group-actions__icon"
+                            aria-hidden="true"
+                        >
+                            ＋
+                        </span>
+                        <span>创建分组</span>
+                    </button>
+                </div>
+            </form>
+            <!-- 页面底部说明 -->
+            <aside class="create-group-note">
+                <span
+                    class="create-group-note__icon"
+                    aria-hidden="true"
+                >
+                    ◈
+                </span>
+                <p>
+                    分组用于整理书籍，不会改变作品本身的内容。
+                </p>
+            </aside>
+        </section>
+    </main>
+    <!-- ==============================================
+         三、底部导航栏
+    ============================================== -->
+    <footer
+        class="app-footer"
+        id="app-footer"
+    >
+        <nav
+            class="bottom-nav"
+            aria-label="主导航"
+        >
+            <a
+                class="bottom-nav__item"
+                href="../index.html"
+                data-nav="home"
             >
-
-                <!-- 书架 -->
-
-                <a
-                    class="bottom-nav__item"
-                    href="../index.html"
-                    data-route="home"
+                <span
+                    class="bottom-nav__icon"
+                    aria-hidden="true"
                 >
-
-                    <span
-                        class="bottom-nav__icon"
-                        aria-hidden="true"
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
                     >
-                        ◫
-                    </span>
-
-                    <span class="bottom-nav__label">
-                        书架
-                    </span>
-
-                </a>
-
-
-                <!-- 工具 -->
-
-                <a
-                    class="bottom-nav__item"
-                    href="./tools.html"
-                    data-route="tools"
+                        <path
+                            d="M3 10.5L12 3L21 10.5"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M5.5 9.5V21H18.5V9.5"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M9 21V14H15V21"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </span>
+                <span class="bottom-nav__label">
+                    书架
+                </span>
+            </a>
+            <a
+                class="bottom-nav__item"
+                href="./tools.html"
+                data-nav="tools"
+            >
+                <span
+                    class="bottom-nav__icon"
+                    aria-hidden="true"
                 >
-
-                    <span
-                        class="bottom-nav__icon"
-                        aria-hidden="true"
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
                     >
-                        ⚒
-                    </span>
-
-                    <span class="bottom-nav__label">
-                        工具
-                    </span>
-
-                </a>
-
-            </nav>
-
-        </footer>
-
-
-    </div>
-
-
-
-    <!-- ==============================================
-         四、公共 JavaScript
-    ============================================== -->
-
-    <script src="../js/storage.js"></script>
-
-    <script src="../js/navigation.js"></script>
-
-    <script src="../js/components.js"></script>
-
-
-    <!-- ==============================================
-         五、当前页面 JavaScript
-    ============================================== -->
-
-    <script src="../page-js/create-group.js"></script>
-
+                        <path
+                            d="M4 5H10V11H4V5Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M14 5H20V11H14V5Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M4 15H10V21H4V15Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M14 15H20V21H14V15Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </span>
+                <span class="bottom-nav__label">
+                    工具
+                </span>
+            </a>
+        </nav>
+    </footer>
+</div>
+<!-- ==============================================
+     四、公共 JavaScript
+============================================== -->
+<!-- 必须先加载原有书籍存储模块 -->
+<script src="../js/storage.js"></script>
+<!-- 再加载分组存储模块 -->
+<script src="../js/groups-storage.js"></script>
+<!-- 公共导航与组件 -->
+<script src="../js/navigation.js"></script>
+<script src="../js/components.js"></script>
+<!-- ==============================================
+     五、当前页面 JavaScript
+============================================== -->
+<script src="../page-js/create-group.js"></script>
 </body>
-
 </html>
