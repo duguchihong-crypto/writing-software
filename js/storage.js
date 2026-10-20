@@ -2,781 +2,805 @@
    写作软件 · 公共数据存储模块
    文件：js/storage.js
 
-   模块职责：
-   1. 保存作品数据
-   2. 读取作品数据
-   3. 创建、修改、删除作品
-   4. 管理作品的基础信息
-   5. 为其他模块提供统一的数据接口
-   6. 通知其他模块数据发生了变化
-
-   存储方式：
-   localStorage
-
-   设计原则：
-   1. 不负责页面布局
-   2. 不负责按钮事件
-   3. 不直接操作 HTML
-   4. 不依赖其他业务模块
-   5. 其他模块通过 WritingStorage 访问数据
+   功能：
+   1. 统一管理书籍数据
+   2. 保存书名、简介、封面
+   3. 创建、读取、修改、删除书籍
+   4. 兼容旧版本书籍数据
+   5. 迁移旧版本单独保存的封面
+   6. 通知其他页面数据发生变化
 ====================================================== */
 
-
 (function () {
-  "use strict";
+    "use strict";
+
+    /* ==================================================
+       一、基础配置
+    ================================================== */
+
+    const DATABASE_KEY = "writing-software-books";
+
+    // 旧版本单独保存封面的数据键
+    const LEGACY_COVERS_KEY = "writing-software-book-covers";
+
+    const DATABASE_VERSION = 2;
+
+    // 单次最多保存的书籍数量不在这里限制，
+    // 实际容量由浏览器的 localStorage 决定。
 
 
-  /* ====================================================
-     一、模块基础配置
-  ==================================================== */
+    /* ==================================================
+       二、错误处理
+    ================================================== */
 
-  const STORAGE_KEY = "writing-software-books";
+    function createStorageError(code, message, originalError) {
+        const error = new Error(message);
 
-  const STORAGE_VERSION = 1;
+        error.name = "WritingStorageError";
+        error.code = code;
 
-  const CHANGE_EVENT = "writing-storage-change";
+        if (originalError) {
+            error.originalError = originalError;
+        }
 
-
-  /* ====================================================
-     二、基础工具
-  ==================================================== */
-
-
-  /**
-   * 生成唯一标识符。
-   *
-   * 优先使用浏览器提供的 crypto.randomUUID。
-   * 不支持时使用备用方案。
-   */
-
-  function createId() {
-    if (
-      typeof crypto !== "undefined" &&
-      typeof crypto.randomUUID === "function"
-    ) {
-      return crypto.randomUUID();
+        return error;
     }
 
-    return (
-      "book-" +
-      Date.now().toString(36) +
-      "-" +
-      Math.random().toString(36).slice(2, 12)
-    );
-  }
 
+    /* ==================================================
+       三、基础工具
+    ================================================== */
 
-  /**
-   * 获取当前时间。
-   *
-   * 使用 ISO 8601 格式保存，
-   * 方便不同页面统一处理。
-   */
-
-  function getCurrentTime() {
-    return new Date().toISOString();
-  }
-
-
-  /**
-   * 生成错误对象。
-   */
-
-  function createError(code, message) {
-    const error = new Error(message);
-
-    error.code = code;
-
-    return error;
-  }
-
-
-  /**
-   * 检查浏览器是否支持 localStorage。
-   */
-
-  function isStorageAvailable() {
-    try {
-      if (typeof localStorage === "undefined") {
-        return false;
-      }
-
-      const testKey = "__writing_storage_test__";
-
-      localStorage.setItem(testKey, "1");
-
-      localStorage.removeItem(testKey);
-
-      return true;
-
-    } catch (error) {
-      return false;
-    }
-  }
-
-
-  /* ====================================================
-     三、默认数据结构
-  ==================================================== */
-
-
-  /**
-   * 创建新的作品数据对象。
-   *
-   * 每部作品使用独立的数据对象。
-   *
-   * 章节、卷、篇、序等内容，
-   * 后续由相应模块逐步扩展。
-   */
-
-  function createDefaultBook(title, description) {
-    const now = getCurrentTime();
-
-    return {
-      id: createId(),
-
-      title: title,
-
-      description: description,
-
-      createdAt: now,
-
-      updatedAt: now,
-
-      wordCount: 0,
-
-      chapters: [],
-
-      metadata: {
-        version: STORAGE_VERSION
-      }
-    };
-  }
-
-
-  /* ====================================================
-     四、数据读取
-  ==================================================== */
-
-
-  /**
-   * 读取全部作品。
-   *
-   * 返回数组副本，避免调用者直接修改内部数据。
-   */
-
-  function getBooks() {
-    const data = readDatabase();
-
-    return data.books.map(function (book) {
-      return cloneData(book);
-    });
-  }
-
-
-  /**
-   * 根据作品 ID 读取单部作品。
-   *
-   * 找不到时返回 null。
-   */
-
-  function getBook(bookId) {
-    if (!bookId) {
-      return null;
+    function getCurrentTime() {
+        return new Date().toISOString();
     }
 
-    const books = readDatabase().books;
 
-    const book = books.find(function (item) {
-      return item.id === bookId;
-    });
+    function createId() {
+        if (
+            typeof crypto !== "undefined" &&
+            typeof crypto.randomUUID === "function"
+        ) {
+            return crypto.randomUUID();
+        }
 
-    return book ? cloneData(book) : null;
-  }
-
-
-  /**
-   * 获取作品数量。
-   */
-
-  function getBookCount() {
-    return readDatabase().books.length;
-  }
-
-
-  /**
-   * 检查作品是否存在。
-   */
-
-  function hasBook(bookId) {
-    if (!bookId) {
-      return false;
-    }
-
-    return readDatabase().books.some(function (book) {
-      return book.id === bookId;
-    });
-  }
-
-
-  /* ====================================================
-     五、创建作品
-  ==================================================== */
-
-
-  /**
-   * 创建新作品。
-   *
-   * 参数：
-   * {
-   *   title: "作品名称",
-   *   description: "作品简介"
-   * }
-   *
-   * 成功时返回新作品的数据副本。
-   *
-   * 失败时抛出错误。
-   */
-
-  function createBook(options) {
-    if (
-      !options ||
-      typeof options !== "object" ||
-      Array.isArray(options)
-    ) {
-      throw createError(
-        "INVALID_OPTIONS",
-        "创建作品时必须提供有效的作品信息。"
-      );
-    }
-
-    const title = normalizeText(options.title);
-
-    const description = normalizeText(
-      options.description
-    );
-
-    if (!title) {
-      throw createError(
-        "EMPTY_TITLE",
-        "作品名称不能为空。"
-      );
-    }
-
-    const database = readDatabase();
-
-    const book = createDefaultBook(
-      title,
-      description
-    );
-
-    database.books.unshift(book);
-
-    writeDatabase(database);
-
-    notifyChange({
-      type: "book-created",
-      bookId: book.id
-    });
-
-    return cloneData(book);
-  }
-
-
-  /* ====================================================
-     六、修改作品基础信息
-  ==================================================== */
-
-
-  /**
-   * 修改作品信息。
-   *
-   * 目前允许修改：
-   * title
-   * description
-   *
-   * 其他数据由对应模块单独管理，
-   * 避免误覆盖章节等内容。
-   */
-
-  function updateBook(bookId, changes) {
-    if (!bookId) {
-      throw createError(
-        "MISSING_BOOK_ID",
-        "修改作品时缺少作品 ID。"
-      );
-    }
-
-    if (
-      !changes ||
-      typeof changes !== "object" ||
-      Array.isArray(changes)
-    ) {
-      throw createError(
-        "INVALID_CHANGES",
-        "作品修改信息无效。"
-      );
-    }
-
-    const database = readDatabase();
-
-    const book = database.books.find(function (item) {
-      return item.id === bookId;
-    });
-
-    if (!book) {
-      throw createError(
-        "BOOK_NOT_FOUND",
-        "找不到需要修改的作品。"
-      );
-    }
-
-    let changed = false;
-
-    if (
-      Object.prototype.hasOwnProperty.call(
-        changes,
-        "title"
-      )
-    ) {
-      const title = normalizeText(changes.title);
-
-      if (!title) {
-        throw createError(
-          "EMPTY_TITLE",
-          "作品名称不能为空。"
+        return (
+            Date.now().toString(36) +
+            "-" +
+            Math.random().toString(36).slice(2, 12)
         );
-      }
-
-      book.title = title;
-
-      changed = true;
     }
 
-    if (
-      Object.prototype.hasOwnProperty.call(
-        changes,
-        "description"
-      )
-    ) {
-      book.description = normalizeText(
-        changes.description
-      );
 
-      changed = true;
+    function isValidId(id) {
+        return typeof id === "string" && id.trim() !== "";
     }
 
-    if (!changed) {
-      return cloneData(book);
+
+    function normalizeText(value) {
+        if (typeof value !== "string") {
+            return "";
+        }
+
+        return value.trim();
     }
 
-    book.updatedAt = getCurrentTime();
 
-    writeDatabase(database);
+    function normalizeCover(value) {
+        if (typeof value !== "string") {
+            return "";
+        }
 
-    notifyChange({
-      type: "book-updated",
-      bookId: book.id
+        const cover = value.trim();
+
+        if (!cover) {
+            return "";
+        }
+
+        // 仅允许图片 Data URL，避免将任意 URL 或脚本内容
+        // 当作封面图片保存。
+        if (
+            !/^data:image\/(?:png|jpe?g|webp|gif|avif);base64,/i.test(
+                cover
+            )
+        ) {
+            throw createStorageError(
+                "INVALID_COVER",
+                "封面格式不正确，请重新选择图片。"
+            );
+        }
+
+        return cover;
+    }
+
+
+    function cloneData(data) {
+        return JSON.parse(JSON.stringify(data));
+    }
+
+
+    /* ==================================================
+       四、书籍数据标准化
+    ================================================== */
+
+    function normalizeBook(book) {
+        if (!book || typeof book !== "object") {
+            return null;
+        }
+
+        if (!isValidId(book.id)) {
+            return null;
+        }
+
+        const now = getCurrentTime();
+
+        const chapters = Array.isArray(book.chapters)
+            ? book.chapters
+            : [];
+
+        const metadata =
+            book.metadata && typeof book.metadata === "object"
+                ? book.metadata
+                : {};
+
+        let cover = "";
+
+        try {
+            cover = normalizeCover(book.cover || "");
+        } catch (error) {
+            // 旧数据中的异常封面不应导致整本书无法读取。
+            cover = "";
+        }
+
+        return {
+            id: book.id,
+
+            title:
+                typeof book.title === "string"
+                    ? book.title
+                    : "未命名书籍",
+
+            description:
+                typeof book.description === "string"
+                    ? book.description
+                    : "",
+
+            cover: cover,
+
+            createdAt:
+                typeof book.createdAt === "string"
+                    ? book.createdAt
+                    : now,
+
+            updatedAt:
+                typeof book.updatedAt === "string"
+                    ? book.updatedAt
+                    : now,
+
+            wordCount:
+                Number.isFinite(book.wordCount) && book.wordCount >= 0
+                    ? book.wordCount
+                    : 0,
+
+            chapters: chapters,
+
+            metadata: {
+                ...metadata,
+                version: DATABASE_VERSION
+            }
+        };
+    }
+
+
+    /* ==================================================
+       五、读取数据库
+    ================================================== */
+
+    function readDatabase() {
+        let rawData;
+
+        try {
+            rawData = localStorage.getItem(DATABASE_KEY);
+        } catch (error) {
+            throw createStorageError(
+                "STORAGE_UNAVAILABLE",
+                "无法读取本地数据，请检查浏览器的存储权限。",
+                error
+            );
+        }
+
+        if (!rawData) {
+            return [];
+        }
+
+        let parsed;
+
+        try {
+            parsed = JSON.parse(rawData);
+        } catch (error) {
+            throw createStorageError(
+                "INVALID_DATABASE",
+                "书籍数据无法解析，请勿清除浏览器数据，以免丢失作品。",
+                error
+            );
+        }
+
+        // 兼容旧版本直接保存数组的格式，
+        // 以及带有 version 和 books 字段的数据库格式。
+        let books;
+
+        if (Array.isArray(parsed)) {
+            books = parsed;
+        } else if (
+            parsed &&
+            typeof parsed === "object" &&
+            Array.isArray(parsed.books)
+        ) {
+            books = parsed.books;
+        } else {
+            throw createStorageError(
+                "INVALID_DATABASE",
+                "书籍数据库格式异常，暂时无法读取。"
+            );
+        }
+
+        return books
+            .map(normalizeBook)
+            .filter(Boolean);
+    }
+
+
+    /* ==================================================
+       六、保存数据库
+    ================================================== */
+
+    function writeDatabase(books) {
+        const database = {
+            version: DATABASE_VERSION,
+            updatedAt: getCurrentTime(),
+            books: books
+        };
+
+        let serialized;
+
+        try {
+            serialized = JSON.stringify(database);
+        } catch (error) {
+            throw createStorageError(
+                "SERIALIZE_FAILED",
+                "书籍数据处理失败，未能保存。",
+                error
+            );
+        }
+
+        try {
+            localStorage.setItem(DATABASE_KEY, serialized);
+        } catch (error) {
+            if (
+                error &&
+                (
+                    error.name === "QuotaExceededError" ||
+                    error.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+                    error.code === 22 ||
+                    error.code === 1014
+                )
+            ) {
+                throw createStorageError(
+                    "STORAGE_FULL",
+                    "浏览器存储空间不足，无法保存。请更换较小的封面图片后重试。",
+                    error
+                );
+            }
+
+            throw createStorageError(
+                "STORAGE_WRITE_FAILED",
+                "保存失败，请检查浏览器的存储权限。",
+                error
+            );
+        }
+
+        return true;
+    }
+
+
+    /* ==================================================
+       七、数据变化通知
+    ================================================== */
+
+    function notifyChange(detail) {
+        try {
+            window.dispatchEvent(
+                new CustomEvent("writing-storage-change", {
+                    detail: {
+                        type: detail.type,
+                        bookId: detail.bookId || null,
+                        timestamp: getCurrentTime()
+                    }
+                })
+            );
+        } catch (error) {
+            // 通知失败不影响已经保存的数据。
+        }
+    }
+
+
+    /* ==================================================
+       八、迁移旧版封面
+    ================================================== */
+
+    function migrateLegacyCovers() {
+        let rawLegacyData;
+
+        try {
+            rawLegacyData = localStorage.getItem(LEGACY_COVERS_KEY);
+        } catch (error) {
+            // 无法访问旧封面数据时，不影响正常读取书籍。
+            return;
+        }
+
+        if (!rawLegacyData) {
+            return;
+        }
+
+        let legacyCovers;
+
+        try {
+            legacyCovers = JSON.parse(rawLegacyData);
+        } catch (error) {
+            // 旧数据损坏时保留原数据，不擅自删除。
+            return;
+        }
+
+        if (
+            !legacyCovers ||
+            typeof legacyCovers !== "object" ||
+            Array.isArray(legacyCovers)
+        ) {
+            return;
+        }
+
+        let books;
+
+        try {
+            books = readDatabase();
+        } catch (error) {
+            return;
+        }
+
+        let changed = false;
+
+        books = books.map(function (book) {
+            if (book.cover) {
+                return book;
+            }
+
+            const legacyEntry = legacyCovers[book.id];
+
+            if (!legacyEntry || typeof legacyEntry !== "object") {
+                return book;
+            }
+
+            const legacyData = legacyEntry.data;
+
+            if (typeof legacyData !== "string") {
+                return book;
+            }
+
+            try {
+                const cover = normalizeCover(legacyData);
+
+                if (!cover) {
+                    return book;
+                }
+
+                changed = true;
+
+                return {
+                    ...book,
+                    cover: cover,
+                    metadata: {
+                        ...book.metadata,
+                        version: DATABASE_VERSION
+                    }
+                };
+            } catch (error) {
+                return book;
+            }
+        });
+
+        if (!changed) {
+            return;
+        }
+
+        try {
+            writeDatabase(books);
+
+            // 迁移成功后删除旧封面记录。
+            // 若写入失败，则保留旧记录，避免封面丢失。
+            localStorage.removeItem(LEGACY_COVERS_KEY);
+        } catch (error) {
+            // 迁移失败不影响正常打开书架。
+        }
+    }
+
+
+    /* ==================================================
+       九、初始化与旧数据兼容
+    ================================================== */
+
+    function initialize() {
+        // 首先读取现有书籍，不能直接覆盖旧数据库。
+        const books = readDatabase();
+
+        // 将旧版本的书籍字段统一为新版格式。
+        let needsMigration = false;
+
+        try {
+            const rawData = localStorage.getItem(DATABASE_KEY);
+
+            if (rawData) {
+                const parsed = JSON.parse(rawData);
+
+                if (
+                    Array.isArray(parsed) ||
+                    !parsed ||
+                    parsed.version !== DATABASE_VERSION
+                ) {
+                    needsMigration = true;
+                }
+
+                if (
+                    books.some(function (book) {
+                        return !Object.prototype.hasOwnProperty.call(
+                            book,
+                            "cover"
+                        );
+                    })
+                ) {
+                    needsMigration = true;
+                }
+            }
+        } catch (error) {
+            // 保留异常数据，不在初始化阶段擅自覆盖。
+        }
+
+        if (needsMigration) {
+            writeDatabase(books);
+        }
+
+        migrateLegacyCovers();
+    }
+
+
+    /* ==================================================
+       十、查询接口
+    ================================================== */
+
+    function getBooks() {
+        return cloneData(readDatabase()).sort(function (a, b) {
+            return (
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime()
+            );
+        });
+    }
+
+
+    function getBook(id) {
+        if (!isValidId(id)) {
+            return null;
+        }
+
+        const books = readDatabase();
+
+        const book = books.find(function (item) {
+            return item.id === id;
+        });
+
+        return book ? cloneData(book) : null;
+    }
+
+
+    function getBookCount() {
+        return readDatabase().length;
+    }
+
+
+    function hasBook(id) {
+        return getBook(id) !== null;
+    }
+
+
+    function getBookCover(id) {
+        const book = getBook(id);
+
+        return book ? book.cover : "";
+    }
+
+
+    /* ==================================================
+       十一、创建书籍
+    ================================================== */
+
+    function createBook(options) {
+        options = options || {};
+
+        const title = normalizeText(options.title);
+        const description = normalizeText(options.description);
+
+        if (!title) {
+            throw createStorageError(
+                "TITLE_REQUIRED",
+                "请输入书名。"
+            );
+        }
+
+        const cover = normalizeCover(options.cover || "");
+
+        const books = readDatabase();
+
+        const now = getCurrentTime();
+
+        const book = {
+            id: createId(),
+
+            title: title,
+
+            description: description,
+
+            cover: cover,
+
+            createdAt: now,
+
+            updatedAt: now,
+
+            wordCount: 0,
+
+            chapters: [],
+
+            metadata: {
+                version: DATABASE_VERSION
+            }
+        };
+
+        books.unshift(book);
+
+        // 书名和封面在同一次数据库写入中保存，
+        // 避免只创建书名却没保存封面。
+        writeDatabase(books);
+
+        notifyChange({
+            type: "book-created",
+            bookId: book.id
+        });
+
+        return cloneData(book);
+    }
+
+
+    /* ==================================================
+       十二、更新书籍
+    ================================================== */
+
+    function updateBook(id, changes) {
+        if (!isValidId(id)) {
+            throw createStorageError(
+                "INVALID_ID",
+                "书籍编号无效。"
+            );
+        }
+
+        if (!changes || typeof changes !== "object") {
+            throw createStorageError(
+                "INVALID_CHANGES",
+                "没有提供有效的修改内容。"
+            );
+        }
+
+        const books = readDatabase();
+
+        const index = books.findIndex(function (book) {
+            return book.id === id;
+        });
+
+        if (index === -1) {
+            throw createStorageError(
+                "BOOK_NOT_FOUND",
+                "没有找到这本书。"
+            );
+        }
+
+        const currentBook = books[index];
+        const updatedBook = { ...currentBook };
+
+        if (Object.prototype.hasOwnProperty.call(changes, "title")) {
+            const title = normalizeText(changes.title);
+
+            if (!title) {
+                throw createStorageError(
+                    "TITLE_REQUIRED",
+                    "书名不能为空。"
+                );
+            }
+
+            updatedBook.title = title;
+        }
+
+        if (
+            Object.prototype.hasOwnProperty.call(
+                changes,
+                "description"
+            )
+        ) {
+            updatedBook.description = normalizeText(
+                changes.description
+            );
+        }
+
+        if (Object.prototype.hasOwnProperty.call(changes, "cover")) {
+            updatedBook.cover = normalizeCover(changes.cover || "");
+        }
+
+        updatedBook.updatedAt = getCurrentTime();
+
+        books[index] = updatedBook;
+
+        writeDatabase(books);
+
+        notifyChange({
+            type: "book-updated",
+            bookId: id
+        });
+
+        return cloneData(updatedBook);
+    }
+
+
+    /* ==================================================
+       十三、删除书籍
+    ================================================== */
+
+    function deleteBook(id) {
+        if (!isValidId(id)) {
+            throw createStorageError(
+                "INVALID_ID",
+                "书籍编号无效。"
+            );
+        }
+
+        const books = readDatabase();
+
+        const index = books.findIndex(function (book) {
+            return book.id === id;
+        });
+
+        if (index === -1) {
+            return false;
+        }
+
+        books.splice(index, 1);
+
+        writeDatabase(books);
+
+        notifyChange({
+            type: "book-deleted",
+            bookId: id
+        });
+
+        return true;
+    }
+
+
+    /* ==================================================
+       十四、更新最近编辑时间
+    ================================================== */
+
+    function touchBook(id) {
+        if (!isValidId(id)) {
+            return null;
+        }
+
+        const books = readDatabase();
+
+        const index = books.findIndex(function (book) {
+            return book.id === id;
+        });
+
+        if (index === -1) {
+            return null;
+        }
+
+        books[index].updatedAt = getCurrentTime();
+
+        writeDatabase(books);
+
+        notifyChange({
+            type: "book-touched",
+            bookId: id
+        });
+
+        return cloneData(books[index]);
+    }
+
+
+    /* ==================================================
+       十五、变化监听接口
+    ================================================== */
+
+    function onChange(callback) {
+        if (typeof callback !== "function") {
+            throw createStorageError(
+                "INVALID_CALLBACK",
+                "监听函数必须是有效的函数。"
+            );
+        }
+
+        function handler(event) {
+            callback(event.detail || {});
+        }
+
+        window.addEventListener(
+            "writing-storage-change",
+            handler
+        );
+
+        return function unsubscribe() {
+            window.removeEventListener(
+                "writing-storage-change",
+                handler
+            );
+        };
+    }
+
+
+    /* ==================================================
+       十六、跨标签页同步通知
+    ================================================== */
+
+    window.addEventListener("storage", function (event) {
+        if (
+            event.key === DATABASE_KEY ||
+            event.key === LEGACY_COVERS_KEY
+        ) {
+            notifyChange({
+                type: "external-change",
+                bookId: null
+            });
+        }
     });
 
-    return cloneData(book);
-  }
 
+    /* ==================================================
+       十七、公开接口
+    ================================================== */
 
-  /* ====================================================
-     七、删除作品
-  ==================================================== */
+    window.WritingStorage = Object.freeze({
+        getBooks: getBooks,
+        getBook: getBook,
+        getBookCount: getBookCount,
+        hasBook: hasBook,
+        getBookCover: getBookCover,
 
+        createBook: createBook,
+        updateBook: updateBook,
+        deleteBook: deleteBook,
+        touchBook: touchBook,
 
-  /**
-   * 根据作品 ID 删除作品。
-   *
-   * 删除前由调用页面负责向用户确认。
-   *
-   * 注意：
-   * 删除作品属于破坏性操作，
-   * 本方法不会自行弹出确认窗口。
-   */
-
-  function deleteBook(bookId) {
-    if (!bookId) {
-      throw createError(
-        "MISSING_BOOK_ID",
-        "删除作品时缺少作品 ID。"
-      );
-    }
-
-    const database = readDatabase();
-
-    const index = database.books.findIndex(
-      function (book) {
-        return book.id === bookId;
-      }
-    );
-
-    if (index === -1) {
-      throw createError(
-        "BOOK_NOT_FOUND",
-        "找不到需要删除的作品。"
-      );
-    }
-
-    const deletedBook = database.books[index];
-
-    database.books.splice(index, 1);
-
-    writeDatabase(database);
-
-    notifyChange({
-      type: "book-deleted",
-      bookId: bookId
+        onChange: onChange
     });
 
-    return cloneData(deletedBook);
-  }
 
-
-  /* ====================================================
-     八、更新时间
-  ==================================================== */
-
-
-  /**
-   * 更新作品的最后修改时间。
-   *
-   * 供编辑器等模块调用。
-   */
-
-  function touchBook(bookId) {
-    if (!bookId) {
-      throw createError(
-        "MISSING_BOOK_ID",
-        "更新作品时间时缺少作品 ID。"
-      );
-    }
-
-    const database = readDatabase();
-
-    const book = database.books.find(function (item) {
-      return item.id === bookId;
-    });
-
-    if (!book) {
-      throw createError(
-        "BOOK_NOT_FOUND",
-        "找不到需要更新的作品。"
-      );
-    }
-
-    book.updatedAt = getCurrentTime();
-
-    writeDatabase(database);
-
-    notifyChange({
-      type: "book-touched",
-      bookId: bookId
-    });
-
-    return cloneData(book);
-  }
-
-
-  /* ====================================================
-     九、数据库读取与写入
-  ==================================================== */
-
-
-  /**
-   * 读取数据库。
-   *
-   * 内部统一管理存储格式。
-   */
-
-  function readDatabase() {
-    if (!isStorageAvailable()) {
-      throw createError(
-        "STORAGE_UNAVAILABLE",
-        "浏览器本地存储不可用，无法读取作品。"
-      );
-    }
-
-    let rawData;
+    /* ==================================================
+       十八、执行初始化
+    ================================================== */
 
     try {
-      rawData = localStorage.getItem(STORAGE_KEY);
+        initialize();
     } catch (error) {
-      throw createError(
-        "STORAGE_READ_FAILED",
-        "读取本地作品数据失败。"
-      );
+        console.error(
+            "[WritingStorage] 初始化失败：",
+            error
+        );
     }
-
-    if (rawData === null) {
-      return {
-        version: STORAGE_VERSION,
-        books: []
-      };
-    }
-
-    let database;
-
-    try {
-      database = JSON.parse(rawData);
-    } catch (error) {
-      throw createError(
-        "INVALID_DATABASE",
-        "作品数据格式异常，无法正常读取。"
-      );
-    }
-
-    if (
-      !database ||
-      typeof database !== "object" ||
-      !Array.isArray(database.books)
-    ) {
-      throw createError(
-        "INVALID_DATABASE",
-        "作品数据库结构异常。"
-      );
-    }
-
-    if (
-      typeof database.version === "number" &&
-      database.version > STORAGE_VERSION
-    ) {
-      throw createError(
-        "UNSUPPORTED_VERSION",
-        "作品数据版本高于当前软件支持的版本。"
-      );
-    }
-
-    return database;
-  }
-
-
-  /**
-   * 写入数据库。
-   *
-   * 先序列化，再写入 localStorage。
-   */
-
-  function writeDatabase(database) {
-    if (!isStorageAvailable()) {
-      throw createError(
-        "STORAGE_UNAVAILABLE",
-        "浏览器本地存储不可用，无法保存作品。"
-      );
-    }
-
-    const dataToSave = {
-      version: STORAGE_VERSION,
-      books: database.books
-    };
-
-    let serialized;
-
-    try {
-      serialized = JSON.stringify(dataToSave);
-    } catch (error) {
-      throw createError(
-        "SERIALIZATION_FAILED",
-        "作品数据无法转换为可保存的格式。"
-      );
-    }
-
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        serialized
-      );
-    } catch (error) {
-      throw createError(
-        "STORAGE_WRITE_FAILED",
-        "保存作品失败，可能是浏览器存储空间不足。"
-      );
-    }
-  }
-
-
-  /* ====================================================
-     十、数据安全辅助方法
-  ==================================================== */
-
-
-  /**
-   * 规范化文本。
-   *
-   * 防止名称和简介被意外保存为非字符串。
-   */
-
-  function normalizeText(value) {
-    if (typeof value !== "string") {
-      return "";
-    }
-
-    return value.trim();
-  }
-
-
-  /**
-   * 深拷贝数据。
-   *
-   * 避免调用者修改读取结果时，
-   * 意外修改原始数据对象。
-   */
-
-  function cloneData(data) {
-    return JSON.parse(JSON.stringify(data));
-  }
-
-
-  /* ====================================================
-     十一、数据变化通知
-  ==================================================== */
-
-
-  /**
-   * 通知当前页面中的其他模块。
-   *
-   * 例如：
-   * 创建作品后，首页可以重新读取书架。
-   *
-   * 通知只传递事件信息，
-   * 不把内部数据库对象暴露出去。
-   */
-
-  function notifyChange(detail) {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    window.dispatchEvent(
-      new CustomEvent(CHANGE_EVENT, {
-        detail: detail
-      })
-    );
-  }
-
-
-  /**
-   * 注册数据变化监听。
-   *
-   * 使用方：
-   *
-   * WritingStorage.onChange(function (event) {
-   *   console.log(event.type);
-   * });
-   *
-   * 返回取消监听的函数。
-   */
-
-  function onChange(callback) {
-    if (typeof callback !== "function") {
-      throw createError(
-        "INVALID_CALLBACK",
-        "数据变化监听必须提供函数。"
-      );
-    }
-
-    const handler = function (event) {
-      callback(event.detail);
-    };
-
-    window.addEventListener(
-      CHANGE_EVENT,
-      handler
-    );
-
-    return function unsubscribe() {
-      window.removeEventListener(
-        CHANGE_EVENT,
-        handler
-      );
-    };
-  }
-
-
-  /* ====================================================
-     十二、其他浏览器标签页的数据变化
-  ==================================================== */
-
-
-  /**
-   * 当同一网站的其他标签页修改了作品数据时，
-   * 通知当前页面刷新。
-   *
-   * 注意：
-   * 这只适用于同一浏览器环境中，
-   * 共享相同 localStorage 的标签页。
-   */
-
-  window.addEventListener(
-    "storage",
-    function (event) {
-      if (event.key !== STORAGE_KEY) {
-        return;
-      }
-
-      window.dispatchEvent(
-        new CustomEvent(CHANGE_EVENT, {
-          detail: {
-            type: "external-change",
-            bookId: null
-          }
-        })
-      );
-    }
-  );
-
-
-  /* ====================================================
-     十三、公开接口
-  ==================================================== */
-
-
-  /**
-   * 其他模块只能通过这个公共接口访问数据。
-   *
-   * 不需要直接操作 localStorage。
-   */
-
-  window.WritingStorage = Object.freeze({
-
-    /* 数据读取 */
-
-    getBooks: getBooks,
-
-    getBook: getBook,
-
-    getBookCount: getBookCount,
-
-    hasBook: hasBook,
-
-
-    /* 作品管理 */
-
-    createBook: createBook,
-
-    updateBook: updateBook,
-
-    deleteBook: deleteBook,
-
-
-    /* 时间管理 */
-
-    touchBook: touchBook,
-
-
-    /* 数据变化监听 */
-
-    onChange: onChange,
-
-
-    /* 公共信息 */
-
-    version: STORAGE_VERSION
-
-  });
-
 
 })();
