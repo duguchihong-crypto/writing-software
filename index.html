@@ -1,212 +1,349 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <meta name="theme-color" content="#242522">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>文墨 · 写作软件</title>
+    <meta
+        name="theme-color"
+        content="#9E2428"
+    >
 
+    <meta
+        name="description"
+        content="一方书斋，静候新篇。记录灵感，创作故事。"
+    >
+
+    <title>写作软件 · 书斋</title>
+
+    <!-- 公共样式 -->
     <link rel="stylesheet" href="css/base.css">
+
+    <!-- 首页样式 -->
     <link rel="stylesheet" href="css/home.css">
 </head>
 
-<body class="home-page">
+<body>
 
-    <!-- 顶部固定栏 -->
-    <header class="app-header">
+    <!-- ==================================================
+         页面整体容器
+    ================================================== -->
 
-        <a class="brand" href="index.html" aria-label="返回首页">
-            <span class="brand-seal">文</span>
-
-            <span class="brand-text">
-                <span class="brand-title">文墨</span>
-                <span class="brand-subtitle">写作 · 藏书 · 创作</span>
-            </span>
-        </a>
-
-        <div class="header-actions">
-
-            <a class="button button-primary"
-               href="pages/create.html">
-                <span class="button-symbol">＋</span>
-                <span>新建</span>
-            </a>
-
-            <a class="button button-setting"
-               href="pages/settings.html"
-               aria-label="设置">
-                <span class="setting-symbol">⚙</span>
-                <span class="setting-text">设置</span>
-            </a>
-
-        </div>
-    </header>
+    <div class="app" id="app">
 
 
-    <!-- 页面主体 -->
-    <main class="home-main">
+        <!-- ==================================================
+             ① 顶部固定导航栏
+        ================================================== -->
 
-        <!-- 欢迎区域 -->
-        <section class="hero">
+        <header class="topbar" id="topbar">
 
-            <div class="hero-decoration hero-decoration-left">「</div>
+            <!-- 左侧：软件名称 -->
+            <div class="topbar__brand">
 
-            <div class="hero-content">
-
-                <div class="hero-kicker">
-                    <span class="ornament-line"></span>
-                    <span>执笔 · 造境 · 成章</span>
-                    <span class="ornament-line"></span>
-                </div>
-
-                <h1>落笔成章</h1>
-
-                <p class="hero-description">
-                    一字一句，自成天地。
-                </p>
-
-                <div class="hero-seal">
-                    <span>静</span>
-                    <span>心</span>
-                    <span>创</span>
-                    <span>作</span>
-                </div>
-
-            </div>
-
-            <div class="hero-decoration hero-decoration-right">」</div>
-
-        </section>
-
-
-        <!-- 创作入口 -->
-        <section class="creation-section">
-
-            <div class="section-heading">
-
-                <div>
-                    <span class="section-eyebrow">YOUR CREATIVE SPACE</span>
-                    <h2>创作天地</h2>
-                </div>
-
-                <span class="section-mark">文</span>
-
-            </div>
-
-            <div class="creation-panel">
-
-                <div class="creation-emblem">
-                    <span>墨</span>
-                </div>
-
-                <div class="creation-copy">
-                    <h3>让灵感，自成篇章</h3>
-                    <p>从一个念头开始，构建属于你的故事世界。</p>
-                </div>
-
-                <a class="creation-button"
-                   href="pages/create.html">
-                    开始创作
-                    <span>→</span>
+                <a
+                    class="topbar__brand-link"
+                    href="./index.html"
+                    aria-label="返回首页"
+                >
+                    <span class="topbar__brand-name">
+                        写作软件
+                    </span>
                 </a>
 
             </div>
 
-        </section>
 
+            <!-- 右侧：操作按钮 -->
+            <nav
+                class="topbar__actions"
+                aria-label="顶部导航"
+            >
 
-        <!-- 最近作品 -->
-        <section class="recent-section">
+                <!-- 新建作品 -->
+                <a
+                    class="topbar__button topbar__button--create"
+                    href="pages/create.html"
+                >
+                    <span
+                        class="topbar__button-icon"
+                        aria-hidden="true"
+                    >＋</span>
 
-            <div class="section-heading">
-
-                <div>
-                    <span class="section-eyebrow">RECENT WORKS</span>
-                    <h2>最近作品</h2>
-                </div>
-
-                <a class="text-link" href="pages/shelf.html">
-                    全部作品
-                    <span>→</span>
+                    <span>新建</span>
                 </a>
 
-            </div>
 
-            <div class="empty-state">
+                <!-- 软件设置 -->
+                <a
+                    class="topbar__button topbar__button--settings"
+                    href="pages/settings.html"
+                >
+                    <span
+                        class="topbar__button-icon"
+                        aria-hidden="true"
+                    >⚙</span>
 
-                <div class="empty-decoration">
-                    <span class="empty-book">册</span>
-                    <span class="empty-cloud">☁</span>
-                </div>
-
-                <h3>静候你的第一部作品</h3>
-
-                <p>
-                    新建一本作品，它便会在这里留下印记。
-                </p>
-
-                <a href="pages/create.html" class="empty-action">
-                    ＋ 创建作品
+                    <span>设置</span>
                 </a>
 
-            </div>
+            </nav>
 
-        </section>
+        </header>
 
 
-        <!-- 首页底部题记 -->
-        <footer class="home-footer">
-            <span class="footer-rule"></span>
-            <p>以笔为舟，以墨为海。</p>
-            <span class="footer-rule"></span>
+
+        <!-- ==================================================
+             ② 中间主内容区
+        ================================================== -->
+
+        <main class="main-content" id="main-content">
+
+            <!-- 首页内容容器 -->
+            <section
+                class="home-view"
+                id="home-view"
+                aria-label="书架首页"
+            >
+
+
+                <!-- ==========================================
+                     空书架状态
+
+                     当书架没有作品时显示。
+                     创建作品后，由 home.js 控制隐藏。
+                =========================================== -->
+
+                <div
+                    class="empty-state"
+                    id="empty-state"
+                >
+
+                    <!-- 中央文字内容 -->
+                    <div class="empty-state__content">
+
+
+                        <!-- 主标题 -->
+                        <h1 class="empty-state__title">
+                            卷帙未启
+                        </h1>
+
+
+                        <!-- 标题装饰线 -->
+                        <div
+                            class="empty-state__ornament"
+                            aria-hidden="true"
+                        >
+                            <span></span>
+                            <span class="empty-state__ornament-center">
+                                ◆
+                            </span>
+                            <span></span>
+                        </div>
+
+
+                        <!-- 空书架提示 -->
+                        <p class="empty-state__subtitle">
+                            书架尚空，静候新篇。
+                        </p>
+
+
+                        <!-- 创作引导 -->
+                        <p class="empty-state__description">
+                            此间尚无作品，不妨挥毫落墨，<br>
+                            写下你的第一个故事。
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     作品列表区域
+
+                     默认隐藏。
+                     有作品时显示。
+                =========================================== -->
+
+                <section
+                    class="shelf-content"
+                    id="shelf-content"
+                    aria-label="我的作品"
+                    hidden
+                >
+
+                    <!-- 作品列表标题 -->
+                    <header class="shelf-content__header">
+
+                        <h1 class="shelf-content__title">
+                            我的书架
+                        </h1>
+
+                        <p class="shelf-content__description">
+                            藏诸笔墨，待续新章。
+                        </p>
+
+                    </header>
+
+
+                    <!--
+                        JavaScript 将作品卡片插入这里。
+                        作品数据暂时不在 HTML 中写死。
+                    -->
+
+                    <div
+                        class="shelf-list"
+                        id="shelf-list"
+                    ></div>
+
+                </section>
+
+
+            </section>
+
+        </main>
+
+
+
+        <!-- ==================================================
+             ③ 底部固定导航栏
+        ================================================== -->
+
+        <footer class="bottom-bar" id="bottom-bar">
+
+            <nav
+                class="bottom-nav"
+                aria-label="底部导航"
+            >
+
+
+                <!-- 书架 -->
+                <a
+                    class="bottom-nav__item bottom-nav__item--active"
+                    href="pages/shelf.html"
+                    aria-current="page"
+                >
+
+                    <span
+                        class="bottom-nav__icon"
+                        aria-hidden="true"
+                    >
+
+                        <!-- 书卷图标 -->
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+
+                            <path
+                                d="M4 5.5C4 4.67 4.67 4 5.5 4H19V18H6C4.9 18 4 18.9 4 20V5.5Z"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linejoin="round"
+                            />
+
+                            <path
+                                d="M4 20C4 18.9 4.9 18 6 18H19"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M8 8H15"
+                                stroke="currentColor"
+                                stroke-width="1.4"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M8 11H15"
+                                stroke="currentColor"
+                                stroke-width="1.4"
+                                stroke-linecap="round"
+                            />
+
+                        </svg>
+
+                    </span>
+
+
+                    <span class="bottom-nav__label">
+                        书架
+                    </span>
+
+                </a>
+
+
+
+                <!-- 工具 -->
+                <a
+                    class="bottom-nav__item"
+                    href="pages/tools.html"
+                >
+
+                    <span
+                        class="bottom-nav__icon"
+                        aria-hidden="true"
+                    >
+
+                        <!-- 文房工具图标 -->
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+
+                            <path
+                                d="M12 3L14 8L19 6L17 11L21 14L15 15L14 21L10 17L5 19L7 14L3 10L9 9L12 3Z"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linejoin="round"
+                            />
+
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="2"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                            />
+
+                        </svg>
+
+                    </span>
+
+
+                    <span class="bottom-nav__label">
+                        工具
+                    </span>
+
+                </a>
+
+
+            </nav>
+
         </footer>
 
-    </main>
+
+    </div>
 
 
-    <!-- 底部固定导航 -->
-    <nav class="bottom-nav" aria-label="主导航">
 
-        <a class="nav-item active"
-           href="pages/shelf.html"
-           aria-label="书架">
+    <!-- ==================================================
+         JavaScript
+    ================================================== -->
 
-            <span class="nav-icon nav-icon-shelf">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 5.5h16v14H4z"/>
-                    <path d="M8 5.5v14M16 5.5v14"/>
-                    <path d="M4 9h4M16 9h4"/>
-                </svg>
-            </span>
-
-            <span class="nav-label">书架</span>
-            <span class="nav-indicator"></span>
-
-        </a>
-
-
-        <a class="nav-item"
-           href="pages/tools.html"
-           aria-label="工具">
-
-            <span class="nav-icon nav-icon-tools">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14.5 6.5a5 5 0 0 0-6.2 6.2L3.5 17.5a2.1 2.1 0 0 0 3 3l4.8-4.8a5 5 0 0 0 6.2-6.2l-3 3-3-3z"/>
-                </svg>
-            </span>
-
-            <span class="nav-label">工具</span>
-            <span class="nav-indicator"></span>
-
-        </a>
-
-    </nav>
-
-
-    <script src="js/home.js"></script>
+    <script src="js/home.js" defer></script>
 
 </body>
+
 </html>
