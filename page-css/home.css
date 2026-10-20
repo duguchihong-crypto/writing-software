@@ -5,20 +5,14 @@
 
    文件职责：
    1. 控制首页整体布局。
-   2. 让首页主体占据顶部栏与底部栏之间的剩余空间。
-   3. 让底部导航栏自然贴近页面底部。
-   4. 让空书架提示在主体区域内居中。
-   5. 展示分组列表与分组卡片。
+   2. 控制首页主体与底部导航的位置。
+   3. 展示空书架提示。
+   4. 展示分组列表与分组卡片。
+   5. 分组卡片只显示组名字。
    6. 展示书籍封面、书名、简介与作品信息。
    7. 提供没有封面时的传统国风默认封面。
-   8. 保留书籍卡片按钮的通用样式。
+   8. 保留书籍卡片按钮样式。
    9. 适配手机、平板与电脑。
-
-   依赖：
-   - css/theme.css
-   - css/base.css
-   - css/header.css
-   - css/footer.css
 
    注意：
    本文件只负责页面外观，不负责数据存储和读取。
@@ -218,17 +212,6 @@
    八、首页分组区域
 ============================================================ */
 
-/*
- * 对应 index.html 中的：
- *
- * #home-groups
- *
- * 该区域由 home.js 根据分组数据动态显示或隐藏。
- *
- * hidden 属性负责控制显示状态；
- * 此处不主动覆盖 hidden 属性的隐藏效果。
- */
-
 .home-groups {
     box-sizing: border-box;
 
@@ -243,7 +226,7 @@
 }
 
 
-/* 分组区域内部统一使用 border-box */
+/* 分组区域统一使用 border-box */
 
 .home-groups *,
 .home-groups *::before,
@@ -259,9 +242,6 @@
 .home-groups__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-
-    flex-wrap: wrap;
 
     gap: 12px;
 
@@ -272,7 +252,7 @@
 }
 
 
-/* 分组标题 */
+/* 我的分组 */
 
 .home-groups__title {
     position: relative;
@@ -303,7 +283,7 @@
 }
 
 
-/* 标题前方的朱红色装饰 */
+/* 标题左侧装饰线 */
 
 .home-groups__title::before {
     display: block;
@@ -318,31 +298,6 @@
     background-color: var(--color-red);
 
     border-radius: 2px;
-}
-
-
-/* 分组数量 */
-
-.home-groups__count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 28px;
-
-    padding: 4px 10px;
-
-    color: var(--theme-text-muted);
-
-    background-color: var(--theme-background-pure);
-
-    border: 1px solid var(--theme-border);
-    border-radius: 4px;
-
-    font-size: 12px;
-    line-height: 1.5;
-
-    white-space: nowrap;
 }
 
 
@@ -365,7 +320,7 @@
 }
 
 
-/* 没有分组卡片时不占用列表空间 */
+/* 没有卡片时隐藏列表 */
 
 .home-groups__list:empty {
     display: none;
@@ -377,11 +332,19 @@
 ============================================================ */
 
 /*
- * 对应 home.js 创建的：
+ * 每张分组卡片只显示组名字。
+ *
+ * 不显示：
+ * - 分组数量
+ * - 分组简介
+ * - 分组编号
+ * - 图标
+ * - 右侧箭头
+ *
+ * 对应 home.js：
  *
  * .home-group-card
- *
- * 卡片采用宣纸色、朱红色、鎏金色的国风设计。
+ * .home-group-card__name
  */
 
 .home-group-card {
@@ -391,11 +354,13 @@
     flex-direction: column;
 
     align-items: stretch;
+    justify-content: center;
 
+    width: 100%;
     min-width: 0;
-    min-height: 108px;
+    min-height: 88px;
 
-    padding: 20px 18px 16px;
+    padding: 20px 22px;
 
     overflow: hidden;
 
@@ -422,7 +387,7 @@
 }
 
 
-/* 分组卡片顶部鎏金装饰线 */
+/* 卡片顶部鎏金装饰线 */
 
 .home-group-card::before {
     position: absolute;
@@ -445,7 +410,7 @@
 }
 
 
-/* 分组卡片左侧装饰线 */
+/* 卡片左侧朱红装饰线 */
 
 .home-group-card::after {
     position: absolute;
@@ -465,10 +430,10 @@
 
 
 /* ============================================================
-   十二、分组卡片标题
+   十二、分组卡片组名字
 ============================================================ */
 
-.home-group-card__title {
+.home-group-card__name {
     position: relative;
     z-index: 1;
 
@@ -477,7 +442,8 @@
     width: 100%;
     min-width: 0;
 
-    margin: 0 0 9px;
+    margin: 0;
+    padding: 0;
 
     overflow: hidden;
 
@@ -496,36 +462,7 @@
     line-height: 1.7;
     letter-spacing: 1px;
 
-    overflow-wrap: anywhere;
-
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-
-/* ============================================================
-   十三、分组卡片说明文字
-============================================================ */
-
-.home-group-card__description {
-    position: relative;
-    z-index: 1;
-
-    display: -webkit-box;
-
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-
-    overflow: hidden;
-
-    color: var(--theme-text-secondary);
-
-    font-size: 12px;
-    font-weight: 400;
-
-    line-height: 1.8;
+    text-align: left;
 
     overflow-wrap: anywhere;
 
@@ -535,85 +472,8 @@
 
 
 /* ============================================================
-   十四、分组卡片装饰文字
+   十三、分组卡片交互效果
 ============================================================ */
-
-/*
- * home.js 中如果使用其他类名显示分组编号，
- * 仍然不会影响分组标题与说明文字的正常显示。
- */
-
-.home-group-card__decoration {
-    position: absolute;
-
-    top: 15px;
-    right: 16px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 28px;
-    height: 28px;
-
-    color: var(--color-yellow-dark);
-
-    border: 1px solid var(--color-yellow-dark);
-
-    font-family:
-        "Noto Serif SC",
-        "Source Han Serif SC",
-        "Songti SC",
-        "SimSun",
-        serif;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    opacity: 0.8;
-
-    pointer-events: none;
-}
-
-
-/* ============================================================
-   十五、分组卡片右侧箭头
-============================================================ */
-
-.home-group-card__arrow {
-    position: absolute;
-
-    right: 17px;
-    bottom: 15px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 20px;
-    height: 20px;
-
-    color: var(--color-yellow-dark);
-
-    font-size: 18px;
-    line-height: 1;
-
-    opacity: 0.85;
-
-    pointer-events: none;
-}
-
-
-/* ============================================================
-   十六、分组卡片交互效果
-============================================================ */
-
-/*
- * 仅提供视觉反馈。
- *
- * CSS 不会自动赋予卡片点击功能。
- * 是否能点击进入分组，需要由 home.js 实现。
- */
 
 @media (hover: hover) {
 
@@ -634,7 +494,7 @@
 }
 
 
-/* 如果以后将分组卡片设置为按钮或链接 */
+/* 如果卡片以后设置为按钮或链接 */
 
 button.home-group-card,
 a.home-group-card {
@@ -657,7 +517,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十七、作品区域
+   十四、作品区域
 ============================================================ */
 
 .shelf-content {
@@ -673,7 +533,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十八、作品区域标题栏
+   十五、作品区域标题栏
 ============================================================ */
 
 .shelf-content__header {
@@ -723,7 +583,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   十九、作品列表
+   十六、作品列表
 ============================================================ */
 
 .shelf-list {
@@ -747,7 +607,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十、作品卡片
+   十七、作品卡片
 ============================================================ */
 
 .shelf-card {
@@ -795,7 +655,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十一、卡片点击区域
+   十八、卡片点击区域
 ============================================================ */
 
 .shelf-card__open {
@@ -839,7 +699,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十二、卡片悬停效果
+   十九、卡片悬停效果
 ============================================================ */
 
 @media (hover: hover) {
@@ -866,7 +726,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十三、书籍封面容器
+   二十、书籍封面容器
 ============================================================ */
 
 .shelf-card__cover {
@@ -891,7 +751,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十四、真实封面图片
+   二十一、真实封面图片
 ============================================================ */
 
 .shelf-card__cover-image {
@@ -912,7 +772,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十五、默认封面
+   二十二、默认封面
 ============================================================ */
 
 .shelf-card__cover--default {
@@ -946,7 +806,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十六、默认封面外框
+   二十三、默认封面外框
 ============================================================ */
 
 .shelf-card__cover--default::before {
@@ -976,7 +836,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十七、默认封面角落装饰
+   二十四、默认封面角落装饰
 ============================================================ */
 
 .shelf-card__cover-decoration {
@@ -1011,7 +871,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十八、默认封面中心文字
+   二十五、默认封面中心文字
 ============================================================ */
 
 .shelf-card__cover-character {
@@ -1049,7 +909,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   二十九、默认封面书名
+   二十六、默认封面书名
 ============================================================ */
 
 .shelf-card__cover-title {
@@ -1086,7 +946,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十、封面备用容器
+   二十七、封面备用容器
 ============================================================ */
 
 .shelf-card__cover-fallback {
@@ -1102,7 +962,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十一、书籍信息区域
+   二十八、书籍信息区域
 ============================================================ */
 
 .shelf-card__body {
@@ -1118,7 +978,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十二、书籍标题
+   二十九、书籍标题
 ============================================================ */
 
 .shelf-card__title {
@@ -1150,7 +1010,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十三、书籍简介
+   三十、书籍简介
 ============================================================ */
 
 .shelf-card__description {
@@ -1176,7 +1036,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十四、书籍信息区域
+   三十一、书籍信息区域
 ============================================================ */
 
 .shelf-card__meta {
@@ -1197,7 +1057,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十五、字数信息
+   三十二、字数信息
 ============================================================ */
 
 .shelf-card__word-count {
@@ -1222,7 +1082,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十六、更新时间
+   三十三、更新时间
 ============================================================ */
 
 .shelf-card__updated-at {
@@ -1237,7 +1097,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十七、卡片操作区域
+   三十四、卡片操作区域
 ============================================================ */
 
 .shelf-card__actions {
@@ -1253,7 +1113,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十八、通用卡片按钮
+   三十五、通用卡片按钮
 ============================================================ */
 
 .shelf-card__button {
@@ -1288,7 +1148,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   三十九、打开作品按钮
+   三十六、打开作品按钮
 ============================================================ */
 
 .shelf-card__button--open {
@@ -1318,7 +1178,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   四十、底部导航布局保障
+   三十七、底部导航布局保障
 ============================================================ */
 
 .app-footer {
@@ -1334,7 +1194,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   四十一、平板适配
+   三十八、平板适配
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -1363,10 +1223,12 @@ a.home-group-card:focus-visible {
     }
 
     .home-group-card {
-        padding: 18px 15px 15px;
+        min-height: 82px;
+
+        padding: 18px 18px;
     }
 
-    .home-group-card__title {
+    .home-group-card__name {
         font-size: 17px;
     }
 
@@ -1397,7 +1259,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   四十二、手机适配
+   三十九、手机适配
 ============================================================ */
 
 @media (max-width: 480px) {
@@ -1408,6 +1270,7 @@ a.home-group-card:focus-visible {
 
     .empty-state h1 {
         font-size: 28px;
+
         letter-spacing: 3px;
     }
 
@@ -1449,14 +1312,6 @@ a.home-group-card:focus-visible {
         height: 20px;
     }
 
-    .home-groups__count {
-        min-height: 26px;
-
-        padding: 3px 8px;
-
-        font-size: 11px;
-    }
-
     .home-groups__list {
         grid-template-columns: minmax(0, 1fr);
 
@@ -1464,36 +1319,13 @@ a.home-group-card:focus-visible {
     }
 
     .home-group-card {
-        min-height: 96px;
+        min-height: 72px;
 
-        padding: 17px 16px 15px;
+        padding: 17px 18px;
     }
 
-    .home-group-card__title {
-        padding-right: 30px;
-
-        margin-bottom: 6px;
-
+    .home-group-card__name {
         font-size: 17px;
-    }
-
-    .home-group-card__description {
-        font-size: 12px;
-    }
-
-    .home-group-card__decoration {
-        top: 13px;
-        right: 13px;
-
-        width: 25px;
-        height: 25px;
-
-        font-size: 12px;
-    }
-
-    .home-group-card__arrow {
-        right: 13px;
-        bottom: 11px;
     }
 
     .shelf-content {
@@ -1566,7 +1398,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   四十三、超小屏幕适配
+   四十、超小屏幕适配
 ============================================================ */
 
 @media (max-width: 360px) {
@@ -1604,7 +1436,7 @@ a.home-group-card:focus-visible {
         padding-left: 13px;
     }
 
-    .home-group-card__title {
+    .home-group-card__name {
         font-size: 16px;
     }
 
@@ -1630,7 +1462,7 @@ a.home-group-card:focus-visible {
 
 
 /* ============================================================
-   四十四、减少动态效果
+   四十一、减少动态效果
 ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
