@@ -6,8 +6,9 @@
    2. 统一盒模型。
    3. 统一字体与文字基础规则。
    4. 统一页面基础尺寸。
-   5. 提供通用辅助类。
-   6. 为所有页面提供基础规则。
+   5. 建立应用整体纵向布局。
+   6. 提供通用辅助类。
+   7. 为所有页面提供基础规则。
 
    不负责：
    - 颜色定义：由 theme.css 负责。
@@ -25,10 +26,8 @@
 /*
  * 统一元素尺寸计算方式。
  *
- * 使用 border-box 后：
- * width 包含内容、内边距和边框。
- *
- * 这样更容易控制布局尺寸。
+ * width 和 height 包含内容、内边距和边框，
+ * 方便控制实际布局尺寸。
  */
 
 *,
@@ -44,6 +43,8 @@
 
 html,
 body {
+    width: 100%;
+
     margin: 0;
     padding: 0;
 }
@@ -57,8 +58,11 @@ body {
 
 html {
     min-height: 100%;
+
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+
+    scroll-behavior: smooth;
 }
 
 
@@ -145,6 +149,7 @@ ul,
 ol {
     margin: 0;
     padding: 0;
+
     list-style: none;
 }
 
@@ -161,7 +166,7 @@ ol {
 
 
 /* ============================================================
-   二、页面基础规则
+   二、全局字体与文字基础
 ============================================================ */
 
 /*
@@ -171,6 +176,10 @@ ol {
  */
 
 body {
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -184,39 +193,12 @@ body {
     font-weight: 400;
     line-height: 1.6;
 
+    font-kerning: normal;
+
+    overflow-wrap: break-word;
+
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-
-/*
- * 应用根节点。
- *
- * 这里只负责基础尺寸与定位上下文。
- * 不在这里设置具体的页面布局。
- */
-
-#app {
-    position: relative;
-    min-width: 0;
-    min-height: 100%;
-}
-
-
-/* ============================================================
-   三、中文字体基础
-============================================================ */
-
-/*
- * 普通正文优先使用清晰易读的系统中文字体。
- *
- * 不强制所有页面使用书法字体，
- * 避免长篇正文难以阅读。
- */
-
-body {
-    font-kerning: normal;
-    overflow-wrap: break-word;
 }
 
 
@@ -229,6 +211,69 @@ textarea,
 select,
 button {
     font-family: inherit;
+}
+
+
+/* ============================================================
+   三、应用整体布局
+============================================================ */
+
+/*
+ * 应用根节点。
+ *
+ * 这是本次修复的关键部分。
+ *
+ * display: flex
+ *    让顶部栏、主体和底部栏形成纵向布局。
+ *
+ * flex-direction: column
+ *    让各区域从上到下排列。
+ *
+ * min-height: 100vh / 100dvh
+ *    让应用至少占满当前屏幕高度。
+ *
+ * 注意：
+ * 这里只建立应用整体布局，
+ * 不负责具体页面内部的布局。
+ */
+
+#app {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+
+/*
+ * 顶部栏与底部栏不应被主体内容挤压。
+ *
+ * 具体高度、颜色与间距仍由各自的 CSS 文件负责。
+ */
+
+.app-header,
+.app-footer {
+    flex-shrink: 0;
+}
+
+
+/*
+ * 公共主体区域。
+ *
+ * 页面主体可以根据剩余空间进行伸展。
+ *
+ * 具体的 flex-grow、最小高度和滚动规则，
+ * 仍由各个页面自己的 CSS 决定。
+ */
+
+.app-main {
+    min-width: 0;
 }
 
 
@@ -292,6 +337,7 @@ button:disabled {
     overflow: hidden;
 
     clip: rect(0, 0, 0, 0);
+
     white-space: nowrap;
 
     border: 0;
@@ -306,6 +352,7 @@ button:disabled {
 
 .text-ellipsis {
     overflow: hidden;
+
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -327,14 +374,13 @@ button:disabled {
 ============================================================ */
 
 /*
- * 统一移动端滚动体验。
+ * 提供统一的滚动体验。
  *
- * 不在这里设置哪个容器负责滚动，
- * 具体滚动区域由对应页面的 CSS 决定。
+ * 具体由哪个容器负责滚动，
+ * 由对应页面的 CSS 决定。
  */
 
 html {
-    scroll-behavior: smooth;
     scrollbar-gutter: stable;
 }
 
@@ -353,6 +399,7 @@ html {
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
+
         animation-iteration-count: 1 !important;
 
         transition-duration: 0.01ms !important;
@@ -368,9 +415,9 @@ html {
 ============================================================ */
 
 /*
- * 防止窄屏设备上出现由根元素最小宽度导致的横向溢出。
+ * 防止窄屏设备出现横向溢出。
  *
- * 不在基础文件里强行指定页面的布局方式。
+ * 不在基础文件里强行指定页面内部的布局方式。
  */
 
 @media (max-width: 480px) {
