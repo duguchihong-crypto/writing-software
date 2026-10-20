@@ -9,6 +9,7 @@
    4. 兼容旧版本书籍数据
    5. 迁移旧版本单独保存的封面
    6. 通知其他页面数据发生变化
+   7. 允许分组模块扩展公共存储接口
 ====================================================== */
 
 (function () {
@@ -24,9 +25,6 @@
     const LEGACY_COVERS_KEY = "writing-software-book-covers";
 
     const DATABASE_VERSION = 2;
-
-    // 单次最多保存的书籍数量不在这里限制，
-    // 实际容量由浏览器的 localStorage 决定。
 
 
     /* ==================================================
@@ -97,8 +95,7 @@
             return "";
         }
 
-        // 仅允许图片 Data URL，避免将任意 URL 或脚本内容
-        // 当作封面图片保存。
+        // 仅允许图片 Data URL。
         if (
             !/^data:image\/(?:png|jpe?g|webp|gif|avif);base64,/i.test(
                 cover
@@ -225,8 +222,7 @@
             );
         }
 
-        // 兼容旧版本直接保存数组的格式，
-        // 以及带有 version 和 books 字段的数据库格式。
+        // 兼容旧版本数组格式和新版数据库格式。
         let books;
 
         if (Array.isArray(parsed)) {
@@ -334,7 +330,6 @@
         try {
             rawLegacyData = localStorage.getItem(LEGACY_COVERS_KEY);
         } catch (error) {
-            // 无法访问旧封面数据时，不影响正常读取书籍。
             return;
         }
 
@@ -347,7 +342,6 @@
         try {
             legacyCovers = JSON.parse(rawLegacyData);
         } catch (error) {
-            // 旧数据损坏时保留原数据，不擅自删除。
             return;
         }
 
@@ -415,11 +409,10 @@
         try {
             writeDatabase(books);
 
-            // 迁移成功后删除旧封面记录。
-            // 若写入失败，则保留旧记录，避免封面丢失。
+            // 只有迁移成功后才删除旧记录。
             localStorage.removeItem(LEGACY_COVERS_KEY);
         } catch (error) {
-            // 迁移失败不影响正常打开书架。
+            // 迁移失败时保留旧记录。
         }
     }
 
@@ -429,10 +422,9 @@
     ================================================== */
 
     function initialize() {
-        // 首先读取现有书籍，不能直接覆盖旧数据库。
+        // 先读取现有数据，绝不直接覆盖旧数据库。
         const books = readDatabase();
 
-        // 将旧版本的书籍字段统一为新版格式。
         let needsMigration = false;
 
         try {
@@ -461,7 +453,7 @@
                 }
             }
         } catch (error) {
-            // 保留异常数据，不在初始化阶段擅自覆盖。
+            // 异常数据不在初始化阶段被主动覆盖。
         }
 
         if (needsMigration) {
@@ -538,26 +530,17 @@
         const cover = normalizeCover(options.cover || "");
 
         const books = readDatabase();
-
         const now = getCurrentTime();
 
         const book = {
             id: createId(),
-
             title: title,
-
             description: description,
-
             cover: cover,
-
             createdAt: now,
-
             updatedAt: now,
-
             wordCount: 0,
-
             chapters: [],
-
             metadata: {
                 version: DATABASE_VERSION
             }
@@ -565,8 +548,6 @@
 
         books.unshift(book);
 
-        // 书名和封面在同一次数据库写入中保存，
-        // 避免只创建书名却没保存封面。
         writeDatabase(books);
 
         notifyChange({
@@ -774,7 +755,17 @@
        十七、公开接口
     ================================================== */
 
-    window.WritingStorage = Object.freeze({
+    // 注意：
+    // 此处不能使用 Object.freeze()。
+    // 分组存储模块需要将分组相关方法挂载到
+    // window.WritingStorage 上。
+    //
+    // 冻结对象会阻止添加属性，导致兼容挂载失败。
+    //
+    // 同时保留独立的 window.WritingGroupsStorage 接口，
+    // 供新建分组页面直接调用。
+
+    window.WritingStorage = {
         getBooks: getBooks,
         getBook: getBook,
         getBookCount: getBookCount,
@@ -787,7 +778,7 @@
         touchBook: touchBook,
 
         onChange: onChange
-    });
+    };
 
 
     /* ==================================================
