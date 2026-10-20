@@ -15,6 +15,8 @@
    10. 兼容旧版数组格式
    11. 防止外部直接修改内部数据
    12. 统一处理存储异常
+   13. 支持重复加载
+   14. 支持延迟连接 WritingStorage
 
    存储位置：localStorage
    存储键：writing-software-groups
@@ -43,22 +45,43 @@
 
     const MAX_NAME_LENGTH = 50;
 
-    const INITIALIZED_KEY = "__writingGroupsStorageInitialized";
+    const INITIALIZED_KEY =
+        "__writingGroupsStorageInitialized";
 
 
     /* ==================================================
-       二、防止重复初始化
+       二、重复加载检查
     ================================================== */
 
-    if (window[INITIALIZED_KEY]) {
-        return;
-    }
+    /*
+     * 如果模块已经成功初始化，
+     * 不再重复创建内部函数和事件监听器。
+     *
+     * 即使 WritingStorage 尚未连接，
+     * 后续加载的脚本也可以尝试重新连接。
+     */
 
-    window[INITIALIZED_KEY] = true;
+    if (window[INITIALIZED_KEY]) {
+        if (
+            window.WritingGroupsStorage &&
+            typeof window.WritingGroupsStorage.createGroup === "function"
+        ) {
+            attachExistingStorage();
+
+            return;
+        }
+
+        /*
+         * 如果初始化标记存在，但接口不存在，
+         * 清除失效标记，允许重新初始化。
+         */
+
+        delete window[INITIALIZED_KEY];
+    }
 
 
     /* ==================================================
-       三、创建统一错误
+       三、统一错误处理
     ================================================== */
 
     function createError(message, code) {
@@ -107,7 +130,7 @@
 
 
     /* ==================================================
-       六、检查分组名称
+       六、验证分组名称
     ================================================== */
 
     function validateName(name) {
@@ -133,9 +156,6 @@
 
     /* ==================================================
        七、比较分组名称
-
-       比较前去除首尾空格。
-       比较时不区分大小写。
     ================================================== */
 
     function normalizeNameForComparison(name) {
@@ -175,9 +195,6 @@
 
     /* ==================================================
        九、复制附加信息
-
-       metadata 用于保存分组的扩展信息。
-       不允许非普通对象直接进入存储。
     ================================================== */
 
     function cloneMetadata(metadata) {
@@ -317,17 +334,9 @@
             const normalizedName =
                 normalizeNameForComparison(group.name);
 
-            /*
-             * 跳过重复 ID。
-             */
-
             if (usedIds.has(normalizedId)) {
                 return;
             }
-
-            /*
-             * 跳过重复名称。
-             */
 
             if (usedNames.has(normalizedName)) {
                 return;
@@ -352,7 +361,7 @@
         const raw = readRawData();
 
         /*
-         * 尚未创建分组数据库。
+         * 尚未创建数据库。
          */
 
         if (raw === null || raw === "") {
@@ -378,14 +387,6 @@
 
         /*
          * 兼容旧版直接保存数组的格式。
-         *
-         * 旧格式：
-         * [
-         *     {
-         *         id: "...",
-         *         name: "..."
-         *     }
-         * ]
          */
 
         if (Array.isArray(parsed)) {
@@ -444,7 +445,7 @@
             );
         } catch (error) {
             console.warn(
-                "分组数据变化通知失败：",
+                "[分组存储] 数据变化通知失败：",
                 error
             );
         }
@@ -478,8 +479,7 @@
         }
 
         /*
-         * 先保存。
-         * 只有保存成功后，才通知页面。
+         * 保存数据。
          */
 
         try {
@@ -506,6 +506,10 @@
                     : "GROUP_STORAGE_UNAVAILABLE"
             );
         }
+
+        /*
+         * 保存成功后通知页面。
+         */
 
         notifyChange(database.groups);
 
@@ -618,28 +622,13 @@
             );
         }
 
-        /*
-         * 验证分组名称。
-         */
-
         const name = validateName(options.name);
-
-        /*
-         * 读取现有数据库。
-         */
 
         const database = readDatabase();
 
-        /*
-         * 检查名称是否重复。
-         */
-
         const duplicated = database.groups.some(
             function (group) {
-                return compareNames(
-                    group.name,
-                    name
-                );
+                return compareNames(group.name, name);
             }
         );
 
@@ -649,10 +638,6 @@
                 "GROUP_NAME_DUPLICATE"
             );
         }
-
-        /*
-         * 创建新分组。
-         */
 
         const now = new Date().toISOString();
 
@@ -667,10 +652,6 @@
 
             metadata: cloneMetadata(options.metadata)
         };
-
-        /*
-         * 写入数据库。
-         */
 
         database.groups.push(group);
 
@@ -713,10 +694,6 @@
             }
         );
 
-        /*
-         * 分组不存在时返回 null。
-         */
-
         if (index === -1) {
             return null;
         }
@@ -725,10 +702,9 @@
             database.groups[index]
         );
 
-
-        /* ----------------------------------------------
-           修改分组名称
-        ---------------------------------------------- */
+        /*
+         * 修改分组名称。
+         */
 
         if (
             Object.prototype.hasOwnProperty.call(
@@ -742,10 +718,7 @@
                 function (group) {
                     return (
                         group.id !== targetId &&
-                        compareNames(
-                            group.name,
-                            name
-                        )
+                        compareNames(group.name, name)
                     );
                 }
             );
@@ -760,10 +733,9 @@
             updatedGroup.name = name;
         }
 
-
-        /* ----------------------------------------------
-           合并附加信息
-        ---------------------------------------------- */
+        /*
+         * 合并附加信息。
+         */
 
         if (
             Object.prototype.hasOwnProperty.call(
@@ -785,18 +757,9 @@
             );
         }
 
-
-        /* ----------------------------------------------
-           更新时间
-        ---------------------------------------------- */
-
         updatedGroup.updatedAt = new Date().toISOString();
 
         database.groups[index] = updatedGroup;
-
-        /*
-         * 保存修改后的数据库。
-         */
 
         writeDatabase(database.groups);
 
@@ -827,10 +790,6 @@
             }
         );
 
-        /*
-         * 分组不存在时，不执行保存。
-         */
-
         if (index === -1) {
             return false;
         }
@@ -852,23 +811,14 @@
             return function () {};
         }
 
-        /*
-         * 处理当前页面的自定义事件。
-         */
-
         function handleChange(event) {
             let groups;
 
             try {
-                /*
-                 * 从最新数据库读取数据，
-                 * 不直接使用事件中可能过时的数据。
-                 */
-
                 groups = getGroups();
             } catch (error) {
                 console.error(
-                    "读取更新后的分组失败：",
+                    "[分组存储] 读取更新后的分组失败：",
                     error
                 );
 
@@ -887,7 +837,6 @@
             });
         }
 
-
         /*
          * 当前页面的数据变化。
          */
@@ -896,7 +845,6 @@
             CHANGE_EVENT,
             handleChange
         );
-
 
         /*
          * 其他标签页的数据变化。
@@ -917,7 +865,6 @@
             handleStorage
         );
 
-
         /*
          * 返回取消监听函数。
          */
@@ -937,10 +884,10 @@
 
 
     /* ==================================================
-       二十七、公开分组存储接口
+       二十七、公开独立分组接口
     ================================================== */
 
-    const groupsAPI = {
+    const groupsAPI = Object.freeze({
         getGroups: getGroups,
 
         getGroup: getGroup,
@@ -958,33 +905,31 @@
         deleteGroup: deleteGroup,
 
         onChange: onChange
-    };
-
-
-    /*
-     * 独立分组接口。
-     */
+    });
 
     window.WritingGroupsStorage = groupsAPI;
 
 
     /* ==================================================
-       二十八、兼容 WritingStorage
+       二十八、连接 WritingStorage
     ================================================== */
 
     function attachToWritingStorage() {
-        if (!window.WritingStorage) {
-            console.error(
-                "分组存储模块无法连接 WritingStorage。" +
-                "请确保 storage.js 在 groups-storage.js 之前加载。"
-            );
+        const storage = window.WritingStorage;
 
+        if (
+            !storage ||
+            (
+                typeof storage !== "object" &&
+                typeof storage !== "function"
+            )
+        ) {
             return false;
         }
 
         /*
-         * 只添加分组相关方法。
-         * 不覆盖原有书籍存储方法。
+         * 只添加分组方法。
+         * 不修改书籍存储方法。
          */
 
         const methods = {
@@ -1007,20 +952,158 @@
             onGroupsChange: onChange
         };
 
-        Object.keys(methods).forEach(function (methodName) {
-            window.WritingStorage[methodName] =
-                methods[methodName];
-        });
+        try {
+            Object.keys(methods).forEach(function (methodName) {
+                storage[methodName] = methods[methodName];
+            });
 
-        return true;
+            return true;
+        } catch (error) {
+            console.error(
+                "[分组存储] 无法连接 WritingStorage：",
+                error
+            );
+
+            return false;
+        }
     }
 
 
     /* ==================================================
-       二十九、初始化
+       二十九、连接已有接口
     ================================================== */
 
+    function attachExistingStorage() {
+        const storage = window.WritingGroupsStorage;
+
+        if (!storage) {
+            return false;
+        }
+
+        const writingStorage = window.WritingStorage;
+
+        if (
+            !writingStorage ||
+            (
+                typeof writingStorage !== "object" &&
+                typeof writingStorage !== "function"
+            )
+        ) {
+            return false;
+        }
+
+        const methods = [
+            "getGroups",
+            "getGroup",
+            "getGroupCount",
+            "hasGroup",
+            "hasGroupName",
+            "createGroup",
+            "updateGroup",
+            "deleteGroup"
+        ];
+
+        try {
+            methods.forEach(function (methodName) {
+                if (typeof storage[methodName] === "function") {
+                    writingStorage[methodName] = storage[methodName];
+                }
+            });
+
+            if (typeof storage.onChange === "function") {
+                writingStorage.onGroupsChange = storage.onChange;
+            }
+
+            return true;
+        } catch (error) {
+            console.error(
+                "[分组存储] 连接已有接口失败：",
+                error
+            );
+
+            return false;
+        }
+    }
+
+
+    /* ==================================================
+       三十、初始化
+    ================================================== */
+
+    /*
+     * 标记初始化成功。
+     */
+
+    window[INITIALIZED_KEY] = true;
+
+    /*
+     * 首次尝试连接 WritingStorage。
+     */
+
     attachToWritingStorage();
+
+    /*
+     * 如果 storage.js 尚未加载，
+     * 页面加载完成后再次尝试连接。
+     */
+
+    if (!window.WritingStorage) {
+        window.addEventListener(
+            "load",
+            function () {
+                attachToWritingStorage();
+            },
+            { once: true }
+        );
+    }
+
+    /*
+     * 兼容其他脚本稍后创建 WritingStorage 的情况。
+     * 仅在当前接口缺失时尝试连接。
+     */
+
+    if (
+        !window.WritingStorage ||
+        typeof window.WritingStorage.createGroup !== "function"
+    ) {
+        let retryCount = 0;
+
+        const MAX_RETRIES = 10;
+
+        const retryTimer = window.setInterval(
+            function () {
+                retryCount++;
+
+                if (attachToWritingStorage()) {
+                    window.clearInterval(retryTimer);
+
+                    return;
+                }
+
+                if (retryCount >= MAX_RETRIES) {
+                    window.clearInterval(retryTimer);
+                }
+            },
+            200
+        );
+    }
+
+    console.log(
+        "[分组存储] 初始化成功。",
+        {
+            independentAPI: Boolean(
+                window.WritingGroupsStorage
+            ),
+
+            writingStorage: Boolean(
+                window.WritingStorage
+            ),
+
+            createGroup: typeof groupsAPI.createGroup,
+
+            getGroups: typeof groupsAPI.getGroups
+        }
+    );
 
 
 })();
