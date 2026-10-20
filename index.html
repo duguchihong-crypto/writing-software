@@ -32,65 +32,41 @@
          二、公共样式
     ================================================== -->
 
-    <link
-        rel="stylesheet"
-        href="./css/theme.css"
-    >
+    <link rel="stylesheet" href="./css/theme.css">
 
-    <link
-        rel="stylesheet"
-        href="./css/base.css"
-    >
+    <link rel="stylesheet" href="./css/base.css">
 
-    <link
-        rel="stylesheet"
-        href="./css/header.css"
-    >
+    <link rel="stylesheet" href="./css/header.css">
 
-    <link
-        rel="stylesheet"
-        href="./css/footer.css"
-    >
+    <link rel="stylesheet" href="./css/footer.css">
 
 
     <!-- ==================================================
          三、首页专属样式
     ================================================== -->
 
-    <link
-        rel="stylesheet"
-        href="./page-css/home.css"
-    >
+    <link rel="stylesheet" href="./page-css/home.css">
 
 
     <!-- ==================================================
          四、公共 JavaScript
     ================================================== -->
 
-    <script
-        src="./js/storage.js"
-        defer
-    ></script>
+    <script src="./js/storage.js" defer></script>
 
-    <script
-        src="./js/navigation.js"
-        defer
-    ></script>
+    <!-- 分组存储模块 -->
+    <script src="./js/groups-storage.js" defer></script>
 
-    <script
-        src="./js/components.js"
-        defer
-    ></script>
+    <script src="./js/navigation.js" defer></script>
+
+    <script src="./js/components.js" defer></script>
 
 
     <!-- ==================================================
          五、首页 JavaScript
     ================================================== -->
 
-    <script
-        src="./page-js/home.js"
-        defer
-    ></script>
+    <script src="./page-js/home.js" defer></script>
 
 </head>
 
@@ -99,27 +75,16 @@
 
     <!-- ==================================================
          软件主体
-
-         使用纵向 Flex 布局：
-         顶部导航栏
-         中间主体
-         底部导航栏
     ================================================== -->
 
-    <div
-        class="app"
-        id="app"
-    >
+    <div class="app" id="app">
 
 
         <!-- ==================================================
              一、顶部导航栏
-    ================================================== -->
+        ================================================== -->
 
-        <header
-            class="app-header"
-            id="app-header"
-        >
+        <header class="app-header" id="app-header">
 
             <!-- 软件名称 -->
 
@@ -144,7 +109,7 @@
 
             <div class="app-header__actions">
 
-                <!-- 新建 -->
+                <!-- 新建作品 -->
 
                 <a
                     class="app-header__button app-header__button--create"
@@ -186,16 +151,9 @@
 
         <!-- ==================================================
              二、中间页面主体
+        ================================================== -->
 
-             关键：
-             app-main 必须能够伸展，
-             占满顶部和底部之间的剩余高度。
-    ================================================== -->
-
-        <main
-            class="app-main"
-            id="app-main"
-        >
+        <main class="app-main" id="app-main">
 
             <!-- 书架页面 -->
 
@@ -265,7 +223,55 @@
 
 
                 <!-- ==========================================
-                     2.2 作品列表
+                     2.2 我的分组
+                =========================================== -->
+
+                <section
+                    class="home-groups"
+                    id="home-groups"
+                    aria-label="我的分组"
+                    hidden
+                >
+
+                    <!-- 分组区域标题 -->
+
+                    <div class="home-groups__header">
+
+                        <h2 class="home-groups__title">
+                            我的分组
+                        </h2>
+
+                        <span
+                            class="home-groups__count"
+                            id="home-groups-count"
+                            aria-live="polite"
+                        >
+                            0 个分组
+                        </span>
+
+                    </div>
+
+
+                    <!-- 分组卡片容器 -->
+
+                    <div
+                        class="home-groups__list"
+                        id="home-groups-list"
+                        aria-label="分组列表"
+                    >
+
+                        <!--
+                            分组卡片由 home.js 动态生成。
+                        -->
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==========================================
+                     2.3 作品列表
                 =========================================== -->
 
                 <section
@@ -319,15 +325,9 @@
 
         <!-- ==================================================
              三、底部导航栏
+        ================================================== -->
 
-             不依赖中间内容的高度。
-             页面主体伸展时，底部自然贴近屏幕底部。
-    ================================================== -->
-
-        <footer
-            class="app-footer"
-            id="app-footer"
-        >
+        <footer class="app-footer" id="app-footer">
 
             <nav
                 class="bottom-nav"
