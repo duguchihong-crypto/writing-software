@@ -8,18 +8,28 @@
    3. 获取单个分组
    4. 获取分组数量
    5. 检查分组 ID 和名称
-   6. 修改分组名称及信息
+   6. 修改分组名称及附加信息
    7. 删除分组
    8. 监听当前页面和其他页面的数据变化
    9. 兼容 WritingStorage
    10. 兼容旧版数组格式
+   11. 防止外部直接修改内部数据
+   12. 统一处理存储异常
 
    存储位置：localStorage
    存储键：writing-software-groups
+
+   依赖：
+   js/storage.js
+
+   全局接口：
+   window.WritingGroupsStorage
+   window.WritingStorage
 ====================================================== */
 
 (function () {
     "use strict";
+
 
     /* ==================================================
        一、基础配置
@@ -33,9 +43,22 @@
 
     const MAX_NAME_LENGTH = 50;
 
+    const INITIALIZED_KEY = "__writingGroupsStorageInitialized";
+
 
     /* ==================================================
-       二、创建统一错误
+       二、防止重复初始化
+    ================================================== */
+
+    if (window[INITIALIZED_KEY]) {
+        return;
+    }
+
+    window[INITIALIZED_KEY] = true;
+
+
+    /* ==================================================
+       三、创建统一错误
     ================================================== */
 
     function createError(message, code) {
@@ -50,7 +73,7 @@
 
 
     /* ==================================================
-       三、生成分组 ID
+       四、生成分组 ID
     ================================================== */
 
     function createId() {
@@ -65,13 +88,13 @@
             "group-" +
             Date.now().toString(36) +
             "-" +
-            Math.random().toString(36).slice(2, 12)
+            Math.random().toString(36).slice(2, 14)
         );
     }
 
 
     /* ==================================================
-       四、标准化分组名称
+       五、标准化分组名称
     ================================================== */
 
     function normalizeName(name) {
@@ -84,7 +107,7 @@
 
 
     /* ==================================================
-       五、检查分组名称
+       六、检查分组名称
     ================================================== */
 
     function validateName(name) {
@@ -109,30 +132,52 @@
 
 
     /* ==================================================
-       六、比较分组名称
+       七、比较分组名称
+
+       比较前去除首尾空格。
+       比较时不区分大小写。
     ================================================== */
 
-    function compareNames(nameA, nameB) {
-        return normalizeName(nameA).toLocaleLowerCase() ===
-            normalizeName(nameB).toLocaleLowerCase();
+    function normalizeNameForComparison(name) {
+        return normalizeName(name).toLocaleLowerCase();
     }
 
 
-    /* ==================================================
-       七、检查对象是否为普通对象
-    ================================================== */
-
-    function isPlainObject(value) {
+    function compareNames(nameA, nameB) {
         return (
-            value !== null &&
-            typeof value === "object" &&
-            !Array.isArray(value)
+            normalizeNameForComparison(nameA) ===
+            normalizeNameForComparison(nameB)
         );
     }
 
 
     /* ==================================================
-       八、复制附加信息
+       八、检查普通对象
+    ================================================== */
+
+    function isPlainObject(value) {
+        if (
+            value === null ||
+            typeof value !== "object" ||
+            Array.isArray(value)
+        ) {
+            return false;
+        }
+
+        const prototype = Object.getPrototypeOf(value);
+
+        return (
+            prototype === Object.prototype ||
+            prototype === null
+        );
+    }
+
+
+    /* ==================================================
+       九、复制附加信息
+
+       metadata 用于保存分组的扩展信息。
+       不允许非普通对象直接进入存储。
     ================================================== */
 
     function cloneMetadata(metadata) {
@@ -141,7 +186,17 @@
         }
 
         try {
-            return JSON.parse(JSON.stringify(metadata));
+            const serialized = JSON.stringify(metadata);
+
+            if (serialized === undefined) {
+                return {};
+            }
+
+            const cloned = JSON.parse(serialized);
+
+            return isPlainObject(cloned)
+                ? cloned
+                : {};
         } catch (error) {
             return {};
         }
@@ -149,7 +204,7 @@
 
 
     /* ==================================================
-       九、标准化分组数据
+       十、标准化单个分组
     ================================================== */
 
     function normalizeGroup(group) {
@@ -170,15 +225,17 @@
         return {
             id: id,
 
-            name: name.slice(0, MAX_NAME_LENGTH),
+            name: name,
 
             createdAt:
-                typeof group.createdAt === "string"
+                typeof group.createdAt === "string" &&
+                group.createdAt
                     ? group.createdAt
                     : now,
 
             updatedAt:
-                typeof group.updatedAt === "string"
+                typeof group.updatedAt === "string" &&
+                group.updatedAt
                     ? group.updatedAt
                     : now,
 
@@ -188,7 +245,7 @@
 
 
     /* ==================================================
-       十、复制单个分组
+       十一、复制单个分组
     ================================================== */
 
     function cloneGroup(group) {
@@ -207,7 +264,7 @@
 
 
     /* ==================================================
-       十一、复制全部分组
+       十二、复制全部分组
     ================================================== */
 
     function cloneGroups(groups) {
@@ -218,7 +275,7 @@
 
 
     /* ==================================================
-       十二、读取原始数据
+       十三、读取原始数据
     ================================================== */
 
     function readRawData() {
@@ -234,7 +291,61 @@
 
 
     /* ==================================================
-       十三、读取分组数据库
+       十四、标准化分组列表
+    ================================================== */
+
+    function normalizeGroups(groups) {
+        if (!Array.isArray(groups)) {
+            return [];
+        }
+
+        const result = [];
+
+        const usedIds = new Set();
+
+        const usedNames = new Set();
+
+        groups.forEach(function (item) {
+            const group = normalizeGroup(item);
+
+            if (!group) {
+                return;
+            }
+
+            const normalizedId = group.id;
+
+            const normalizedName =
+                normalizeNameForComparison(group.name);
+
+            /*
+             * 跳过重复 ID。
+             */
+
+            if (usedIds.has(normalizedId)) {
+                return;
+            }
+
+            /*
+             * 跳过重复名称。
+             */
+
+            if (usedNames.has(normalizedName)) {
+                return;
+            }
+
+            usedIds.add(normalizedId);
+
+            usedNames.add(normalizedName);
+
+            result.push(group);
+        });
+
+        return result;
+    }
+
+
+    /* ==================================================
+       十五、读取分组数据库
     ================================================== */
 
     function readDatabase() {
@@ -267,6 +378,14 @@
 
         /*
          * 兼容旧版直接保存数组的格式。
+         *
+         * 旧格式：
+         * [
+         *     {
+         *         id: "...",
+         *         name: "..."
+         *     }
+         * ]
          */
 
         if (Array.isArray(parsed)) {
@@ -307,57 +426,7 @@
 
 
     /* ==================================================
-       十四、标准化分组列表
-    ================================================== */
-
-    function normalizeGroups(groups) {
-        const result = [];
-
-        const usedIds = new Set();
-
-        const usedNames = new Set();
-
-        groups.forEach(function (item) {
-            const group = normalizeGroup(item);
-
-            if (!group) {
-                return;
-            }
-
-            const normalizedId = group.id;
-
-            const normalizedName =
-                group.name.toLocaleLowerCase();
-
-            /*
-             * 跳过重复 ID。
-             */
-
-            if (usedIds.has(normalizedId)) {
-                return;
-            }
-
-            /*
-             * 跳过重复名称。
-             */
-
-            if (usedNames.has(normalizedName)) {
-                return;
-            }
-
-            usedIds.add(normalizedId);
-
-            usedNames.add(normalizedName);
-
-            result.push(group);
-        });
-
-        return result;
-    }
-
-
-    /* ==================================================
-       十五、通知数据变化
+       十六、通知数据变化
     ================================================== */
 
     function notifyChange(groups) {
@@ -383,7 +452,7 @@
 
 
     /* ==================================================
-       十六、保存分组数据库
+       十七、保存分组数据库
     ================================================== */
 
     function writeDatabase(groups) {
@@ -407,6 +476,11 @@
                 "GROUP_SERIALIZE_FAILED"
             );
         }
+
+        /*
+         * 先保存。
+         * 只有保存成功后，才通知页面。
+         */
 
         try {
             window.localStorage.setItem(
@@ -433,10 +507,6 @@
             );
         }
 
-        /*
-         * 只有保存成功后才通知页面。
-         */
-
         notifyChange(database.groups);
 
         return database;
@@ -444,7 +514,7 @@
 
 
     /* ==================================================
-       十七、获取全部分组
+       十八、获取全部分组
     ================================================== */
 
     function getGroups() {
@@ -455,11 +525,15 @@
 
 
     /* ==================================================
-       十八、获取单个分组
+       十九、获取单个分组
     ================================================== */
 
     function getGroup(id) {
-        if (id === null || id === undefined || id === "") {
+        if (
+            id === null ||
+            id === undefined ||
+            id === ""
+        ) {
             return null;
         }
 
@@ -471,12 +545,14 @@
             return item.id === targetId;
         });
 
-        return group ? cloneGroup(group) : null;
+        return group
+            ? cloneGroup(group)
+            : null;
     }
 
 
     /* ==================================================
-       十九、获取分组数量
+       二十、获取分组数量
     ================================================== */
 
     function getGroupCount() {
@@ -485,7 +561,7 @@
 
 
     /* ==================================================
-       二十、检查分组是否存在
+       二十一、检查分组 ID 是否存在
     ================================================== */
 
     function hasGroup(id) {
@@ -494,7 +570,7 @@
 
 
     /* ==================================================
-       二十一、检查分组名称是否重复
+       二十二、检查分组名称是否重复
     ================================================== */
 
     function hasGroupName(name, excludeId) {
@@ -505,14 +581,18 @@
         }
 
         const targetId =
-            excludeId === null || excludeId === undefined
+            excludeId === null ||
+            excludeId === undefined
                 ? null
                 : String(excludeId);
 
         const groups = getGroups();
 
         return groups.some(function (group) {
-            if (targetId && group.id === targetId) {
+            if (
+                targetId !== null &&
+                group.id === targetId
+            ) {
                 return false;
             }
 
@@ -525,11 +605,18 @@
 
 
     /* ==================================================
-       二十二、创建分组
+       二十三、创建分组
     ================================================== */
 
     function createGroup(options) {
         options = options || {};
+
+        if (!isPlainObject(options)) {
+            throw createError(
+                "分组创建参数不正确。",
+                "GROUP_INVALID_OPTIONS"
+            );
+        }
 
         /*
          * 验证分组名称。
@@ -538,7 +625,7 @@
         const name = validateName(options.name);
 
         /*
-         * 读取现有数据。
+         * 读取现有数据库。
          */
 
         const database = readDatabase();
@@ -549,7 +636,10 @@
 
         const duplicated = database.groups.some(
             function (group) {
-                return compareNames(group.name, name);
+                return compareNames(
+                    group.name,
+                    name
+                );
             }
         );
 
@@ -591,18 +681,20 @@
 
 
     /* ==================================================
-       二十三、修改分组
+       二十四、修改分组
     ================================================== */
 
     function updateGroup(id, changes) {
-        if (id === null || id === undefined || id === "") {
+        if (
+            id === null ||
+            id === undefined ||
+            id === ""
+        ) {
             throw createError(
                 "缺少分组 ID。",
                 "GROUP_ID_REQUIRED"
             );
         }
-
-        changes = changes || {};
 
         if (!isPlainObject(changes)) {
             throw createError(
@@ -621,6 +713,10 @@
             }
         );
 
+        /*
+         * 分组不存在时返回 null。
+         */
+
         if (index === -1) {
             return null;
         }
@@ -630,9 +726,9 @@
         );
 
 
-        /*
-         * 修改名称。
-         */
+        /* ----------------------------------------------
+           修改分组名称
+        ---------------------------------------------- */
 
         if (
             Object.prototype.hasOwnProperty.call(
@@ -646,7 +742,10 @@
                 function (group) {
                     return (
                         group.id !== targetId &&
-                        compareNames(group.name, name)
+                        compareNames(
+                            group.name,
+                            name
+                        )
                     );
                 }
             );
@@ -662,9 +761,9 @@
         }
 
 
-        /*
-         * 合并附加信息。
-         */
+        /* ----------------------------------------------
+           合并附加信息
+        ---------------------------------------------- */
 
         if (
             Object.prototype.hasOwnProperty.call(
@@ -681,19 +780,23 @@
 
             updatedGroup.metadata = Object.assign(
                 {},
-                updatedGroup.metadata,
+                cloneMetadata(updatedGroup.metadata),
                 cloneMetadata(changes.metadata)
             );
         }
 
 
-        /*
-         * 更新时间。
-         */
+        /* ----------------------------------------------
+           更新时间
+        ---------------------------------------------- */
 
         updatedGroup.updatedAt = new Date().toISOString();
 
         database.groups[index] = updatedGroup;
+
+        /*
+         * 保存修改后的数据库。
+         */
 
         writeDatabase(database.groups);
 
@@ -702,11 +805,15 @@
 
 
     /* ==================================================
-       二十四、删除分组
+       二十五、删除分组
     ================================================== */
 
     function deleteGroup(id) {
-        if (id === null || id === undefined || id === "") {
+        if (
+            id === null ||
+            id === undefined ||
+            id === ""
+        ) {
             return false;
         }
 
@@ -719,6 +826,10 @@
                 return group.id === targetId;
             }
         );
+
+        /*
+         * 分组不存在时，不执行保存。
+         */
 
         if (index === -1) {
             return false;
@@ -733,7 +844,7 @@
 
 
     /* ==================================================
-       二十五、监听分组数据变化
+       二十六、监听分组数据变化
     ================================================== */
 
     function onChange(callback) {
@@ -742,13 +853,18 @@
         }
 
         /*
-         * 当前页面的数据变化。
+         * 处理当前页面的自定义事件。
          */
 
         function handleChange(event) {
             let groups;
 
             try {
+                /*
+                 * 从最新数据库读取数据，
+                 * 不直接使用事件中可能过时的数据。
+                 */
+
                 groups = getGroups();
             } catch (error) {
                 console.error(
@@ -773,7 +889,7 @@
 
 
         /*
-         * 监听当前页面的自定义事件。
+         * 当前页面的数据变化。
          */
 
         window.addEventListener(
@@ -783,7 +899,7 @@
 
 
         /*
-         * 监听其他页面或标签页的 localStorage 更新。
+         * 其他标签页的数据变化。
          */
 
         function handleStorage(event) {
@@ -821,7 +937,7 @@
 
 
     /* ==================================================
-       二十六、公开分组存储接口
+       二十七、公开分组存储接口
     ================================================== */
 
     const groupsAPI = {
@@ -853,7 +969,7 @@
 
 
     /* ==================================================
-       二十七、兼容 WritingStorage
+       二十八、兼容 WritingStorage
     ================================================== */
 
     function attachToWritingStorage() {
@@ -867,34 +983,41 @@
         }
 
         /*
-         * 仅添加分组相关方法。
-         * 不覆盖原有书籍方法。
+         * 只添加分组相关方法。
+         * 不覆盖原有书籍存储方法。
          */
 
-        window.WritingStorage.getGroups = getGroups;
+        const methods = {
+            getGroups: getGroups,
 
-        window.WritingStorage.getGroup = getGroup;
+            getGroup: getGroup,
 
-        window.WritingStorage.getGroupCount = getGroupCount;
+            getGroupCount: getGroupCount,
 
-        window.WritingStorage.hasGroup = hasGroup;
+            hasGroup: hasGroup,
 
-        window.WritingStorage.hasGroupName = hasGroupName;
+            hasGroupName: hasGroupName,
 
-        window.WritingStorage.createGroup = createGroup;
+            createGroup: createGroup,
 
-        window.WritingStorage.updateGroup = updateGroup;
+            updateGroup: updateGroup,
 
-        window.WritingStorage.deleteGroup = deleteGroup;
+            deleteGroup: deleteGroup,
 
-        window.WritingStorage.onGroupsChange = onChange;
+            onGroupsChange: onChange
+        };
+
+        Object.keys(methods).forEach(function (methodName) {
+            window.WritingStorage[methodName] =
+                methods[methodName];
+        });
 
         return true;
     }
 
 
     /* ==================================================
-       二十八、初始化
+       二十九、初始化
     ================================================== */
 
     attachToWritingStorage();
