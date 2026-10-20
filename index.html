@@ -6,7 +6,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
     <meta
@@ -16,91 +16,114 @@
 
     <meta
         name="description"
-        content="一方书斋，静候新篇。记录灵感，创作故事。"
+        content="一方宣纸，一卷故事。用于创作、整理与管理个人作品的写作软件。"
     >
 
-    <title>写作软件 · 书斋</title>
+    <title>写作软件 · 书架</title>
 
-    <!-- ==================================================
+    <!-- ==============================
          公共样式
-    ================================================== -->
+         负责全站基础样式与颜色变量
+    =============================== -->
+    <link
+        rel="stylesheet"
+        href="css/base.css"
+    >
 
-    <link rel="stylesheet" href="css/base.css">
-
-    <!-- 首页样式 -->
-
-    <link rel="stylesheet" href="css/home.css">
+    <!-- ==============================
+         书架专属样式
+         不影响其他功能页面
+    =============================== -->
+    <link
+        rel="stylesheet"
+        href="css/home.css"
+    >
 </head>
 
 <body>
 
-    <!-- ==================================================
-         页面整体容器
-    ================================================== -->
+    <!-- ==============================
+         应用根节点
+    =============================== -->
+    <div id="app" class="app">
 
-    <div class="app" id="app">
+        <!-- ==============================
+             顶部导航栏
+        =============================== -->
+        <header class="topbar">
 
-
-        <!-- ==================================================
-             ① 顶部固定导航栏
-        ================================================== -->
-
-        <header class="topbar" id="topbar">
-
-            <!-- 左侧：软件名称 -->
-
+            <!-- 软件名称 -->
             <div class="topbar__brand">
 
-                <a
-                    class="topbar__brand-link"
-                    href="./index.html"
-                    aria-label="返回书架首页"
+                <span
+                    class="topbar__brand-mark"
+                    aria-hidden="true"
                 >
+                    文
+                </span>
 
-                    <span class="topbar__brand-name">
-                        写作软件
-                    </span>
-
-                </a>
+                <span class="topbar__brand-name">
+                    写作软件
+                </span>
 
             </div>
 
-
-            <!-- 右侧：操作按钮 -->
-
+            <!-- 顶部操作区 -->
             <nav
                 class="topbar__actions"
-                aria-label="顶部导航"
+                aria-label="顶部操作"
             >
 
                 <!-- 新建作品 -->
-
                 <a
                     class="topbar__button topbar__button--create"
                     href="pages/create.html"
                 >
 
-                    <span
+                    <svg
                         class="topbar__button-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
                         aria-hidden="true"
-                    >＋</span>
+                    >
+                        <path
+                            d="M12 5V19M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </svg>
 
                     <span>新建</span>
 
                 </a>
 
-
-                <!-- 软件设置 -->
-
+                <!-- 设置 -->
                 <a
                     class="topbar__button topbar__button--settings"
                     href="pages/settings.html"
+                    aria-label="设置"
                 >
 
-                    <span
+                    <svg
                         class="topbar__button-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
                         aria-hidden="true"
-                    >⚙</span>
+                    >
+                        <path
+                            d="M12 8.5A3.5 3.5 0 1 0 12 15.5A3.5 3.5 0 0 0 12 8.5Z"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        />
+
+                        <path
+                            d="M19.4 13.5A7.7 7.7 0 0 0 19.4 10.5L21 9.3L19.4 6.5L17.5 7.2A7.5 7.5 0 0 0 14.9 5.7L14.6 3.7H9.4L9.1 5.7A7.5 7.5 0 0 0 6.5 7.2L4.6 6.5L3 9.3L4.6 10.5A7.7 7.7 0 0 0 4.6 13.5L3 14.7L4.6 17.5L6.5 16.8A7.5 7.5 0 0 0 9.1 18.3L9.4 20.3H14.6L14.9 18.3A7.5 7.5 0 0 0 17.5 16.8L19.4 17.5L21 14.7L19.4 13.5Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
 
                     <span>设置</span>
 
@@ -111,281 +134,251 @@
         </header>
 
 
-
-        <!-- ==================================================
-             ② 中间主内容区
-
-             首页本身就是书架。
-             不需要单独创建 shelf.html。
-        ================================================== -->
-
-        <main class="main-content" id="main-content">
-
-            <!-- 书架首页 -->
+        <!-- ==============================
+             主内容区域
+             只负责展示书架内容
+        =============================== -->
+        <main class="main-content">
 
             <section
-                class="home-view"
                 id="home-view"
-                aria-label="书架首页"
+                class="home-view"
+                aria-label="我的书架"
             >
 
-
-                <!-- ==========================================
+                <!-- ==============================
                      空书架状态
-
-                     当书架没有作品时显示。
-                     创建作品后，由 home.js 控制隐藏。
-                =========================================== -->
-
+                     没有作品时显示
+                =============================== -->
                 <div
-                    class="empty-state"
                     id="empty-state"
+                    class="empty-state"
                 >
 
-                    <!-- 中央文字内容 -->
+                    <!-- 中央装饰 -->
+                    <div
+                        class="empty-state__ornament"
+                        aria-hidden="true"
+                    >
 
-                    <div class="empty-state__content">
+                        <span class="empty-state__ornament-line"></span>
 
+                        <span class="empty-state__ornament-symbol">
+                            卷
+                        </span>
 
-                        <!-- 主标题 -->
-
-                        <h1 class="empty-state__title">
-                            卷帙未启
-                        </h1>
-
-
-                        <!-- 标题装饰线 -->
-
-                        <div
-                            class="empty-state__ornament"
-                            aria-hidden="true"
-                        >
-
-                            <span></span>
-
-                            <span class="empty-state__ornament-center">
-                                ◆
-                            </span>
-
-                            <span></span>
-
-                        </div>
-
-
-                        <!-- 空书架提示 -->
-
-                        <p class="empty-state__subtitle">
-                            书架尚空，静候新篇。
-                        </p>
-
-
-                        <!-- 创作引导 -->
-
-                        <p class="empty-state__description">
-                            此间尚无作品，不妨挥毫落墨，<br>
-                            写下你的第一个故事。
-                        </p>
+                        <span class="empty-state__ornament-line"></span>
 
                     </div>
+
+                    <!-- 主标题 -->
+                    <h1 class="empty-state__title">
+                        卷帙未启
+                    </h1>
+
+                    <!-- 标题下方装饰 -->
+                    <div
+                        class="empty-state__divider"
+                        aria-hidden="true"
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <!-- 简短提示 -->
+                    <p class="empty-state__subtitle">
+                        书架尚空，静候新篇。
+                    </p>
+
+                    <!-- 引导文字 -->
+                    <p class="empty-state__description">
+                        此间尚无作品，不妨挥毫落墨，<br>
+                        写下你的第一个故事。
+                    </p>
 
                 </div>
 
 
-
-                <!-- ==========================================
-                     作品列表区域
-
-                     默认隐藏。
-                     有作品时显示。
-                =========================================== -->
-
+                <!-- ==============================
+                     作品列表
+                     有作品时显示
+                =============================== -->
                 <section
-                    class="shelf-content"
                     id="shelf-content"
-                    aria-label="我的作品"
+                    class="shelf-content"
+                    aria-label="作品列表"
                     hidden
                 >
 
-                    <!-- 作品列表标题 -->
+                    <!-- 书架标题区 -->
+                    <div class="shelf-header">
 
-                    <header class="shelf-content__header">
+                        <div class="shelf-header__text">
 
-                        <h1 class="shelf-content__title">
-                            我的书架
-                        </h1>
+                            <h1 class="shelf-header__title">
+                                我的书架
+                            </h1>
 
-                        <p class="shelf-content__description">
-                            藏诸笔墨，待续新章。
-                        </p>
+                            <p class="shelf-header__subtitle">
+                                收藏每一段灵感，记录每一个故事。
+                            </p>
 
-                    </header>
+                        </div>
+
+                        <!-- 作品数量由 JavaScript 更新 -->
+                        <span
+                            id="shelf-count"
+                            class="shelf-header__count"
+                            aria-live="polite"
+                        >
+                            0 部作品
+                        </span>
+
+                    </div>
 
 
-                    <!-- ======================================
-                         作品列表
-
-                         JavaScript 会在这里生成作品卡片。
-                         作品数据不直接写在 HTML 中。
-                    ======================================= -->
-
+                    <!-- 作品卡片容器 -->
                     <div
-                        class="shelf-list"
                         id="shelf-list"
-                    ></div>
+                        class="shelf-list"
+                        aria-label="所有作品"
+                    >
+                        <!--
+                            作品卡片由 js/home.js 动态生成。
+
+                            不在 HTML 中写死作品内容，
+                            避免与数据存储模块发生冲突。
+                        -->
+                    </div>
 
                 </section>
-
 
             </section>
 
         </main>
 
 
-
-        <!-- ==================================================
-             ③ 底部固定导航栏
-        ================================================== -->
-
-        <footer class="bottom-bar" id="bottom-bar">
+        <!-- ==============================
+             底部导航栏
+        =============================== -->
+        <footer class="bottom-bar">
 
             <nav
                 class="bottom-nav"
                 aria-label="底部导航"
             >
 
-
-                <!-- ==========================================
-                     书架
-
-                     首页本身就是书架。
-                     点击后返回 index.html。
-                =========================================== -->
-
+                <!-- 书架：当前首页 -->
                 <a
                     class="bottom-nav__item bottom-nav__item--active"
                     href="./index.html"
                     aria-current="page"
+                    data-nav="shelf"
                 >
 
-                    <span
-                        class="bottom-nav__icon"
-                        aria-hidden="true"
-                    >
-
-                        <!-- 书卷图标 -->
+                    <span class="bottom-nav__indicator">
 
                         <svg
+                            class="bottom-nav__icon"
                             viewBox="0 0 24 24"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
                         >
-
                             <path
-                                d="M4 5.5C4 4.67 4.67 4 5.5 4H19V18H6C4.9 18 4 18.9 4 20V5.5Z"
+                                d="M4 4.5H10.5C11.3 4.5 12 5.2 12 6V20C12 19 11.3 18.5 10.5 18.5H4V4.5Z"
                                 stroke="currentColor"
-                                stroke-width="1.6"
+                                stroke-width="1.7"
                                 stroke-linejoin="round"
                             />
 
                             <path
-                                d="M4 20C4 18.9 4.9 18 6 18H19"
+                                d="M20 4.5H13.5C12.7 4.5 12 5.2 12 6V20C12 19 12.7 18.5 13.5 18.5H20V4.5Z"
                                 stroke="currentColor"
-                                stroke-width="1.6"
-                                stroke-linecap="round"
+                                stroke-width="1.7"
+                                stroke-linejoin="round"
                             />
 
                             <path
-                                d="M8 8H15"
+                                d="M6.5 8H9.5M6.5 11H9.5M14.5 8H17.5M14.5 11H17.5"
                                 stroke="currentColor"
-                                stroke-width="1.4"
+                                stroke-width="1.3"
                                 stroke-linecap="round"
                             />
-
-                            <path
-                                d="M8 11H15"
-                                stroke="currentColor"
-                                stroke-width="1.4"
-                                stroke-linecap="round"
-                            />
-
                         </svg>
 
-                    </span>
+                        <span class="bottom-nav__label">
+                            书架
+                        </span>
 
-
-                    <span class="bottom-nav__label">
-                        书架
                     </span>
 
                 </a>
 
 
-
-                <!-- ==========================================
-                     工具
-
-                     点击后进入工具页面。
-                =========================================== -->
-
+                <!-- 工具：跳转到工具中心 -->
                 <a
                     class="bottom-nav__item"
                     href="pages/tools.html"
+                    data-nav="tools"
                 >
 
-                    <span
-                        class="bottom-nav__icon"
-                        aria-hidden="true"
-                    >
-
-                        <!-- 文房工具图标 -->
+                    <span class="bottom-nav__indicator">
 
                         <svg
+                            class="bottom-nav__icon"
                             viewBox="0 0 24 24"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
                         >
-
                             <path
-                                d="M12 3L14 8L19 6L17 11L21 14L15 15L14 21L10 17L5 19L7 14L3 10L9 9L12 3Z"
+                                d="M14 6.5A4.5 4.5 0 0 0 8.1 12.4L3.7 16.8A2.1 2.1 0 0 0 6.7 19.8L11.1 15.4A4.5 4.5 0 0 0 17 9.5L14 12.5L11 9.5L14 6.5Z"
                                 stroke="currentColor"
-                                stroke-width="1.5"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
                                 stroke-linejoin="round"
                             />
 
                             <circle
-                                cx="12"
-                                cy="12"
-                                r="2"
-                                stroke="currentColor"
-                                stroke-width="1.5"
+                                cx="5.2"
+                                cy="18.3"
+                                r="0.7"
+                                fill="currentColor"
                             />
-
                         </svg>
 
-                    </span>
+                        <span class="bottom-nav__label">
+                            工具
+                        </span>
 
-
-                    <span class="bottom-nav__label">
-                        工具
                     </span>
 
                 </a>
-
 
             </nav>
 
         </footer>
 
-
     </div>
 
 
+    <!-- ==============================
+         公共数据存储模块
+         只提供数据接口
+    =============================== -->
+    <script
+        src="js/storage.js"
+        defer
+    ></script>
 
-    <!-- ==================================================
-         JavaScript
-    ================================================== -->
-
-    <script src="js/home.js" defer></script>
+    <!-- ==============================
+         书架专属逻辑
+         只负责首页的作品展示
+    =============================== -->
+    <script
+        src="js/home.js"
+        defer
+    ></script>
 
 </body>
 
