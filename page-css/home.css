@@ -8,8 +8,10 @@
    2. 让首页主体占据顶部栏与底部栏之间的剩余空间。
    3. 让底部导航栏自然贴近页面底部。
    4. 让空书架提示在主体区域内居中。
-   5. 展示书籍列表与作品卡片。
-   6. 适配手机、平板与电脑。
+   5. 展示书籍封面、书名、简介与作品信息。
+   6. 提供没有封面时的传统国风默认封面。
+   7. 适配手机、平板与电脑。
+   8. 保留书籍卡片按钮的通用样式。
 
    依赖：
    - css/theme.css
@@ -29,25 +31,6 @@
    一、首页整体布局
 ============================================================ */
 
-/*
- * 首页整体使用纵向 Flex 布局。
- *
- * 页面结构：
- *
- * #app
- * ├── header.app-header
- * ├── main.app-main
- * │   └── section.home-page
- * │       ├── section.empty-state
- * │       └── section.shelf-content
- * └── footer.app-footer
- *
- * #app 的最小高度由 base.css 控制。
- *
- * 首页主体通过 flex: 1 1 auto
- * 占据顶部栏和底部栏之间的剩余空间。
- */
-
 #app {
     display: flex;
     flex-direction: column;
@@ -64,27 +47,11 @@
    二、首页主体区域
 ============================================================ */
 
-/*
- * app-main 是顶部栏与底部栏之间的主体容器。
- *
- * flex-grow: 1
- * 让主体区域自动扩展。
- *
- * flex-shrink: 1
- * 允许空间不足时正常收缩。
- *
- * flex-basis: 0%
- * 让 Flex 根据剩余空间分配主体尺寸。
- *
- * min-height: 0
- * 避免内容的默认最小高度影响 Flex 布局。
- */
-
 .app-main {
     display: flex;
     flex-direction: column;
 
-    flex: 1 1 0%;
+    flex: 1 0 auto;
 
     width: 100%;
     min-width: 0;
@@ -93,16 +60,6 @@
     background-color: var(--theme-background);
 }
 
-
-/*
- * 首页页面容器。
- *
- * 由于 app-main 已经负责占据剩余空间，
- * home-page 不再重复使用 flex: 1 0 auto。
- *
- * 这里使用 flex: 1 1 auto，
- * 让页面内容填充主体区域。
- */
 
 .home-page {
     display: flex;
@@ -122,18 +79,6 @@
 /* ============================================================
    三、空书架区域
 ============================================================ */
-
-/*
- * 空书架状态。
- *
- * 当书架没有作品时：
- * - 占据首页主体的剩余高度。
- * - 水平居中。
- * - 垂直居中。
- *
- * 当书架内容不足一屏时，
- * 提示仍会在主体区域内居中。
- */
 
 .empty-state {
     display: flex;
@@ -198,8 +143,6 @@
 }
 
 
-/* 分隔线两端的金色装饰 */
-
 .empty-state__divider::before,
 .empty-state__divider::after {
     position: absolute;
@@ -217,9 +160,11 @@
     transform: translateY(-50%) rotate(45deg);
 }
 
+
 .empty-state__divider::before {
     left: -3px;
 }
+
 
 .empty-state__divider::after {
     right: -3px;
@@ -275,15 +220,6 @@
    八、作品区域
 ============================================================ */
 
-/*
- * 有作品时显示书架内容。
- *
- * 不设置 flex: 1，
- * 避免作品较少时作品区域被强制拉伸。
- *
- * 空书架状态与作品区域由 home.js 控制显示。
- */
-
 .shelf-content {
     width: 100%;
     max-width: 1200px;
@@ -312,8 +248,6 @@
 }
 
 
-/* 作品区域标题 */
-
 .shelf-content__title {
     margin: 0;
 
@@ -335,8 +269,6 @@
     overflow-wrap: anywhere;
 }
 
-
-/* 作品数量 */
 
 .shelf-content__count {
     flex-shrink: 0;
@@ -367,15 +299,13 @@
 }
 
 
-/* 空列表不占据可见空间 */
-
 .shelf-list:empty {
     display: none;
 }
 
 
 /* ============================================================
-   十一、作品卡片基础样式
+   十一、作品卡片
 ============================================================ */
 
 .shelf-card {
@@ -385,9 +315,7 @@
     flex-direction: column;
 
     min-width: 0;
-    min-height: 180px;
-
-    padding: 22px 20px;
+    min-height: 0;
 
     overflow: hidden;
 
@@ -406,10 +334,12 @@
 }
 
 
-/* 卡片顶部的传统金色装饰线 */
+/* 卡片顶部金色装饰线 */
 
 .shelf-card::before {
     position: absolute;
+    z-index: 2;
+
     top: 0;
     left: 0;
 
@@ -423,7 +353,59 @@
 
 
 /* ============================================================
-   十二、作品卡片悬停效果
+   十二、卡片点击区域
+============================================================ */
+
+/*
+ * home.js 使用 button.shelf-card__open
+ * 作为整张卡片的点击区域。
+ *
+ * 因此这里将按钮恢复为卡片布局容器，
+ * 避免浏览器默认按钮样式影响页面。
+ */
+
+.shelf-card__open {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1 1 auto;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    padding: 0;
+
+    overflow: hidden;
+
+    color: var(--theme-text);
+
+    background-color: transparent;
+
+    border: 0;
+    border-radius: inherit;
+
+    font: inherit;
+    text-align: left;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+
+.shelf-card__open:focus-visible {
+    outline: 2px solid var(--color-cyan);
+
+    outline-offset: -4px;
+}
+
+
+/* ============================================================
+   十三、卡片悬停效果
 ============================================================ */
 
 @media (hover: hover) {
@@ -437,17 +419,290 @@
         transform: translateY(-2px);
     }
 
+    .shelf-card__open:hover {
+        background-color: var(--theme-background-pure);
+    }
+
+}
+
+
+.shelf-card__open:active {
+    background-color: var(--theme-background-muted);
 }
 
 
 /* ============================================================
-   十三、作品标题
+   十四、书籍封面容器
+============================================================ */
+
+/*
+ * 使用 3:4 竖向比例。
+ *
+ * 无论原图是横图还是竖图，
+ * 封面区域始终保持统一尺寸。
+ */
+
+.shelf-card__cover {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    width: 100%;
+
+    aspect-ratio: 3 / 4;
+
+    overflow: hidden;
+
+    background-color: var(--color-white-dark);
+
+    border-bottom: 1px solid var(--color-white-deep);
+}
+
+
+/* ============================================================
+   十五、真实封面图片
+============================================================ */
+
+.shelf-card__cover-image {
+    position: absolute;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    background-color: var(--color-white-dark);
+}
+
+
+/* ============================================================
+   十六、默认封面
+============================================================ */
+
+/*
+ * 没有上传封面时，
+ * 使用宣纸色背景、朱红文字和鎏金装饰。
+ */
+
+.shelf-card__cover--default {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    padding: 20px 12px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #FBF7ED 0%,
+            #F1E7D2 100%
+        );
+
+    color: var(--color-red);
+}
+
+
+/* ============================================================
+   十七、默认封面外框
+============================================================ */
+
+.shelf-card__cover--default::before {
+    position: absolute;
+
+    inset: 8px;
+
+    content: "";
+
+    border: 1px solid var(--color-yellow-dark);
+
+    pointer-events: none;
+}
+
+
+.shelf-card__cover--default::after {
+    position: absolute;
+
+    inset: 13px;
+
+    content: "";
+
+    border: 1px solid rgba(169, 135, 62, 0.4);
+
+    pointer-events: none;
+}
+
+
+/* ============================================================
+   十八、默认封面角落装饰
+============================================================ */
+
+.shelf-card__cover-decoration {
+    position: absolute;
+
+    top: 18px;
+    left: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 26px;
+    height: 26px;
+
+    color: var(--color-red);
+
+    border: 1px solid var(--color-red);
+
+    font-family:
+        "Noto Serif SC",
+        "Source Han Serif SC",
+        "Songti SC",
+        "SimSun",
+        serif;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    writing-mode: vertical-rl;
+}
+
+
+/* ============================================================
+   十九、默认封面中心文字
+============================================================ */
+
+.shelf-card__cover-character {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 52%;
+
+    aspect-ratio: 1 / 1;
+
+    flex: 0 0 auto;
+
+    margin-bottom: 12px;
+
+    color: var(--color-red);
+
+    border: 1px solid var(--color-yellow-dark);
+
+    font-family:
+        "Noto Serif SC",
+        "Source Han Serif SC",
+        "Songti SC",
+        "SimSun",
+        serif;
+
+    font-size: clamp(30px, 7vw, 52px);
+
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+/* ============================================================
+   二十、默认封面书名
+============================================================ */
+
+.shelf-card__cover-title {
+    position: relative;
+
+    display: -webkit-box;
+
+    width: 85%;
+    max-width: 100%;
+
+    overflow: hidden;
+
+    color: var(--color-black);
+
+    font-family:
+        "Noto Serif SC",
+        "Source Han Serif SC",
+        "Songti SC",
+        "SimSun",
+        serif;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1.7;
+
+    text-align: center;
+
+    overflow-wrap: anywhere;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+
+/* ============================================================
+   二十一、封面备用容器
+============================================================ */
+
+.shelf-card__cover-fallback {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: var(--color-white-dark);
+}
+
+
+/* ============================================================
+   二十二、书籍信息区域
+============================================================ */
+
+.shelf-card__body {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    padding: 14px;
+}
+
+
+/* ============================================================
+   二十三、书籍标题
 ============================================================ */
 
 .shelf-card__title {
     display: -webkit-box;
 
-    margin: 0 0 12px;
+    margin: 0 0 8px;
 
     overflow: hidden;
 
@@ -460,7 +715,7 @@
         "SimSun",
         serif;
 
-    font-size: 19px;
+    font-size: 17px;
     font-weight: 700;
 
     line-height: 1.6;
@@ -473,19 +728,22 @@
 
 
 /* ============================================================
-   十四、作品简介
+   二十四、书籍简介
 ============================================================ */
 
 .shelf-card__description {
     display: -webkit-box;
 
-    margin: 0 0 16px;
+    min-height: 0;
+
+    margin: 0 0 14px;
 
     overflow: hidden;
 
     color: var(--theme-text-secondary);
 
-    font-size: 13px;
+    font-size: 12px;
+
     line-height: 1.8;
 
     overflow-wrap: anywhere;
@@ -496,38 +754,74 @@
 
 
 /* ============================================================
-   十五、作品信息
+   二十五、书籍信息区域
 ============================================================ */
 
 .shelf-card__meta {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
 
     flex-wrap: wrap;
 
-    gap: 8px;
+    gap: 6px 10px;
 
     margin-top: auto;
-    padding-top: 12px;
+
+    padding-top: 10px;
 
     border-top: 1px solid var(--theme-border);
 }
 
 
-/* 作品字数等信息 */
+/* ============================================================
+   二十六、字数信息
+============================================================ */
+
+.shelf-card__word-count {
+    color: var(--color-cyan);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1.6;
+}
+
+
+/* 兼容旧版 home.js 使用的类名 */
 
 .shelf-card__info {
     color: var(--theme-text-muted);
 
     font-size: 12px;
+
     line-height: 1.6;
 }
 
 
 /* ============================================================
-   十六、作品卡片按钮区域
+   二十七、更新时间
 ============================================================ */
+
+.shelf-card__updated-at {
+    color: var(--theme-text-muted);
+
+    font-size: 11px;
+
+    line-height: 1.6;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   二十八、卡片操作区域
+============================================================ */
+
+/*
+ * 保留原有卡片操作按钮样式，
+ * 供后续编辑、删除、移动分组等功能使用。
+ */
 
 .shelf-card__actions {
     display: flex;
@@ -541,7 +835,9 @@
 }
 
 
-/* 通用卡片按钮 */
+/* ============================================================
+   二十九、通用卡片按钮
+============================================================ */
 
 .shelf-card__button {
     display: inline-flex;
@@ -562,6 +858,8 @@
     font-size: 12px;
     font-weight: 600;
 
+    line-height: 1.5;
+
     text-decoration: none;
 
     cursor: pointer;
@@ -572,7 +870,9 @@
 }
 
 
-/* 打开作品按钮 */
+/* ============================================================
+   三十、打开作品按钮
+============================================================ */
 
 .shelf-card__button--open {
     color: var(--theme-text-inverse);
@@ -583,17 +883,17 @@
 }
 
 
-/* 按钮悬停 */
-
 @media (hover: hover) {
 
     .shelf-card__button--open:hover {
         background-color: var(--color-cyan-dark);
+
         border-color: var(--color-cyan-dark);
     }
 
     .shelf-card__button:not(.shelf-card__button--open):hover {
         background-color: var(--theme-background-muted);
+
         border-color: var(--color-yellow-dark);
     }
 
@@ -601,18 +901,8 @@
 
 
 /* ============================================================
-   十七、底部导航布局保障
+   三十一、底部导航布局保障
 ============================================================ */
-
-/*
- * 底部导航始终位于 #app 的纵向布局末端。
- *
- * 不使用 position: fixed，
- * 避免底部栏遮挡作品内容。
- *
- * 不使用绝对定位，
- * 让页面内容较多时底栏仍能正常向下排列。
- */
 
 .app-footer {
     position: relative;
@@ -627,7 +917,7 @@
 
 
 /* ============================================================
-   十八、平板屏幕适配
+   三十二、平板适配
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -655,11 +945,19 @@
         gap: 16px;
     }
 
+    .shelf-card__body {
+        padding: 12px;
+    }
+
+    .shelf-card__title {
+        font-size: 16px;
+    }
+
 }
 
 
 /* ============================================================
-   十九、手机屏幕适配
+   三十三、手机适配
 ============================================================ */
 
 @media (max-width: 480px) {
@@ -685,6 +983,7 @@
 
     .empty-state__description {
         font-size: 13px;
+
         line-height: 1.9;
     }
 
@@ -694,6 +993,7 @@
 
     .shelf-content__header {
         margin-bottom: 20px;
+
         padding-bottom: 12px;
     }
 
@@ -708,20 +1008,56 @@
     .shelf-list {
         grid-template-columns: minmax(0, 1fr);
 
-        gap: 14px;
+        gap: 16px;
     }
 
     .shelf-card {
-        min-height: 160px;
+        min-height: 0;
+    }
 
-        padding: 20px 16px;
+    .shelf-card__cover {
+        aspect-ratio: 3 / 4;
+    }
+
+    .shelf-card__body {
+        padding: 12px;
+    }
+
+    .shelf-card__title {
+        font-size: 15px;
+    }
+
+    .shelf-card__description {
+        font-size: 12px;
+    }
+
+    .shelf-card__meta {
+        gap: 6px 8px;
+    }
+
+    .shelf-card__cover-decoration {
+        top: 15px;
+        left: 15px;
+
+        width: 23px;
+        height: 23px;
+
+        font-size: 12px;
+    }
+
+    .shelf-card__cover--default::before {
+        inset: 6px;
+    }
+
+    .shelf-card__cover--default::after {
+        inset: 10px;
     }
 
 }
 
 
 /* ============================================================
-   二十、超小屏幕适配
+   三十四、超小屏幕适配
 ============================================================ */
 
 @media (max-width: 360px) {
@@ -733,6 +1069,7 @@
 
     .empty-state h1 {
         font-size: 26px;
+
         letter-spacing: 2px;
     }
 
@@ -749,18 +1086,40 @@
         padding-left: 12px;
     }
 
+    .shelf-card__body {
+        padding: 10px;
+    }
+
+    .shelf-card__title {
+        font-size: 14px;
+    }
+
+    .shelf-card__cover-decoration {
+        top: 12px;
+        left: 12px;
+    }
+
 }
 
 
 /* ============================================================
-   二十一、减少动画
+   三十五、减少动态效果
 ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
 
     .shelf-card,
+    .shelf-card__open,
     .shelf-card__button {
         transition: none;
+    }
+
+    .shelf-card:hover {
+        transform: none;
+    }
+
+    .shelf-card__open:active {
+        transform: none;
     }
 
 }
