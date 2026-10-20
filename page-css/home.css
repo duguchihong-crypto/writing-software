@@ -1,0 +1,605 @@
+/* ======================================================
+   写作软件 · 首页书架
+   文件：page-css/home.css
+
+   负责：
+   1. 首页整体布局
+   2. 顶部与底部之间的内容区域
+   3. 空书架提示居中
+   4. 作品列表布局
+   5. 手机屏幕适配
+
+   不负责：
+   顶部栏样式、底部栏样式、作品数据存储
+====================================================== */
+
+
+/* ======================================================
+   一、首页整体
+====================================================== */
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1 0 auto;
+
+  width: 100%;
+  min-width: 0;
+
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+}
+
+
+/* ======================================================
+   二、首页内容区域
+====================================================== */
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1 0 auto;
+
+  width: 100%;
+  min-width: 0;
+
+  background-color: var(--theme-background);
+}
+
+
+/* ======================================================
+   三、空书架区域
+====================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  flex: 1 0 auto;
+
+  width: 100%;
+  min-height: 360px;
+
+  padding: 48px 24px;
+
+  text-align: center;
+
+  background-color: var(--theme-background);
+}
+
+
+/* ======================================================
+   四、空书架主标题
+====================================================== */
+
+.empty-state h1 {
+  margin: 0;
+
+  color: var(--color-red);
+
+  font-family:
+    "Noto Serif SC",
+    "Source Han Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif;
+
+  font-size: clamp(28px, 5vw, 38px);
+  font-weight: 700;
+
+  line-height: 1.5;
+  letter-spacing: 5px;
+}
+
+
+/* ======================================================
+   五、空书架装饰分隔线
+====================================================== */
+
+.empty-state__divider {
+  position: relative;
+
+  width: 120px;
+  height: 1px;
+
+  margin: 24px 0;
+
+  background-color: var(--theme-divider);
+}
+
+
+/* 分隔线两端的装饰 */
+
+.empty-state__divider::before,
+.empty-state__divider::after {
+  position: absolute;
+  top: 50%;
+
+  width: 6px;
+  height: 6px;
+
+  content: "";
+
+  background-color: var(--color-yellow);
+
+  border: 1px solid var(--color-yellow-dark);
+
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.empty-state__divider::before {
+  left: -3px;
+}
+
+.empty-state__divider::after {
+  right: -3px;
+}
+
+
+/* ======================================================
+   六、空书架提示
+====================================================== */
+
+.empty-state__hint {
+  margin: 0;
+
+  color: var(--theme-text-secondary);
+
+  font-family:
+    "Noto Serif SC",
+    "Source Han Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  line-height: 1.9;
+  letter-spacing: 1px;
+}
+
+
+/* ======================================================
+   七、空书架引导文字
+====================================================== */
+
+.empty-state__description {
+  margin: 12px 0 0;
+
+  color: var(--theme-text-muted);
+
+  font-size: 14px;
+  font-weight: 400;
+
+  line-height: 2;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* ======================================================
+   八、作品区域
+====================================================== */
+
+.shelf-content {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 36px 32px 48px;
+}
+
+
+/* ======================================================
+   九、作品区域标题栏
+====================================================== */
+
+.shelf-content__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid var(--theme-border);
+}
+
+
+/* 作品区域标题 */
+
+.shelf-content__title {
+  margin: 0;
+
+  color: var(--color-red);
+
+  font-family:
+    "Noto Serif SC",
+    "Source Han Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  line-height: 1.5;
+  letter-spacing: 2px;
+}
+
+
+/* 作品数量 */
+
+.shelf-content__count {
+  flex-shrink: 0;
+
+  color: var(--theme-text-muted);
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ======================================================
+   十、作品列表
+====================================================== */
+
+.shelf-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+
+  gap: 20px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ======================================================
+   十一、作品卡片基础样式
+====================================================== */
+
+.shelf-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 180px;
+
+  padding: 22px 20px;
+
+  overflow: hidden;
+
+  background-color: var(--theme-background-pure);
+
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+
+  box-shadow:
+    0 3px 12px var(--theme-shadow-color);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* 卡片顶部的传统金色装饰线 */
+
+.shelf-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 3px;
+
+  content: "";
+
+  background-color: var(--color-yellow);
+}
+
+
+/* ======================================================
+   十二、作品卡片悬停效果
+====================================================== */
+
+@media (hover: hover) {
+
+  .shelf-card:hover {
+    border-color: var(--color-yellow-dark);
+
+    box-shadow:
+      0 6px 18px var(--theme-shadow-color-strong);
+
+    transform: translateY(-2px);
+  }
+
+}
+
+
+/* ======================================================
+   十三、作品标题
+====================================================== */
+
+.shelf-card__title {
+  display: -webkit-box;
+
+  margin: 0 0 12px;
+
+  overflow: hidden;
+
+  color: var(--color-red);
+
+  font-family:
+    "Noto Serif SC",
+    "Source Han Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif;
+
+  font-size: 19px;
+  font-weight: 700;
+
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+
+/* ======================================================
+   十四、作品简介
+====================================================== */
+
+.shelf-card__description {
+  display: -webkit-box;
+
+  margin: 0 0 16px;
+
+  overflow: hidden;
+
+  color: var(--theme-text-secondary);
+
+  font-size: 13px;
+  line-height: 1.8;
+
+  overflow-wrap: anywhere;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+
+/* ======================================================
+   十五、作品信息
+====================================================== */
+
+.shelf-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: auto;
+  padding-top: 12px;
+
+  border-top: 1px solid var(--theme-border);
+}
+
+
+/* 作品字数等信息 */
+
+.shelf-card__info {
+  color: var(--theme-text-muted);
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+
+/* ======================================================
+   十六、作品卡片按钮区域
+====================================================== */
+
+.shelf-card__actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+
+/* 通用卡片按钮 */
+
+.shelf-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 34px;
+
+  padding: 6px 12px;
+
+  color: var(--theme-text);
+
+  background-color: var(--theme-background);
+
+  border: 1px solid var(--theme-border);
+  border-radius: 5px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+/* 打开作品按钮 */
+
+.shelf-card__button--open {
+  color: var(--theme-text-inverse);
+
+  background-color: var(--color-cyan);
+
+  border-color: var(--color-cyan);
+}
+
+
+/* 打开作品按钮悬停 */
+
+@media (hover: hover) {
+
+  .shelf-card__button--open:hover {
+    background-color: var(--color-cyan-dark);
+    border-color: var(--color-cyan-dark);
+  }
+
+  .shelf-card__button:not(.shelf-card__button--open):hover {
+    background-color: var(--theme-background-muted);
+    border-color: var(--color-yellow-dark);
+  }
+
+}
+
+
+/* ======================================================
+   十七、作品列表为空时的布局兼容
+====================================================== */
+
+.shelf-list:empty {
+  display: none;
+}
+
+
+/* ======================================================
+   十八、平板屏幕适配
+====================================================== */
+
+@media (max-width: 768px) {
+
+  .empty-state {
+    padding: 40px 20px;
+  }
+
+  .empty-state h1 {
+    letter-spacing: 4px;
+  }
+
+  .shelf-content {
+    padding: 28px 22px 40px;
+  }
+
+  .shelf-content__title {
+    font-size: 22px;
+  }
+
+  .shelf-list {
+    grid-template-columns:
+      repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+
+    gap: 16px;
+  }
+
+}
+
+
+/* ======================================================
+   十九、手机屏幕适配
+====================================================== */
+
+@media (max-width: 480px) {
+
+  .empty-state {
+    min-height: 300px;
+
+    padding: 36px 20px;
+  }
+
+  .empty-state h1 {
+    font-size: 28px;
+    letter-spacing: 3px;
+  }
+
+  .empty-state__divider {
+    width: 96px;
+    margin: 20px 0;
+  }
+
+  .empty-state__hint {
+    font-size: 14px;
+  }
+
+  .empty-state__description {
+    font-size: 13px;
+    line-height: 1.9;
+  }
+
+  .shelf-content {
+    padding: 24px 16px 32px;
+  }
+
+  .shelf-content__header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .shelf-content__title {
+    font-size: 20px;
+  }
+
+  .shelf-content__count {
+    font-size: 12px;
+  }
+
+  .shelf-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .shelf-card {
+    min-height: 160px;
+    padding: 20px 16px;
+  }
+
+}
+
+
+/* ======================================================
+   二十、减少动画
+====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .shelf-card,
+  .shelf-card__button {
+    transition: none;
+  }
+
+}
