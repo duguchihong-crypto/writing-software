@@ -1,736 +1,792 @@
-/* =========================================================
-   写作软件 · 首页样式
+/* ==========================================================
+   写作软件 · 书架首页样式
    文件：css/home.css
 
-   页面结构：
-   1. 顶部朱红色导航栏
-   2. 中间宣纸色内容区
-   3. 中央空书架提示
-   4. 作品列表
-   5. 底部玄黑色导航栏
+   负责：
+   1. 首页整体布局
+   2. 朱红色顶部导航栏
+   3. 青色新建按钮
+   4. 宣纸白书架背景
+   5. 空书架提示
+   6. 作品列表
+   7. 玄黑色底部导航
+   8. 黄色当前页面选中框
 
-   依赖：css/base.css
-========================================================= */
+   不负责：
+   1. 作品创建
+   2. 作品数据存储
+   3. 正文编辑
+   4. 工具页面逻辑
+========================================================== */
 
 
-/* =========================================================
-   一、页面整体
-========================================================= */
+/* ==========================================================
+   01. 首页根布局
+========================================================== */
 
-html,
-body {
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-
-}
-
-body {
-
-    background-color: var(--color-page-background);
-
-}
-
-.app {
-
+#app.app {
     display: flex;
-
     flex-direction: column;
 
     width: 100%;
+    min-width: 320px;
 
-    height: 100vh;
-    height: 100dvh;
-
-    min-height: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
 
     overflow: hidden;
 
-    background-color: var(--color-page-background);
-
+    background-color: var(--color-white);
 }
 
 
-/* =========================================================
-   二、顶部导航栏
-========================================================= */
+/* ==========================================================
+   02. 顶部导航栏
+========================================================== */
 
 .topbar {
-
     position: relative;
-
-    z-index: var(--z-topbar);
+    z-index: var(--z-sticky);
 
     display: flex;
-
-    flex: 0 0 var(--topbar-height);
-
     align-items: center;
-
     justify-content: space-between;
 
+    flex: 0 0 auto;
+
     width: 100%;
-
-    height: var(--topbar-height);
-
     min-height: var(--topbar-height);
 
-    padding:
-        0
-        max(18px, env(safe-area-inset-right))
-        0
-        max(20px, env(safe-area-inset-left));
+    padding-top: var(--safe-area-top);
+
+    padding-right:
+        max(var(--space-4), var(--safe-area-right));
+
+    padding-bottom: 0;
+
+    padding-left:
+        max(var(--space-4), var(--safe-area-left));
 
     background:
         linear-gradient(
-            180deg,
+            135deg,
             var(--color-red-light) 0%,
             var(--color-red) 48%,
             var(--color-red-dark) 100%
         );
 
-    border-bottom: 1px solid rgba(232, 207, 136, 0.75);
+    border-bottom: 2px solid var(--color-yellow-dark);
 
-    box-shadow:
-        0 2px 8px rgba(50, 20, 15, 0.12);
-
+    color: var(--color-white-pure);
 }
 
 
-/* ---------------------------------------------------------
-   顶部装饰金线
---------------------------------------------------------- */
-
-.topbar::after {
-
-    position: absolute;
-
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    height: 2px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(214, 177, 94, 0.25) 12%,
-            rgba(233, 207, 136, 0.95) 50%,
-            rgba(214, 177, 94, 0.25) 88%,
-            transparent 100%
-        );
-
-    content: "";
-
-    pointer-events: none;
-
-}
-
-
-/* =========================================================
-   三、顶部左侧品牌
-========================================================= */
+/* 顶部品牌区域 */
 
 .topbar__brand {
-
     display: flex;
-
-    flex: 0 1 auto;
-
     align-items: center;
+
+    gap: var(--space-2);
 
     min-width: 0;
 
+    flex-shrink: 1;
 }
 
 
-.topbar__brand-link {
+/* 品牌印记 */
 
-    display: inline-flex;
-
+.topbar__brand-mark {
+    display: flex;
     align-items: center;
+    justify-content: center;
 
-    min-width: 0;
+    flex: 0 0 34px;
 
-    color: var(--color-white);
+    width: 34px;
+    height: 34px;
 
+    border: 1px solid var(--color-yellow);
+
+    color: var(--color-yellow-light);
+
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+
+    line-height: 1;
+
+    user-select: none;
 }
 
+
+/* 软件名称 */
 
 .topbar__brand-name {
-
     overflow: hidden;
 
-    color: var(--color-white);
+    color: var(--color-white-pure);
 
-    font-size: 19px;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
 
-    font-weight: 700;
-
-    letter-spacing: 1px;
-
-    line-height: 1.4;
+    letter-spacing: 0.06em;
 
     white-space: nowrap;
-
     text-overflow: ellipsis;
-
 }
 
 
-/* =========================================================
-   四、顶部右侧操作区域
-========================================================= */
+/* ==========================================================
+   03. 顶部操作按钮
+========================================================== */
 
 .topbar__actions {
-
     display: flex;
+    align-items: center;
+    justify-content: flex-end;
 
     flex: 0 0 auto;
 
-    align-items: center;
+    gap: var(--space-2);
 
-    justify-content: flex-end;
-
-    gap: 10px;
-
-    margin-left: 12px;
-
+    min-width: 0;
 }
 
 
-/* =========================================================
-   五、顶部公共按钮
-========================================================= */
+/* 所有顶部按钮的公共结构 */
 
 .topbar__button {
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
 
     gap: 5px;
 
-    min-height: 36px;
+    min-height: 40px;
 
     padding: 0 12px;
 
     border: 1px solid transparent;
+    border-radius: var(--radius-sm);
 
-    border-radius: var(--radius-small);
-
-    font-size: 14px;
-
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
 
     line-height: 1;
 
     white-space: nowrap;
 
+    text-decoration: none;
+
     transition:
-        background-color var(--transition-normal),
-        border-color var(--transition-normal),
-        box-shadow var(--transition-normal),
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast),
         transform var(--transition-fast);
-
-    -webkit-tap-highlight-color: transparent;
-
 }
 
 
-/* ---------------------------------------------------------
-   新建按钮：青色
---------------------------------------------------------- */
-
-.topbar__button--create {
-
-    color: var(--color-white-pure);
-
-    background:
-        linear-gradient(
-            180deg,
-            var(--color-cyan-light) 0%,
-            var(--color-cyan) 100%
-        );
-
-    border-color: rgba(225, 245, 233, 0.35);
-
-    box-shadow:
-        0 2px 4px rgba(20, 40, 30, 0.14);
-
-}
-
-
-.topbar__button--create:hover {
-
-    background-color: var(--color-cyan-dark);
-
-    box-shadow:
-        0 3px 8px rgba(20, 40, 30, 0.20);
-
-}
-
-
-.topbar__button--create:active {
-
-    transform: translateY(1px);
-
-}
-
-
-/* ---------------------------------------------------------
-   设置按钮：白色
---------------------------------------------------------- */
-
-.topbar__button--settings {
-
-    color: var(--color-red-dark);
-
-    background-color: var(--color-white);
-
-    border-color: rgba(255, 255, 255, 0.85);
-
-}
-
-
-.topbar__button--settings:hover {
-
-    background-color: var(--color-white-pure);
-
-    box-shadow:
-        0 2px 6px rgba(50, 20, 15, 0.12);
-
-}
-
-
-.topbar__button--settings:active {
-
-    transform: translateY(1px);
-
-}
-
-
-/* ---------------------------------------------------------
-   按钮图标
---------------------------------------------------------- */
+/* 顶部按钮图标 */
 
 .topbar__button-icon {
+    flex: 0 0 18px;
 
-    display: inline-flex;
+    width: 18px;
+    height: 18px;
+}
 
-    align-items: center;
 
-    justify-content: center;
+/* ----------------------------------------------------------
+   新建按钮：青色
+   不是蓝色，也不是普通绿色
+---------------------------------------------------------- */
 
-    font-size: 17px;
+.topbar__button--create {
+    background-color: var(--color-cyan);
 
-    line-height: 1;
+    border-color: var(--color-cyan-light);
+
+    color: var(--color-white-pure);
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+
+    .topbar__button--create:hover {
+        background-color: var(--color-cyan-light);
+
+        border-color: var(--color-yellow-light);
+
+        color: var(--color-white-pure);
+    }
 
 }
 
 
-/* =========================================================
-   六、中间主内容区
-========================================================= */
+/* ----------------------------------------------------------
+   设置按钮：白色
+---------------------------------------------------------- */
+
+.topbar__button--settings {
+    background-color: var(--color-white-pure);
+
+    border-color: var(--color-white-pure);
+
+    color: var(--color-red-dark);
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+
+    .topbar__button--settings:hover {
+        background-color: var(--color-white-dark);
+
+        border-color: var(--color-yellow-light);
+
+        color: var(--color-red-dark);
+    }
+
+}
+
+
+/* 按钮点击反馈 */
+
+.topbar__button:active {
+    transform: scale(0.97);
+}
+
+
+/* ==========================================================
+   04. 主内容区域
+========================================================== */
 
 .main-content {
-
     position: relative;
 
-    z-index: var(--z-content);
-
+    display: flex;
     flex: 1 1 auto;
+    flex-direction: column;
 
     width: 100%;
+    min-width: 0;
 
     min-height: 0;
 
     overflow-x: hidden;
-
     overflow-y: auto;
 
     overscroll-behavior-y: contain;
 
-    -webkit-overflow-scrolling: touch;
-
-    background-color: var(--color-content-background);
-
+    background-color: var(--color-white);
 }
 
 
-/* ---------------------------------------------------------
-   宣纸背景纹理
+/* 书架页面主体 */
 
-   使用 CSS 绘制非常淡的装饰，
-   不依赖外部图片。
---------------------------------------------------------- */
+.home-view {
+    position: relative;
 
-.main-content::before {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
 
-    position: absolute;
+    width: 100%;
+    min-width: 0;
 
-    inset: 0;
+    min-height: 100%;
 
-    z-index: 0;
+    isolation: isolate;
+
+    background-color: var(--color-white);
 
     background-image:
         radial-gradient(
-            ellipse at 18% 20%,
-            rgba(184, 58, 62, 0.035) 0,
-            transparent 45%
-        ),
-        radial-gradient(
-            ellipse at 82% 78%,
-            rgba(40, 124, 115, 0.035) 0,
+            ellipse at 20% 20%,
+            rgb(214 177 94 / 5%) 0%,
             transparent 42%
         ),
-        repeating-linear-gradient(
-            0deg,
-            rgba(120, 100, 70, 0.012) 0,
-            rgba(120, 100, 70, 0.012) 1px,
+        radial-gradient(
+            ellipse at 80% 75%,
+            rgb(158 36 40 / 3%) 0%,
+            transparent 45%
+        ),
+        linear-gradient(
+            90deg,
+            rgb(169 135 62 / 3%) 0,
             transparent 1px,
-            transparent 5px
+            transparent 100%
         );
 
-    content: "";
-
-    pointer-events: none;
-
+    background-size:
+        auto,
+        auto,
+        8px 8px;
 }
 
 
-/* =========================================================
-   七、首页视图
-========================================================= */
-
-.home-view {
-
-    position: relative;
-
-    z-index: 1;
-
-    display: flex;
-
-    flex-direction: column;
-
-    width: 100%;
-
-    min-height: 100%;
-
-}
-
-
-/* =========================================================
-   八、空书架状态
-========================================================= */
+/* ==========================================================
+   05. 空书架状态
+========================================================== */
 
 .empty-state {
-
     display: flex;
-
     flex: 1 0 auto;
-
+    flex-direction: column;
     align-items: center;
-
     justify-content: center;
 
     width: 100%;
 
-    min-height: 100%;
+    min-height: 340px;
 
     padding:
-        40px
-        24px
-        48px;
+        var(--space-10)
+        var(--page-padding-x);
 
     text-align: center;
-
 }
 
 
-/* ---------------------------------------------------------
-   中央文字内容组
-
-   让三段文字作为一个整体居中。
---------------------------------------------------------- */
-
-.empty-state__content {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    width: 100%;
-
-    max-width: 560px;
-
-    margin: auto;
-
-}
-
-
-/* =========================================================
-   九、空书架主标题
-========================================================= */
-
-.empty-state__title {
-
-    margin: 0;
-
-    color: var(--color-text-primary);
-
-    font-family:
-        "Songti SC",
-        "STSong",
-        "Noto Serif CJK SC",
-        "SimSun",
-        serif;
-
-    font-size: clamp(28px, 5vw, 36px);
-
-    font-weight: 600;
-
-    letter-spacing: 5px;
-
-    line-height: 1.5;
-
-}
-
-
-/* =========================================================
-   十、标题下方装饰线
-========================================================= */
+/* 空书架顶部装饰 */
 
 .empty-state__ornament {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    gap: 10px;
+    gap: var(--space-4);
 
-    width: 150px;
-
-    margin-top: 17px;
-
-    margin-bottom: 25px;
-
-    color: var(--color-yellow-dark);
-
+    margin-bottom: var(--space-6);
 }
 
 
-.empty-state__ornament > span:not(.empty-state__ornament-center) {
+/* 装饰线 */
 
-    flex: 1 1 auto;
+.empty-state__ornament-line {
+    display: block;
 
+    width: 38px;
     height: 1px;
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--color-yellow-dark)
-        );
-
+    background-color: var(--color-yellow-dark);
 }
 
 
-.empty-state__ornament > span:last-child {
+/* 中央装饰文字 */
 
-    background:
-        linear-gradient(
-            90deg,
-            var(--color-yellow-dark),
-            transparent
-        );
-
-}
-
-
-.empty-state__ornament-center {
-
-    display: inline-flex;
-
+.empty-state__ornament-symbol {
+    display: flex;
     align-items: center;
-
     justify-content: center;
 
-    color: var(--color-yellow-dark);
+    width: 38px;
+    height: 38px;
 
-    font-size: 11px;
+    border: 1px solid var(--color-yellow-dark);
+
+    color: var(--color-red);
+
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
 
     line-height: 1;
-
 }
 
 
-/* =========================================================
-   十一、空书架提示
-========================================================= */
+/* 空书架主标题 */
+
+.empty-state__title {
+    color: var(--color-red-dark);
+
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: var(--font-weight-semibold);
+
+    line-height: var(--line-height-tight);
+
+    letter-spacing: 0.12em;
+}
+
+
+/* 标题下方三点装饰 */
+
+.empty-state__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-5);
+}
+
+
+.empty-state__divider span {
+    display: block;
+
+    width: 5px;
+    height: 5px;
+
+    background-color: var(--color-yellow-dark);
+
+    transform: rotate(45deg);
+}
+
+
+.empty-state__divider span:nth-child(2) {
+    width: 7px;
+    height: 7px;
+
+    background-color: var(--color-red);
+}
+
+
+/* 空书架副标题 */
 
 .empty-state__subtitle {
+    color: var(--color-text-primary);
 
-    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
 
-    color: #655D50;
+    letter-spacing: 0.04em;
 
-    font-family:
-        "Songti SC",
-        "STSong",
-        "Noto Serif CJK SC",
-        "SimSun",
-        serif;
-
-    font-size: 17px;
-
-    font-weight: 500;
-
-    letter-spacing: 1px;
-
-    line-height: 1.8;
-
+    line-height: var(--line-height-relaxed);
 }
 
 
-/* =========================================================
-   十二、创作引导文字
-========================================================= */
+/* 空书架引导文字 */
 
 .empty-state__description {
-
-    margin-top: 18px;
+    margin-top: var(--space-3);
 
     color: var(--color-text-secondary);
 
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 
-    font-weight: 400;
+    line-height: var(--line-height-relaxed);
 
-    letter-spacing: 0.5px;
-
-    line-height: 2.1;
-
+    letter-spacing: 0.025em;
 }
 
 
-/* =========================================================
-   十三、作品列表区域
-========================================================= */
+/* ==========================================================
+   06. 作品列表区域
+========================================================== */
 
 .shelf-content {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+
+    padding:
+        var(--space-8)
+        var(--page-padding-x)
+        var(--space-10);
+}
+
+
+/* 作品列表标题区 */
+
+.shelf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+
+    gap: var(--space-4);
 
     width: 100%;
 
-    max-width: var(--page-max-width);
+    margin-bottom: var(--space-6);
 
-    margin: 0 auto;
+    padding-bottom: var(--space-5);
 
-    padding:
-        32px
-        24px
-        40px;
-
+    border-bottom: 1px solid var(--color-border);
 }
 
 
-/* ---------------------------------------------------------
-   作品区标题
---------------------------------------------------------- */
+/* 标题文字组 */
 
-.shelf-content__header {
+.shelf-header__text {
+    display: flex;
+    flex-direction: column;
 
-    margin-bottom: 28px;
+    gap: var(--space-2);
 
-    padding-bottom: 18px;
-
-    border-bottom: var(--border-gold);
-
+    min-width: 0;
 }
 
 
-.shelf-content__title {
+/* 书架标题 */
 
-    color: var(--color-text-primary);
+.shelf-header__title {
+    color: var(--color-red-dark);
 
-    font-family:
-        "Songti SC",
-        "STSong",
-        "Noto Serif CJK SC",
-        "SimSun",
-        serif;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
 
-    font-size: 26px;
-
-    font-weight: 600;
-
-    letter-spacing: 2px;
-
+    letter-spacing: 0.06em;
 }
 
 
-.shelf-content__description {
+/* 书架副标题 */
 
-    margin-top: 8px;
+.shelf-header__subtitle {
+    color: var(--color-text-secondary);
+
+    font-size: var(--font-size-sm);
+
+    line-height: var(--line-height-relaxed);
+}
+
+
+/* 作品数量 */
+
+.shelf-header__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    min-height: 32px;
+
+    padding: 4px 12px;
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-sm);
+
+    background-color: rgb(255 255 255 / 45%);
 
     color: var(--color-text-secondary);
 
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 
+    white-space: nowrap;
 }
 
 
-/* ---------------------------------------------------------
-   作品列表
---------------------------------------------------------- */
+/* 作品列表 */
 
 .shelf-list {
-
     display: grid;
 
     grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(min(100%, 240px), 1fr)
-        );
+        repeat(auto-fill, minmax(min(100%, 220px), 1fr));
 
-    gap: 18px;
+    align-content: start;
+
+    gap: var(--space-5);
 
     width: 100%;
+    min-width: 0;
+}
+
+
+/* ==========================================================
+   07. 作品卡片
+   仅供 home.js 创建的作品卡片使用
+========================================================== */
+
+.work-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    min-height: 180px;
+
+    padding: var(--space-5);
+
+    overflow: hidden;
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-md);
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--color-white-pure) 0%,
+            var(--color-white) 100%
+        );
+
+    color: var(--color-text-primary);
+
+    box-shadow: var(--shadow-sm);
+
+    transition:
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+}
+
+
+/* 卡片顶部金线 */
+
+.work-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 2px;
+
+    background-color: var(--color-yellow-dark);
+
+    opacity: 0.8;
+}
+
+
+/* 鼠标悬停反馈 */
+
+@media (hover: hover) and (pointer: fine) {
+
+    .work-card:hover {
+        border-color: var(--color-yellow-dark);
+
+        box-shadow: var(--shadow-md);
+
+        transform: translateY(-2px);
+    }
 
 }
 
 
-/* =========================================================
-   十四、底部固定导航栏
-========================================================= */
+/* 卡片标题 */
+
+.work-card__title {
+    display: -webkit-box;
+
+    overflow: hidden;
+
+    color: var(--color-red-dark);
+
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+
+    line-height: var(--line-height-tight);
+
+    overflow-wrap: anywhere;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+
+/* 卡片描述 */
+
+.work-card__description {
+    display: -webkit-box;
+
+    margin-top: var(--space-3);
+
+    overflow: hidden;
+
+    color: var(--color-text-secondary);
+
+    font-size: var(--font-size-sm);
+
+    line-height: var(--line-height-relaxed);
+
+    overflow-wrap: anywhere;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+
+/* 卡片类型标签 */
+
+.work-card__type {
+    display: inline-flex;
+    align-items: center;
+
+    align-self: flex-start;
+
+    max-width: 100%;
+
+    margin-top: var(--space-4);
+
+    padding: 3px 8px;
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-secondary);
+
+    font-size: var(--font-size-xs);
+
+    overflow-wrap: anywhere;
+}
+
+
+/* 卡片底部信息 */
+
+.work-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+
+    gap: var(--space-2);
+
+    margin-top: auto;
+    padding-top: var(--space-5);
+}
+
+
+/* 卡片日期 */
+
+.work-card__date {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-xs);
+}
+
+
+/* ==========================================================
+   08. 底部导航栏
+========================================================== */
 
 .bottom-bar {
-
     position: relative;
-
-    z-index: var(--z-bottom-bar);
+    z-index: var(--z-fixed);
 
     flex: 0 0 auto;
 
     width: 100%;
 
-    padding:
-        0
-        max(16px, env(safe-area-inset-right))
-        env(safe-area-inset-bottom)
-        max(16px, env(safe-area-inset-left));
+    padding-top: 0;
+
+    padding-right:
+        max(var(--space-4), var(--safe-area-right));
+
+    padding-bottom: var(--safe-area-bottom);
+
+    padding-left:
+        max(var(--space-4), var(--safe-area-left));
+
+    border-top: 1px solid var(--color-yellow-dark);
 
     background:
         linear-gradient(
@@ -739,464 +795,316 @@ body {
             var(--color-black) 100%
         );
 
-    border-top: 1px solid rgba(214, 177, 94, 0.70);
-
-    box-shadow:
-        0 -3px 12px rgba(20, 18, 14, 0.10);
-
+    color: var(--color-yellow-light);
 }
 
 
-/* ---------------------------------------------------------
-   底部导航内部
---------------------------------------------------------- */
+/* 底部导航布局 */
 
 .bottom-nav {
-
     display: flex;
-
     align-items: stretch;
-
     justify-content: center;
 
     width: 100%;
+    max-width: 560px;
 
-    max-width: 500px;
-
-    min-height: 62px;
+    min-height: var(--bottom-bar-height);
 
     margin: 0 auto;
-
 }
 
 
-/* =========================================================
-   十五、底部导航项目
-========================================================= */
+/* 导航入口 */
 
 .bottom-nav__item {
-
     position: relative;
 
     display: flex;
+    align-items: center;
+    justify-content: center;
 
     flex: 1 1 0;
 
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 3px;
-
     min-width: 0;
-
-    min-height: 62px;
+    min-height: 44px;
 
     padding: 7px 12px;
 
     color: var(--color-yellow);
 
-    text-align: center;
-
-    transition:
-        color var(--transition-normal),
-        background-color var(--transition-normal);
+    text-decoration: none;
 
     -webkit-tap-highlight-color: transparent;
-
 }
 
 
-/* ---------------------------------------------------------
-   导航图标
---------------------------------------------------------- */
+/* 导航入口内部 */
 
-.bottom-nav__icon {
-
+.bottom-nav__indicator {
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    width: 24px;
+    flex-direction: column;
 
-    height: 24px;
+    gap: 3px;
+
+    width: 100%;
+    max-width: 128px;
+
+    min-height: 48px;
+
+    padding: 4px 12px;
+
+    border: 1px solid transparent;
+
+    border-radius: var(--radius-sm);
+
+    background-color: transparent;
+
+    transition:
+        border-color var(--transition-normal),
+        background-color var(--transition-normal),
+        color var(--transition-normal);
+}
+
+
+/* 导航图标 */
+
+.bottom-nav__icon {
+    flex: 0 0 22px;
+
+    width: 22px;
+    height: 22px;
 
     color: currentColor;
-
 }
 
 
-.bottom-nav__icon svg {
-
-    width: 23px;
-
-    height: 23px;
-
-}
-
-
-/* ---------------------------------------------------------
-   导航文字
---------------------------------------------------------- */
+/* 导航文字 */
 
 .bottom-nav__label {
+    display: block;
 
     color: currentColor;
 
-    font-size: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
 
-    font-weight: 500;
+    line-height: 1.4;
 
-    letter-spacing: 1px;
-
-    line-height: 1.5;
-
+    letter-spacing: 0.04em;
 }
 
 
-/* ---------------------------------------------------------
-   当前选中状态
---------------------------------------------------------- */
+/* ----------------------------------------------------------
+   当前页面：黄色选中框
+---------------------------------------------------------- */
 
 .bottom-nav__item--active {
+    color: var(--color-yellow-light);
+}
+
+
+.bottom-nav__item--active .bottom-nav__indicator {
+    border-color: var(--color-yellow);
+
+    background-color: rgb(214 177 94 / 8%);
 
     color: var(--color-yellow-light);
-
 }
 
 
-.bottom-nav__item--active::before {
+/* 鼠标悬停时不改变当前页面选中状态 */
 
-    position: absolute;
+@media (hover: hover) and (pointer: fine) {
 
-    top: 0;
+    .bottom-nav__item:not(.bottom-nav__item--active):hover
+    .bottom-nav__indicator {
+        border-color: rgb(214 177 94 / 45%);
 
-    left: 50%;
-
-    width: 32px;
-
-    height: 2px;
-
-    background-color: var(--color-yellow);
-
-    transform: translateX(-50%);
-
-    content: "";
-
-}
-
-
-.bottom-nav__item--active .bottom-nav__label {
-
-    font-weight: 700;
-
-}
-
-
-/* ---------------------------------------------------------
-   导航交互
---------------------------------------------------------- */
-
-.bottom-nav__item:hover {
-
-    color: var(--color-yellow-light);
-
-    background-color: rgba(214, 177, 94, 0.06);
-
-}
-
-
-.bottom-nav__item:active {
-
-    background-color: rgba(214, 177, 94, 0.12);
-
-}
-
-
-/* =========================================================
-   十六、平板与较小屏幕
-========================================================= */
-
-@media (max-width: 600px) {
-
-    :root {
-
-        --topbar-height: 58px;
-
+        background-color: rgb(214 177 94 / 5%);
     }
 
+}
+
+
+/* ==========================================================
+   09. 移动端适配
+========================================================== */
+
+@media (max-width: 768px) {
 
     .topbar {
-
-        padding-right:
-            max(12px, env(safe-area-inset-right));
-
-        padding-left:
-            max(14px, env(safe-area-inset-left));
-
+        gap: var(--space-2);
     }
 
+    .topbar__brand-mark {
+        flex-basis: 30px;
+
+        width: 30px;
+        height: 30px;
+
+        font-size: var(--font-size-md);
+    }
 
     .topbar__brand-name {
+        font-size: var(--font-size-md);
 
-        font-size: 17px;
-
-        letter-spacing: 0.5px;
-
+        letter-spacing: 0.025em;
     }
-
-
-    .topbar__actions {
-
-        gap: 7px;
-
-        margin-left: 8px;
-
-    }
-
 
     .topbar__button {
+        min-height: 38px;
 
-        gap: 3px;
+        padding-right: 9px;
+        padding-left: 9px;
 
-        min-height: 34px;
-
-        padding: 0 9px;
-
-        font-size: 13px;
-
+        gap: 4px;
     }
-
 
     .topbar__button-icon {
+        width: 16px;
+        height: 16px;
 
-        font-size: 15px;
-
+        flex-basis: 16px;
     }
-
 
     .empty-state {
-
-        padding:
-            30px
-            18px
-            36px;
-
+        padding-top: var(--space-8);
+        padding-bottom: var(--space-8);
     }
 
-
-    .empty-state__title {
-
-        font-size: 29px;
-
-        letter-spacing: 4px;
-
+    .shelf-content {
+        padding-top: var(--space-6);
+        padding-bottom: var(--space-8);
     }
 
+    .shelf-list {
+        grid-template-columns:
+            repeat(auto-fill, minmax(min(100%, 200px), 1fr));
 
-    .empty-state__ornament {
-
-        margin-top: 15px;
-
-        margin-bottom: 22px;
-
+        gap: var(--space-4);
     }
 
+    .work-card {
+        min-height: 160px;
 
-    .empty-state__subtitle {
-
-        font-size: 16px;
-
-    }
-
-
-    .empty-state__description {
-
-        margin-top: 15px;
-
-        font-size: 13px;
-
-        line-height: 2;
-
-    }
-
-
-    .bottom-nav {
-
-        min-height: 58px;
-
-    }
-
-
-    .bottom-nav__item {
-
-        min-height: 58px;
-
+        padding: var(--space-4);
     }
 
 }
 
 
-/* =========================================================
-   十七、窄屏手机
-========================================================= */
+/* ==========================================================
+   10. 窄屏手机适配
+========================================================== */
 
-@media (max-width: 360px) {
+@media (max-width: 380px) {
+
+    .topbar {
+        padding-right: var(--space-2);
+        padding-left: var(--space-2);
+    }
+
+    .topbar__brand {
+        gap: 5px;
+    }
+
+    .topbar__brand-mark {
+        flex-basis: 26px;
+
+        width: 26px;
+        height: 26px;
+
+        font-size: var(--font-size-sm);
+    }
 
     .topbar__brand-name {
-
-        font-size: 15px;
-
+        font-size: var(--font-size-sm);
     }
-
 
     .topbar__actions {
-
         gap: 5px;
-
-        margin-left: 5px;
-
     }
-
 
     .topbar__button {
+        min-height: 36px;
 
-        gap: 2px;
+        padding-right: 7px;
+        padding-left: 7px;
 
-        padding: 0 7px;
-
-        font-size: 12px;
-
+        font-size: var(--font-size-xs);
     }
 
+    .topbar__button-icon {
+        width: 15px;
+        height: 15px;
+
+        flex-basis: 15px;
+    }
+
+    .empty-state {
+        padding-right: var(--space-3);
+        padding-left: var(--space-3);
+    }
 
     .empty-state__title {
-
-        font-size: 27px;
-
-        letter-spacing: 3px;
-
+        letter-spacing: 0.08em;
     }
 
-
     .empty-state__description {
+        font-size: var(--font-size-xs);
+    }
 
-        font-size: 12px;
+    .bottom-nav__item {
+        padding-right: 6px;
+        padding-left: 6px;
+    }
 
-        letter-spacing: 0;
-
+    .bottom-nav__indicator {
+        padding-right: 8px;
+        padding-left: 8px;
     }
 
 }
 
 
-/* =========================================================
-   十八、横屏手机
-========================================================= */
+/* ==========================================================
+   11. 超矮屏幕适配
+========================================================== */
 
 @media (max-height: 480px) and (orientation: landscape) {
 
-    :root {
-
-        --topbar-height: 48px;
-
-    }
-
-
-    .topbar__brand-name {
-
-        font-size: 16px;
-
-    }
-
-
-    .bottom-nav {
-
-        min-height: 48px;
-
-    }
-
-
-    .bottom-nav__item {
-
-        min-height: 48px;
-
-        padding-top: 4px;
-
-        padding-bottom: 4px;
-
-    }
-
-
-    .bottom-nav__icon {
-
-        width: 20px;
-
-        height: 20px;
-
-    }
-
-
-    .bottom-nav__icon svg {
-
-        width: 19px;
-
-        height: 19px;
-
-    }
-
-
     .empty-state {
+        min-height: 280px;
 
-        padding-top: 16px;
-
-        padding-bottom: 16px;
-
+        padding-top: var(--space-5);
+        padding-bottom: var(--space-5);
     }
-
-
-    .empty-state__title {
-
-        font-size: 24px;
-
-    }
-
 
     .empty-state__ornament {
-
-        margin-top: 8px;
-
-        margin-bottom: 10px;
-
+        margin-bottom: var(--space-3);
     }
 
-
-    .empty-state__description {
-
-        margin-top: 8px;
-
-        line-height: 1.7;
-
+    .empty-state__divider {
+        margin-top: var(--space-3);
+        margin-bottom: var(--space-3);
     }
 
 }
 
 
-/* =========================================================
-   十九、减少动态效果
-========================================================= */
+/* ==========================================================
+   12. 书架样式结束
 
-@media (prefers-reduced-motion: reduce) {
+   不在此文件中：
+   - 保存作品
+   - 读取作品
+   - 创建作品
+   - 修改正文
+   - 修改其他页面 DOM
 
-    .topbar__button,
-    .bottom-nav__item {
-
-        transition: none;
-
-    }
-
-}
+   上述功能分别交由独立 JS 模块处理。
+========================================================== */
