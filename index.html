@@ -1,63 +1,115 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
-    <!-- 基础信息 -->
+    <!-- ==================================================
+         基础信息
+    ================================================== -->
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-
     <meta
         name="theme-color"
         content="#9E2428"
     >
-
     <meta
         name="description"
         content="一款采用传统五色国风设计的写作软件，用于创作小说、整理大纲、管理人物与构建世界。"
     >
-
-    <meta name="color-scheme" content="light">
-
+    <meta
+        name="color-scheme"
+        content="light"
+    >
     <title>写作软件 · 书架</title>
-
-
-    <!-- 公共样式 -->
-    <link rel="stylesheet" href="./css/theme.css">
-    <link rel="stylesheet" href="./css/base.css">
-    <link rel="stylesheet" href="./css/header.css">
-    <link rel="stylesheet" href="./css/footer.css">
-
-
-    <!-- 首页样式 -->
-    <link rel="stylesheet" href="./page-css/home.css">
-
-
-    <!-- 公共 JavaScript -->
-    <script src="./js/storage.js" defer></script>
-    <script src="./js/groups-storage.js" defer></script>
-    <script src="./js/navigation.js" defer></script>
-    <script src="./js/components.js" defer></script>
-
-
-    <!-- 首页 JavaScript -->
-    <script src="./page-js/home.js" defer></script>
-
+    <!-- ==================================================
+         公共样式
+    ================================================== -->
+    <link
+        rel="stylesheet"
+        href="./css/theme.css"
+    >
+    <link
+        rel="stylesheet"
+        href="./css/base.css"
+    >
+    <link
+        rel="stylesheet"
+        href="./css/header.css"
+    >
+    <link
+        rel="stylesheet"
+        href="./css/footer.css"
+    >
+    <!-- ==================================================
+         首页样式
+    ================================================== -->
+    <link
+        rel="stylesheet"
+        href="./page-css/home.css"
+    >
+    <!-- ==================================================
+         公共 JavaScript
+         负责全站共用的基础功能
+    ================================================== -->
+    <!-- 书籍数据存储 -->
+    <script
+        src="./js/storage.js"
+        defer
+    ></script>
+    <!-- 分组数据存储 -->
+    <script
+        src="./js/groups-storage.js"
+        defer
+    ></script>
+    <!-- 页面导航 -->
+    <script
+        src="./js/navigation.js"
+        defer
+    ></script>
+    <!-- 公共组件 -->
+    <script
+        src="./js/components.js"
+        defer
+    ></script>
+    <!-- ==================================================
+         首页独立功能模块
+    ================================================== -->
+    <!-- 书籍删除模块
+         只负责书籍删除按钮、确认及删除操作 -->
+    <script
+        src="./page-js/home-book-delete.js"
+        defer
+    ></script>
+    <!-- 分组删除模块
+         只负责分组删除按钮、确认及删除操作 -->
+    <script
+        src="./page-js/home-group-delete.js"
+        defer
+    ></script>
+    <!-- ==================================================
+         首页主体模块
+         负责书架与分组的显示和初始化
+    ================================================== -->
+    <script
+        src="./page-js/home.js"
+        defer
+    ></script>
 </head>
-
-
 <body>
-
-    <div class="app" id="app">
-
-        <!-- 顶部导航栏 -->
-        <header class="app-header" id="app-header">
-
+    <div
+        class="app"
+        id="app"
+    >
+        <!-- ==================================================
+             顶部导航栏
+        ================================================== -->
+        <header
+            class="app-header"
+            id="app-header"
+        >
+            <!-- 品牌名称 -->
             <div class="app-header__brand">
-
                 <a
                     class="app-header__brand-link"
                     href="./index.html"
@@ -67,12 +119,9 @@
                         写作软件
                     </span>
                 </a>
-
             </div>
-
-
+            <!-- 顶部操作 -->
             <div class="app-header__actions">
-
                 <!-- 新建作品 -->
                 <a
                     class="app-header__button app-header__button--create"
@@ -83,14 +132,11 @@
                         class="app-header__button-icon"
                         aria-hidden="true"
                     >＋</span>
-
                     <span class="app-header__button-text">
                         新建
                     </span>
                 </a>
-
-
-                <!-- 设置 -->
+                <!-- 软件设置 -->
                 <a
                     class="app-header__button app-header__button--settings"
                     href="./pages/settings.html"
@@ -100,115 +146,104 @@
                         设置
                     </span>
                 </a>
-
             </div>
-
         </header>
-
-
-
-        <!-- 页面主体 -->
-        <main class="app-main" id="app-main">
-
+        <!-- ==================================================
+             页面主体
+        ================================================== -->
+        <main
+            class="app-main"
+            id="app-main"
+        >
             <section
                 class="home-page"
                 id="home-page"
                 aria-label="书架"
             >
-
-                <!-- 空书架状态 -->
+                <!-- ==========================================
+                     空书架状态
+                     由 home.js 根据书籍数据控制显示
+                ========================================== -->
                 <section
                     class="empty-state"
                     id="empty-state"
                     aria-labelledby="empty-state-title"
                 >
-
                     <h1
                         class="empty-state__title"
                         id="empty-state-title"
                     >
                         卷帙未启
                     </h1>
-
-
                     <div
                         class="empty-state__divider"
                         aria-hidden="true"
                     >
-
                         <span
                             class="empty-state__divider-line"
                         ></span>
-
                         <span
                             class="empty-state__divider-symbol"
                         >◆</span>
-
                         <span
                             class="empty-state__divider-line"
                         ></span>
-
                     </div>
-
-
                     <p class="empty-state__subtitle">
                         书架尚空，静候新篇。
                     </p>
-
-
                     <p class="empty-state__description">
                         此间尚无作品，不妨挥毫落墨，<br>
                         写下你的第一个故事。
                     </p>
-
                 </section>
-
-
-
-                <!-- 我的分组 -->
+                <!-- ==========================================
+                     我的分组
+                     由分组模块独立管理
+                ========================================== -->
                 <section
                     class="home-groups"
                     id="home-groups"
                     aria-label="我的分组"
                     hidden
                 >
-
+                    <!-- 分组标题 -->
                     <div class="home-groups__header">
-
                         <h2 class="home-groups__title">
                             我的分组
                         </h2>
-
                     </div>
-
-
-                    <!-- 分组卡片：只显示组名字 -->
+                    <!-- 分组列表 -->
                     <div
                         class="home-groups__list"
                         id="home-groups-list"
                         aria-label="分组列表"
                     >
-                        <!-- 分组卡片由 home.js 生成 -->
+                        <!--
+                            分组卡片由 home.js 生成。
+                            分组删除按钮由
+                            home-group-delete.js 独立生成。
+                            分组数据由
+                            groups-storage.js 独立管理。
+                        -->
                     </div>
-
                 </section>
-
-
-
-                <!-- 我的作品 -->
+                <!-- ==========================================
+                     我的作品
+                     由书籍模块独立管理
+                ========================================== -->
                 <section
                     class="shelf-content"
                     id="shelf-content"
                     aria-label="我的作品"
                     hidden
                 >
-
+                    <!-- 书架标题 -->
                     <div class="shelf-content__header">
-
                         <h2 class="shelf-content__title">
                             我的作品
                         </h2>
-
+                        <!-- 作品数量 -->
                         <span
                             class="shelf-content__count"
                             id="shelf-count"
@@ -216,42 +251,44 @@
                         >
                             0 部作品
                         </span>
-
                     </div>
-
-
+                    <!-- 作品列表 -->
                     <div
                         class="shelf-list"
                         id="shelf-list"
                         aria-label="作品列表"
                     >
-                        <!-- 作品卡片由 home.js 生成 -->
+                        <!--
+                            作品卡片由 home.js 生成。
+                            书籍删除按钮由
+                            home-book-delete.js 独立生成。
+                            书籍数据由
+                            storage.js 独立管理。
+                        -->
                     </div>
-
                 </section>
-
             </section>
-
         </main>
-
-
-
-        <!-- 底部导航栏 -->
-        <footer class="app-footer" id="app-footer">
-
+        <!-- ==================================================
+             底部导航栏
+        ================================================== -->
+        <footer
+            class="app-footer"
+            id="app-footer"
+        >
             <nav
                 class="bottom-nav"
                 aria-label="主导航"
             >
-
-                <!-- 书架 -->
+                <!-- ==========================================
+                     书架
+                ========================================== -->
                 <a
                     class="bottom-nav__item bottom-nav__item--active"
                     href="./index.html"
                     aria-current="page"
                     aria-label="书架"
                 >
-
                     <svg
                         class="bottom-nav__icon"
                         viewBox="0 0 24 24"
@@ -262,35 +299,31 @@
                         stroke-linejoin="round"
                         aria-hidden="true"
                     >
-
                         <path
                             d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22Z"
                         ></path>
-
-                        <path d="M4 5.5V22"></path>
-
-                        <path d="M8 7h8"></path>
-
-                        <path d="M8 11h8"></path>
-
+                        <path
+                            d="M4 5.5V22"
+                        ></path>
+                        <path
+                            d="M8 7h8"
+                        ></path>
+                        <path
+                            d="M8 11h8"
+                        ></path>
                     </svg>
-
-
                     <span class="bottom-nav__label">
                         书架
                     </span>
-
                 </a>
-
-
-
-                <!-- 工具 -->
+                <!-- ==========================================
+                     工具
+                ========================================== -->
                 <a
                     class="bottom-nav__item"
                     href="./pages/tools.html"
                     aria-label="工具"
                 >
-
                     <svg
                         class="bottom-nav__icon"
                         viewBox="0 0 24 24"
@@ -301,32 +334,21 @@
                         stroke-linejoin="round"
                         aria-hidden="true"
                     >
-
                         <circle
                             cx="12"
                             cy="12"
                             r="8.5"
                         ></circle>
-
                         <path
                             d="M14.5 9.5 13 13l-3.5 1.5L11 11Z"
                         ></path>
-
                     </svg>
-
-
                     <span class="bottom-nav__label">
                         工具
                     </span>
-
                 </a>
-
             </nav>
-
         </footer>
-
     </div>
-
 </body>
-
 </html>
