@@ -16,7 +16,10 @@
 
     <title>新建 - 写作软件</title>
 
-    <!-- 公共样式 -->
+    <!-- =========================
+         公共样式
+    ========================== -->
+
     <link
         rel="stylesheet"
         href="../css/theme.css"
@@ -37,7 +40,10 @@
         href="../css/footer.css"
     >
 
-    <!-- 新建页面样式 -->
+    <!-- =========================
+         新建页面样式
+    ========================== -->
+
     <link
         rel="stylesheet"
         href="../page-css/create.css"
@@ -52,7 +58,10 @@
          顶部栏
     ========================== -->
 
-    <header class="app-header" id="app-header">
+    <header
+        class="app-header"
+        id="app-header"
+    >
 
         <div class="app-header__brand">
 
@@ -64,10 +73,14 @@
 
         <div class="app-header__actions">
 
+            <!-- 返回书架 -->
+
             <button
                 class="app-header__button app-header__button--settings"
                 id="cancel-create-top"
                 type="button"
+                data-action="back-to-shelf"
+                aria-label="返回书架"
             >
                 返回书架
             </button>
@@ -125,22 +138,26 @@
 
             <div class="create-options">
 
-
-                <!-- 新建书籍 -->
+                <!-- =========================
+                     新建书籍
+                ========================== -->
 
                 <a
                     class="create-option create-option--book"
                     href="./create-book.html"
+                    aria-label="新建书籍"
                 >
 
                     <div
                         class="create-option__icon"
                         aria-hidden="true"
                     >
+
                         <svg
                             viewBox="0 0 48 48"
                             fill="none"
                         >
+
                             <path
                                 d="M8 10.5C8 8.8 9.3 7.5 11 7.5H22V39H11C9.3 39 8 37.7 8 36V10.5Z"
                                 stroke="currentColor"
@@ -182,7 +199,9 @@
                                 stroke-width="2"
                                 stroke-linecap="round"
                             />
+
                         </svg>
+
                     </div>
 
 
@@ -213,21 +232,26 @@
                 </a>
 
 
-                <!-- 新建分组 -->
+                <!-- =========================
+                     新建分组
+                ========================== -->
 
                 <a
                     class="create-option create-option--group"
                     href="./create-group.html"
+                    aria-label="新建分组"
                 >
 
                     <div
                         class="create-option__icon"
                         aria-hidden="true"
                     >
+
                         <svg
                             viewBox="0 0 48 48"
                             fill="none"
                         >
+
                             <path
                                 d="M5.5 13C5.5 11.3 6.8 10 8.5 10H19L23 14H39.5C41.2 14 42.5 15.3 42.5 17V35C42.5 36.7 41.2 38 39.5 38H8.5C6.8 38 5.5 36.7 5.5 35V13Z"
                                 stroke="currentColor"
@@ -255,7 +279,9 @@
                                 stroke-width="2"
                                 stroke-linecap="round"
                             />
+
                         </svg>
+
                     </div>
 
 
@@ -285,7 +311,6 @@
 
                 </a>
 
-
             </div>
 
         </section>
@@ -297,27 +322,35 @@
          底部导航
     ========================== -->
 
-    <footer class="app-footer" id="app-footer">
+    <footer
+        class="app-footer"
+        id="app-footer"
+    >
 
         <nav
             class="bottom-nav"
             aria-label="主导航"
         >
 
+            <!-- 返回书架 -->
+
             <a
                 class="bottom-nav__item"
                 href="../index.html"
                 data-nav="home"
+                aria-label="返回书架首页"
             >
 
                 <span
                     class="bottom-nav__icon"
                     aria-hidden="true"
                 >
+
                     <svg
                         viewBox="0 0 24 24"
                         fill="none"
                     >
+
                         <path
                             d="M3 10.5L12 3L21 10.5"
                             stroke="currentColor"
@@ -339,7 +372,9 @@
                             stroke-width="1.8"
                             stroke-linejoin="round"
                         />
+
                     </svg>
+
                 </span>
 
                 <span class="bottom-nav__label">
@@ -348,6 +383,8 @@
 
             </a>
 
+
+            <!-- 工具 -->
 
             <a
                 class="bottom-nav__item"
@@ -359,10 +396,12 @@
                     class="bottom-nav__icon"
                     aria-hidden="true"
                 >
+
                     <svg
                         viewBox="0 0 24 24"
                         fill="none"
                     >
+
                         <path
                             d="M4 5H10V11H4V5Z"
                             stroke="currentColor"
@@ -390,7 +429,9 @@
                             stroke-width="1.8"
                             stroke-linejoin="round"
                         />
+
                     </svg>
+
                 </span>
 
                 <span class="bottom-nav__label">
@@ -407,13 +448,35 @@
 
 
 <!-- =========================
-     公共脚本
+     公共导航脚本
 ========================== -->
 
 <script
     src="../js/navigation.js"
     defer
 ></script>
+
+
+<!-- =========================
+     新建页面返回书架功能
+========================== -->
+
+<script>
+(function () {
+    "use strict";
+
+    const backButton = document.getElementById("cancel-create-top");
+
+    if (!backButton) {
+        return;
+    }
+
+    backButton.addEventListener("click", function () {
+        window.location.href = "../index.html";
+    });
+
+})();
+</script>
 
 </body>
 </html>
