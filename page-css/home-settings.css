@@ -1,12 +1,22 @@
 /* ==================================================
    首页设置弹窗
    文件：page-css/home-settings.css
-   仅控制设置窗口，不修改书架卡片样式
+
+   仅控制设置窗口，不修改书架卡片样式。
+   设置选项：书籍排序、网格模式、列表模式。
    ================================================== */
+
+
+/* 隐藏状态 */
 
 .home-settings[hidden] {
   display: none !important;
 }
+
+
+/* ==================================================
+   弹窗外层
+   ================================================== */
 
 .home-settings {
   position: fixed;
@@ -32,7 +42,10 @@
   visibility: visible;
 }
 
-/* 背景遮罩 */
+
+/* ==================================================
+   背景遮罩
+   ================================================== */
 
 .home-settings__backdrop {
   position: absolute;
@@ -44,7 +57,10 @@
   backdrop-filter: blur(4px);
 }
 
-/* 弹窗主体 */
+
+/* ==================================================
+   弹窗主体
+   ================================================== */
 
 .home-settings__panel {
   position: relative;
@@ -77,7 +93,10 @@
   transform: translateY(0) scale(1);
 }
 
-/* 标题区域 */
+
+/* ==================================================
+   标题区域
+   ================================================== */
 
 .home-settings__header {
   display: flex;
@@ -102,7 +121,11 @@
   letter-spacing: 2px;
 }
 
-/* 关闭按钮 */
+
+/* ==================================================
+   右上角关闭按钮
+   鲜艳赤色
+   ================================================== */
 
 .home-settings__close {
   display: inline-flex;
@@ -114,28 +137,59 @@
 
   flex-shrink: 0;
 
-  border: 1px solid rgba(141, 41, 41, 0.22);
+  padding: 0;
+
+  border: 1px solid #F00020;
   border-radius: 8px;
 
   background: transparent;
-  color: #8d2929;
+  color: #F00020;
 
-  font-size: 23px;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1;
 
   cursor: pointer;
 
   transition:
     background 0.18s ease,
-    color 0.18s ease;
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
+
+
+/* 鼠标悬停 */
 
 .home-settings__close:hover {
-  background: #8d2929;
-  color: #fffaf0;
+  background: #F00020;
+  border-color: #F00020;
+  color: #FFFFFF;
+
+  box-shadow: 0 0 10px rgba(240, 0, 32, 0.35);
 }
 
-/* 选项列表 */
+
+/* 点击状态 */
+
+.home-settings__close:active {
+  background: #C9001B;
+  border-color: #C9001B;
+  color: #FFFFFF;
+}
+
+
+/* 键盘焦点 */
+
+.home-settings__close:focus-visible {
+  outline: 2px solid #F00020;
+  outline-offset: 3px;
+}
+
+
+/* ==================================================
+   设置选项列表
+   ================================================== */
 
 .home-settings__options {
   display: flex;
@@ -143,7 +197,13 @@
   gap: 12px;
 }
 
-/* 单个设置选项 */
+
+/* ==================================================
+   单个设置选项
+
+   仅保留图标和名称。
+   不显示介绍文字。
+   ================================================== */
 
 .home-settings__option {
   display: flex;
@@ -151,9 +211,9 @@
   gap: 14px;
 
   width: 100%;
-  min-height: 82px;
+  min-height: 72px;
 
-  padding: 15px;
+  padding: 13px 15px;
 
   border: 1px solid rgba(120, 85, 45, 0.2);
   border-radius: 10px;
@@ -168,26 +228,42 @@
   transition:
     border-color 0.18s ease,
     background 0.18s ease,
-    transform 0.18s ease;
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
+
+
+/* 鼠标悬停 */
 
 .home-settings__option:hover {
   border-color: #8d2929;
   background: #fff8ed;
+
+  box-shadow: 0 3px 10px rgba(100, 40, 30, 0.08);
+
   transform: translateY(-1px);
 }
 
+
+/* 点击状态 */
+
 .home-settings__option:active {
   transform: translateY(0);
+  box-shadow: none;
 }
 
-.home-settings__option:focus-visible,
-.home-settings__close:focus-visible {
+
+/* 键盘焦点 */
+
+.home-settings__option:focus-visible {
   outline: 2px solid #176b67;
   outline-offset: 3px;
 }
 
-/* 图标 */
+
+/* ==================================================
+   选项图标
+   ================================================== */
 
 .home-settings__option-icon {
   display: flex;
@@ -205,16 +281,22 @@
   color: #8d2929;
 
   font-size: 22px;
+  line-height: 1;
 }
 
-/* 文字区域 */
+
+/* ==================================================
+   选项名称
+
+   兼容现有 HTML 结构。
+   ================================================== */
 
 .home-settings__option-content {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  align-items: center;
 
   min-width: 0;
+  flex: 1;
 }
 
 .home-settings__option-title {
@@ -222,24 +304,33 @@
 
   font-size: 16px;
   font-weight: 700;
-}
-
-.home-settings__option-description {
-  color: #75685c;
-
-  font-size: 13px;
   line-height: 1.5;
 }
 
-/* 弹窗打开时禁止背景页面滚动 */
+
+/* 兼容旧 HTML 中残留的介绍文字。
+   即使 HTML 尚未删除介绍节点，也不显示。 */
+
+.home-settings__option-description {
+  display: none !important;
+}
+
+
+/* ==================================================
+   弹窗打开时禁止背景页面滚动
+   ================================================== */
 
 body.home-settings-open {
   overflow: hidden;
 }
 
-/* 手机屏幕适配 */
+
+/* ==================================================
+   手机屏幕适配
+   ================================================== */
 
 @media (max-width: 480px) {
+
   .home-settings {
     padding: 14px;
   }
@@ -254,26 +345,48 @@ body.home-settings-open {
     font-size: 20px;
   }
 
+  .home-settings__header {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+  }
+
   .home-settings__option {
-    min-height: 76px;
-    padding: 12px;
+    min-height: 66px;
+    padding: 11px 12px;
     gap: 12px;
   }
 
   .home-settings__option-icon {
     width: 42px;
     height: 42px;
+
     font-size: 20px;
+  }
+
+  .home-settings__option-title {
+    font-size: 15px;
+  }
+
+  .home-settings__close {
+    width: 34px;
+    height: 34px;
+
+    font-size: 28px;
   }
 }
 
-/* 减少动态效果的辅助设置 */
+
+/* ==================================================
+   减少动态效果
+   ================================================== */
 
 @media (prefers-reduced-motion: reduce) {
+
   .home-settings,
   .home-settings__panel,
   .home-settings__option,
   .home-settings__close {
     transition: none;
   }
+
 }
