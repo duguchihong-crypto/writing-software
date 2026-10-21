@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <!-- ==================================================
-         基础信息
-    ================================================== -->
+    <!-- 基础信息 -->
     <meta charset="UTF-8">
 
     <meta
@@ -31,61 +30,33 @@
 
     <!-- ==================================================
          公共样式
+         保留现有公共样式，不重复定义
     ================================================== -->
 
-    <link
-        rel="stylesheet"
-        href="./css/theme.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="./css/base.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="./css/header.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="./css/footer.css"
-    >
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="./css/footer.css">
 
 
     <!-- ==================================================
-         首页样式
+         首页基础样式
     ================================================== -->
 
-    <link
-        rel="stylesheet"
-        href="./page-css/home.css"
-    >
+    <link rel="stylesheet" href="./page-css/home.css">
 
-    <!-- 设置菜单 -->
-    <link
-        rel="stylesheet"
-        href="./page-css/home-settings.css"
-    >
 
-    <!-- 排序功能 -->
-    <link
-        rel="stylesheet"
-        href="./page-css/home-sort.css"
-    >
+    <!-- ==================================================
+         首页独立功能样式
 
-    <!-- 网格布局 -->
-    <link
-        rel="stylesheet"
-        href="./page-css/home-grid.css"
-    >
+         设置、排序、网格、列表各自独立。
+         home.css 继续负责书架基础样式。
+    ================================================== -->
 
-    <!-- 列表布局 -->
-    <link
-        rel="stylesheet"
-        href="./page-css/home-list.css"
-    >
+    <link rel="stylesheet" href="./page-css/home-settings.css">
+    <link rel="stylesheet" href="./page-css/home-sort.css">
+    <link rel="stylesheet" href="./page-css/home-grid.css">
+    <link rel="stylesheet" href="./page-css/home-list.css">
 
 
     <!-- ==================================================
@@ -93,28 +64,16 @@
     ================================================== -->
 
     <!-- 书籍数据存储 -->
-    <script
-        src="./js/storage.js"
-        defer
-    ></script>
+    <script src="./js/storage.js" defer></script>
 
     <!-- 分组数据存储 -->
-    <script
-        src="./js/groups-storage.js"
-        defer
-    ></script>
+    <script src="./js/groups-storage.js" defer></script>
 
     <!-- 页面导航 -->
-    <script
-        src="./js/navigation.js"
-        defer
-    ></script>
+    <script src="./js/navigation.js" defer></script>
 
     <!-- 公共组件 -->
-    <script
-        src="./js/components.js"
-        defer
-    ></script>
+    <script src="./js/components.js" defer></script>
 
 
     <!-- ==================================================
@@ -122,76 +81,54 @@
     ================================================== -->
 
     <!-- 书籍删除 -->
-    <script
-        src="./page-js/home-book-delete.js"
-        defer
-    ></script>
+    <script src="./page-js/home-book-delete.js" defer></script>
 
     <!-- 分组删除 -->
-    <script
-        src="./page-js/home-group-delete.js"
-        defer
-    ></script>
+    <script src="./page-js/home-group-delete.js" defer></script>
 
 
     <!-- ==================================================
          设置与书架布局模块
 
          每个模块只负责自己的功能。
-         不直接管理作品存储数据。
+         不直接修改书籍数据库。
     ================================================== -->
 
-    <!-- 设置菜单 -->
-    <script
-        src="./page-js/home-settings.js"
-        defer
-    ></script>
+    <!-- 设置弹窗 -->
+    <script src="./page-js/home-settings.js" defer></script>
 
-    <!-- 排序 -->
-    <script
-        src="./page-js/home-sort.js"
-        defer
-    ></script>
+    <!-- 书籍排序 -->
+    <script src="./page-js/home-sort.js" defer></script>
 
     <!-- 网格布局 -->
-    <script
-        src="./page-js/home-grid.js"
-        defer
-    ></script>
+    <script src="./page-js/home-grid.js" defer></script>
 
     <!-- 列表布局 -->
-    <script
-        src="./page-js/home-list.js"
-        defer
-    ></script>
+    <script src="./page-js/home-list.js" defer></script>
 
 
     <!-- ==================================================
          首页主体模块
+
+         负责书籍、分组的读取和渲染。
+         放在布局模块之后加载。
     ================================================== -->
 
-    <script
-        src="./page-js/home.js"
-        defer
-    ></script>
+    <script src="./page-js/home.js" defer></script>
 
 </head>
 
+
 <body>
 
-    <div
-        class="app"
-        id="app"
-    >
+    <div class="app" id="app">
+
 
         <!-- ==================================================
              顶部导航栏
         ================================================== -->
 
-        <header
-            class="app-header"
-            id="app-header"
-        >
+        <header class="app-header" id="app-header">
 
             <!-- 品牌名称 -->
             <div class="app-header__brand">
@@ -229,7 +166,7 @@
                 </a>
 
 
-                <!-- 软件设置：点击弹出菜单 -->
+                <!-- 书架设置 -->
                 <button
                     class="app-header__button app-header__button--settings"
                     id="home-settings-trigger"
@@ -253,10 +190,7 @@
              页面主体
         ================================================== -->
 
-        <main
-            class="app-main"
-            id="app-main"
-        >
+        <main class="app-main" id="app-main">
 
             <section
                 class="home-page"
@@ -282,24 +216,22 @@
                         卷帙未启
                     </h1>
 
+
                     <div
                         class="empty-state__divider"
                         aria-hidden="true"
                     >
 
-                        <span
-                            class="empty-state__divider-line"
-                        ></span>
+                        <span class="empty-state__divider-line"></span>
 
-                        <span
-                            class="empty-state__divider-symbol"
-                        >◆</span>
+                        <span class="empty-state__divider-symbol">
+                            ◆
+                        </span>
 
-                        <span
-                            class="empty-state__divider-line"
-                        ></span>
+                        <span class="empty-state__divider-line"></span>
 
                     </div>
+
 
                     <p class="empty-state__subtitle">
                         书架尚空，静候新篇。
@@ -315,7 +247,9 @@
 
                 <!-- ==========================================
                      我的分组
-                     保留现有分组管理功能
+
+                     保留现有分组管理功能。
+                     排序功能不应改变分组顺序。
                 ========================================== -->
 
                 <section
@@ -332,6 +266,7 @@
                         </h2>
 
                     </div>
+
 
                     <div
                         class="home-groups__list"
@@ -355,14 +290,13 @@
                     hidden
                 >
 
-                    <!-- 书架标题 -->
+                    <!-- 作品标题与数量 -->
                     <div class="shelf-content__header">
 
                         <h2 class="shelf-content__title">
                             我的作品
                         </h2>
 
-                        <!-- 作品数量 -->
                         <span
                             class="shelf-content__count"
                             id="shelf-count"
@@ -374,16 +308,26 @@
                     </div>
 
 
-                    <!-- 作品列表 -->
+                    <!-- 作品容器 -->
                     <div
                         class="shelf-list"
                         id="shelf-list"
                         aria-label="作品列表"
                     >
                         <!--
-                            作品卡片由 home.js 生成。
-                            排序、网格、列表模块分别负责自己的功能。
-                            书籍数据仍由 storage.js 管理。
+                            书籍卡片由 home.js 生成。
+
+                            home-sort.js：
+                            负责排序、保存、取消。
+
+                            home-grid.js：
+                            负责网格布局。
+
+                            home-list.js：
+                            负责列表布局。
+
+                            storage.js：
+                            负责书籍数据存储。
                         -->
                     </div>
 
@@ -398,15 +342,10 @@
              底部导航栏
         ================================================== -->
 
-        <footer
-            class="app-footer"
-            id="app-footer"
-        >
+        <footer class="app-footer" id="app-footer">
 
-            <nav
-                class="bottom-nav"
-                aria-label="主导航"
-            >
+            <nav class="bottom-nav" aria-label="主导航">
+
 
                 <!-- 书架 -->
                 <a
@@ -430,17 +369,11 @@
                             d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22Z"
                         ></path>
 
-                        <path
-                            d="M4 5.5V22"
-                        ></path>
+                        <path d="M4 5.5V22"></path>
 
-                        <path
-                            d="M8 7h8"
-                        ></path>
+                        <path d="M8 7h8"></path>
 
-                        <path
-                            d="M8 11h8"
-                        ></path>
+                        <path d="M8 11h8"></path>
                     </svg>
 
                     <span class="bottom-nav__label">
@@ -490,10 +423,10 @@
 
 
         <!-- ==================================================
-             设置弹出菜单
+             设置弹窗
 
              不创建新页面。
-             排序、网格、列表分别由独立模块处理。
+             不覆盖书架与分组的数据。
         ================================================== -->
 
         <div
@@ -545,7 +478,11 @@
                 <!-- 设置选项 -->
                 <div class="home-settings__options">
 
-                    <!-- 排序 -->
+
+                    <!-- ======================================
+                         排序
+                    ====================================== -->
+
                     <button
                         class="home-settings__option"
                         type="button"
@@ -572,7 +509,10 @@
                     </button>
 
 
-                    <!-- 网格 -->
+                    <!-- ======================================
+                         网格
+                    ====================================== -->
+
                     <button
                         class="home-settings__option"
                         type="button"
@@ -591,7 +531,7 @@
                             </span>
 
                             <span class="home-settings__option-description">
-                                每行最多显示三本书
+                                每行最多显示三本书，仅显示封面和书名
                             </span>
 
                         </span>
@@ -599,7 +539,10 @@
                     </button>
 
 
-                    <!-- 列表 -->
+                    <!-- ======================================
+                         列表
+                    ====================================== -->
+
                     <button
                         class="home-settings__option"
                         type="button"
@@ -618,7 +561,7 @@
                             </span>
 
                             <span class="home-settings__option-description">
-                                每行一本，只显示封面和书名
+                                每行一本书，仅显示封面和书名
                             </span>
 
                         </span>
@@ -628,7 +571,7 @@
                 </div>
 
 
-                <!-- 底部关闭按钮 -->
+                <!-- 底部操作 -->
                 <footer class="home-settings__footer">
 
                     <button
@@ -648,4 +591,5 @@
     </div>
 
 </body>
+
 </html>
