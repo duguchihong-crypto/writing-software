@@ -124,7 +124,7 @@
 
 /* ==================================================
    右上角关闭按钮
-   鲜艳赤色
+   鲜艳赤色实心方框 + 白色 ×
    ================================================== */
 
 .home-settings__close {
@@ -136,16 +136,16 @@
   height: 36px;
 
   flex-shrink: 0;
-
   padding: 0;
+
+  /* 赤色实心背景 */
+  background: #F00020;
+  color: #FFFFFF;
 
   border: 1px solid #F00020;
   border-radius: 8px;
 
-  background: transparent;
-  color: #F00020;
-
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1;
 
@@ -153,29 +153,27 @@
 
   transition:
     background 0.18s ease,
-    color 0.18s ease,
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
 
 
-/* 鼠标悬停 */
+/* 鼠标悬停：赤色加深 */
 
 .home-settings__close:hover {
-  background: #F00020;
-  border-color: #F00020;
-  color: #FFFFFF;
+  background: #C9001B;
+  border-color: #C9001B;
 
-  box-shadow: 0 0 10px rgba(240, 0, 32, 0.35);
+  box-shadow: 0 0 10px rgba(240, 0, 32, 0.4);
 }
 
 
 /* 点击状态 */
 
 .home-settings__close:active {
-  background: #C9001B;
-  border-color: #C9001B;
-  color: #FFFFFF;
+  background: #A90017;
+  border-color: #A90017;
+  box-shadow: none;
 }
 
 
@@ -200,9 +198,7 @@
 
 /* ==================================================
    单个设置选项
-
-   仅保留图标和名称。
-   不显示介绍文字。
+   仅显示图标和名称
    ================================================== */
 
 .home-settings__option {
@@ -287,8 +283,6 @@
 
 /* ==================================================
    选项名称
-
-   兼容现有 HTML 结构。
    ================================================== */
 
 .home-settings__option-content {
@@ -308,8 +302,7 @@
 }
 
 
-/* 兼容旧 HTML 中残留的介绍文字。
-   即使 HTML 尚未删除介绍节点，也不显示。 */
+/* 兼容旧 HTML：隐藏介绍文字 */
 
 .home-settings__option-description {
   display: none !important;
@@ -371,7 +364,7 @@ body.home-settings-open {
     width: 34px;
     height: 34px;
 
-    font-size: 28px;
+    font-size: 26px;
   }
 }
 
