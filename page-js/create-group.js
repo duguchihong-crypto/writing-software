@@ -14,6 +14,7 @@
    9. 兼容 WritingGroupsStorage
    10. 兼容 WritingStorage
    11. 兼容 WritingNavigation
+   12. 创建成功后返回首页
 ====================================================== */
 
 (function () {
@@ -99,7 +100,7 @@
 
 
     /* ==================================================
-       五、通用消息处理
+       五、消息处理
     ================================================== */
 
     function showMessage(text, type) {
@@ -271,11 +272,6 @@
 
     /* ==================================================
        十、获取分组存储模块
-
-       优先使用独立的分组接口。
-
-       如果独立接口不存在，再尝试
-       WritingStorage 中的兼容接口。
     ================================================== */
 
     function getStorage() {
@@ -286,7 +282,7 @@
             window.WritingStorage;
 
         /*
-         * 优先检查独立分组存储接口。
+         * 优先使用独立分组存储模块。
          */
 
         if (
@@ -298,7 +294,7 @@
         }
 
         /*
-         * 其次检查兼容接口。
+         * 兼容 WritingStorage。
          */
 
         if (
@@ -309,20 +305,8 @@
             return writingStorage;
         }
 
-        /*
-         * 尝试明确判断加载问题。
-         */
-
-        if (!window.WritingGroupsStorage) {
-            throw new Error(
-                "未找到独立分组存储接口。请检查 " +
-                "js/groups-storage.js 是否加载成功，以及文件路径是否正确。"
-            );
-        }
-
         throw new Error(
-            "分组存储接口缺少必要的方法。请检查 " +
-            "js/groups-storage.js 中的 createGroup 和 getGroups 方法。"
+            "分组存储接口不可用，请检查 groups-storage.js 是否正确加载。"
         );
     }
 
@@ -333,7 +317,7 @@
 
     function hasDuplicateName(storage, name) {
         /*
-         * 优先使用存储模块提供的方法。
+         * 优先使用存储模块提供的检查方法。
          */
 
         if (
@@ -343,7 +327,7 @@
         }
 
         /*
-         * 兼容没有 hasGroupName 的旧版本。
+         * 兼容没有 hasGroupName 方法的版本。
          */
 
         const groups = storage.getGroups();
@@ -367,26 +351,63 @@
 
 
     /* ==================================================
-       十二、返回新建选择页
+       十二、导航功能
+
+       创建成功后：返回首页 index.html
+
+       取消创建时：返回创建选择页 create.html
     ================================================== */
 
-    function navigateToCreatePage() {
-        if (redirectTimer !== null) {
-            window.clearTimeout(redirectTimer);
+    function navigateToHome() {
+        clearRedirectTimer();
 
-            redirectTimer = null;
-        }
+        /*
+         * 当前页面位于 pages/ 目录。
+         * ../index.html 指向项目根目录的首页。
+         */
+
+        window.location.replace("../index.html");
+    }
+
+
+    function navigateToCreatePage() {
+        clearRedirectTimer();
+
+        /*
+         * 取消创建时，优先使用现有导航模块。
+         */
 
         if (
             window.WritingNavigation &&
             typeof window.WritingNavigation.navigate === "function"
         ) {
-            window.WritingNavigation.navigate("create");
+            try {
+                window.WritingNavigation.navigate("create");
 
-            return;
+                return;
+            } catch (error) {
+                console.error(
+                    "[新建分组] 返回创建页面失败：",
+                    error
+                );
+            }
         }
 
+        /*
+         * create-group.html 位于 pages/ 目录。
+         * create.html 与它处于同一目录。
+         */
+
         window.location.href = "./create.html";
+    }
+
+
+    function clearRedirectTimer() {
+        if (redirectTimer !== null) {
+            window.clearTimeout(redirectTimer);
+
+            redirectTimer = null;
+        }
     }
 
 
@@ -410,7 +431,7 @@
         clearNameError();
 
         /*
-         * 验证名称。
+         * 验证分组名称。
          */
 
         if (!validateName()) {
@@ -422,20 +443,16 @@
         const name = nameInput.value.trim();
 
         /*
-         * 开始创建。
+         * 开始提交。
          */
 
         setSubmitting(true);
 
         try {
-            /*
-             * 获取正确的分组存储接口。
-             */
-
             const storage = getStorage();
 
             /*
-             * 检查重复名称。
+             * 检查名称是否重复。
              */
 
             if (hasDuplicateName(storage, name)) {
@@ -451,7 +468,7 @@
             }
 
             /*
-             * 创建并保存分组。
+             * 创建分组。
              */
 
             const group = storage.createGroup({
@@ -459,7 +476,7 @@
             });
 
             /*
-             * 验证返回结果。
+             * 验证创建结果。
              */
 
             if (
@@ -473,27 +490,31 @@
             }
 
             /*
-             * 标记创建成功。
+             * 标记保存成功。
              */
 
             isSaved = true;
 
             originalName = name;
 
+            /*
+             * 显示成功提示。
+             */
+
             showMessage(
                 "分组「" +
                 group.name +
-                "」创建成功！正在返回……",
+                "」创建成功！正在返回首页……",
                 "success"
             );
 
             /*
-             * 创建成功后延迟返回。
+             * 创建成功后返回首页。
              */
 
             redirectTimer = window.setTimeout(
                 function () {
-                    navigateToCreatePage();
+                    navigateToHome();
                 },
                 REDIRECT_DELAY
             );
@@ -521,20 +542,21 @@
     ================================================== */
 
     function handleCancel() {
-        if (isSubmitting) {
+        if (isSubmitting || isSaved) {
             return;
         }
 
-        const currentName = nameInput.value.trim();
+        const currentName =
+            nameInput.value.trim();
 
         const hasChanged =
             currentName !== originalName.trim();
 
         /*
-         * 输入内容发生变化时，提示用户。
+         * 如果输入内容发生变化，提示用户。
          */
 
-        if (hasChanged && !isSaved) {
+        if (hasChanged) {
             const confirmed = window.confirm(
                 "分组名称尚未保存，确定放弃本次创建吗？"
             );
@@ -617,6 +639,10 @@
     window.addEventListener(
         "beforeunload",
         function (event) {
+            /*
+             * 正在提交或已经成功保存时，不提示。
+             */
+
             if (isSubmitting || isSaved) {
                 return;
             }
@@ -654,10 +680,6 @@
         console.log(
             "[新建分组] 页面初始化成功。"
         );
-
-        /*
-         * 输出接口加载情况，便于排查问题。
-         */
 
         console.log(
             "[新建分组] WritingGroupsStorage：",
