@@ -1,5 +1,5 @@
 /* ======================================================
-   新建分组页面逻辑
+   写作软件 · 新建分组页面逻辑
    文件：page-js/create-group.js
 
    功能：
@@ -15,6 +15,7 @@
    10. 兼容 WritingStorage
    11. 兼容 WritingNavigation
    12. 创建成功后返回首页
+   13. 兼容 GitHub Pages 项目路径
 ====================================================== */
 
 (function () {
@@ -316,19 +317,11 @@
     ================================================== */
 
     function hasDuplicateName(storage, name) {
-        /*
-         * 优先使用存储模块提供的检查方法。
-         */
-
         if (
             typeof storage.hasGroupName === "function"
         ) {
             return storage.hasGroupName(name);
         }
-
-        /*
-         * 兼容没有 hasGroupName 方法的版本。
-         */
 
         const groups = storage.getGroups();
 
@@ -351,56 +344,8 @@
 
 
     /* ==================================================
-       十二、导航功能
-
-       创建成功后：返回首页 index.html
-
-       取消创建时：返回创建选择页 create.html
+       十二、清除跳转定时器
     ================================================== */
-
-    function navigateToHome() {
-        clearRedirectTimer();
-
-        /*
-         * 当前页面位于 pages/ 目录。
-         * ../index.html 指向项目根目录的首页。
-         */
-
-        window.location.replace("../index.html");
-    }
-
-
-    function navigateToCreatePage() {
-        clearRedirectTimer();
-
-        /*
-         * 取消创建时，优先使用现有导航模块。
-         */
-
-        if (
-            window.WritingNavigation &&
-            typeof window.WritingNavigation.navigate === "function"
-        ) {
-            try {
-                window.WritingNavigation.navigate("create");
-
-                return;
-            } catch (error) {
-                console.error(
-                    "[新建分组] 返回创建页面失败：",
-                    error
-                );
-            }
-        }
-
-        /*
-         * create-group.html 位于 pages/ 目录。
-         * create.html 与它处于同一目录。
-         */
-
-        window.location.href = "./create.html";
-    }
-
 
     function clearRedirectTimer() {
         if (redirectTimer !== null) {
@@ -412,7 +357,157 @@
 
 
     /* ==================================================
-       十三、创建分组
+       十三、返回首页
+       
+       优先使用 WritingNavigation.goHome()。
+       如果导航模块不可用，则根据当前页面
+       的实际 URL 计算项目根目录。
+    ================================================== */
+
+    function navigateToHome() {
+        clearRedirectTimer();
+
+        console.log(
+            "[新建分组] 准备返回首页。"
+        );
+
+        /*
+         * 方法一：使用统一导航模块。
+         */
+
+        if (
+            window.WritingNavigation &&
+            typeof window.WritingNavigation.goHome === "function"
+        ) {
+            try {
+                window.WritingNavigation.goHome();
+
+                return;
+
+            } catch (error) {
+                console.error(
+                    "[新建分组] 导航模块跳转失败：",
+                    error
+                );
+            }
+        }
+
+        /*
+         * 方法二：直接根据当前 URL 计算首页。
+         *
+         * 例如：
+         * /writing-software/pages/create-group.html
+         *
+         * 转换为：
+         * /writing-software/index.html
+         *
+         * 不把首页错误地指向域名根目录。
+         */
+
+        try {
+            const currentUrl = new URL(
+                window.location.href
+            );
+
+            const currentPath = currentUrl.pathname;
+
+            const pageSuffix = "/pages/create-group.html";
+
+            if (currentPath.endsWith(pageSuffix)) {
+                currentUrl.pathname =
+                    currentPath.slice(
+                        0,
+                        -pageSuffix.length
+                    ) + "/index.html";
+
+            } else {
+                /*
+                 * 兼容页面目录结构发生变化的情况。
+                 */
+
+                const lastSlashIndex =
+                    currentPath.lastIndexOf("/");
+
+                const currentDirectory =
+                    currentPath.slice(
+                        0,
+                        lastSlashIndex + 1
+                    );
+
+                currentUrl.pathname =
+                    currentDirectory + "index.html";
+            }
+
+            currentUrl.search = "";
+
+            currentUrl.hash = "";
+
+            console.log(
+                "[新建分组] 首页地址：",
+                currentUrl.href
+            );
+
+            window.location.replace(
+                currentUrl.href
+            );
+
+        } catch (error) {
+            console.error(
+                "[新建分组] 无法计算首页地址：",
+                error
+            );
+
+            showMessage(
+                "分组已创建成功，但无法自动返回首页。请点击返回书架。",
+                "success"
+            );
+        }
+    }
+
+
+    /* ==================================================
+       十四、返回创建选择页
+       
+       取消创建时使用，不影响创建成功后的跳转。
+    ================================================== */
+
+    function navigateToCreatePage() {
+        clearRedirectTimer();
+
+        /*
+         * 优先使用统一导航模块。
+         */
+
+        if (
+            window.WritingNavigation &&
+            typeof window.WritingNavigation.goCreate === "function"
+        ) {
+            try {
+                window.WritingNavigation.goCreate();
+
+                return;
+
+            } catch (error) {
+                console.error(
+                    "[新建分组] 返回创建页面失败：",
+                    error
+                );
+            }
+        }
+
+        /*
+         * 备用方案。
+         *
+         * create.html 与 create-group.html
+         * 位于同一个 pages/ 目录。
+         */
+
+        window.location.href = "./create.html";
+    }
+
+
+    /* ==================================================
+       十五、创建分组
     ================================================== */
 
     function handleSubmit(event) {
@@ -468,7 +563,7 @@
             }
 
             /*
-             * 创建分组。
+             * 创建并保存分组。
              */
 
             const group = storage.createGroup({
@@ -476,7 +571,7 @@
             });
 
             /*
-             * 验证创建结果。
+             * 检查创建结果。
              */
 
             if (
@@ -498,7 +593,7 @@
             originalName = name;
 
             /*
-             * 显示成功提示。
+             * 显示创建成功消息。
              */
 
             showMessage(
@@ -508,9 +603,16 @@
                 "success"
             );
 
+            console.log(
+                "[新建分组] 创建成功：",
+                group
+            );
+
             /*
-             * 创建成功后返回首页。
+             * 创建成功后，延迟 600 毫秒返回首页。
              */
+
+            clearRedirectTimer();
 
             redirectTimer = window.setTimeout(
                 function () {
@@ -538,7 +640,7 @@
 
 
     /* ==================================================
-       十四、取消创建
+       十六、取消创建
     ================================================== */
 
     function handleCancel() {
@@ -571,7 +673,7 @@
 
 
     /* ==================================================
-       十五、监听输入变化
+       十七、监听输入变化
     ================================================== */
 
     function handleInput() {
@@ -590,7 +692,7 @@
 
 
     /* ==================================================
-       十六、失去焦点时验证
+       十八、失去焦点时验证
     ================================================== */
 
     nameInput.addEventListener(
@@ -604,7 +706,7 @@
 
 
     /* ==================================================
-       十七、绑定表单提交事件
+       十九、绑定表单提交事件
     ================================================== */
 
     form.addEventListener(
@@ -614,7 +716,7 @@
 
 
     /* ==================================================
-       十八、绑定取消按钮
+       二十、绑定取消按钮
     ================================================== */
 
     if (cancelButton) {
@@ -633,7 +735,7 @@
 
 
     /* ==================================================
-       十九、离开页面前提示
+       二十一、离开页面前提示
     ================================================== */
 
     window.addEventListener(
@@ -665,7 +767,7 @@
 
 
     /* ==================================================
-       二十、页面初始化
+       二十二、页面初始化
     ================================================== */
 
     function init() {
@@ -679,6 +781,16 @@
 
         console.log(
             "[新建分组] 页面初始化成功。"
+        );
+
+        console.log(
+            "[新建分组] 当前页面地址：",
+            window.location.href
+        );
+
+        console.log(
+            "[新建分组] WritingNavigation：",
+            Boolean(window.WritingNavigation)
         );
 
         console.log(
