@@ -1,852 +1,627 @@
 /* ======================================================
-新建书籍页面样式
-文件：page-css/create-book.css
+写作软件 · 新建书籍
+文件：page-js/create-book.js
 
 功能：
 
-1. 页面整体布局
-2. 页面标题与装饰
-3. 书籍封面预览
-4. 图片选择与移除按钮
-5. 书名输入框
-6. 错误提示与操作按钮
-7. 手机端适配
-8. 固定底部导航栏
-9. 青色主题统一
-    ====================================================== */
+1. 输入书名
+2. 选择、预览、更换、移除封面
+3. 自动压缩图片
+4. 验证书名与图片
+5. 通过 WritingStorage 创建书籍
+6. 防止重复提交
+7. 取消时确认放弃
+8. 顶部返回、底部取消均返回新建页面
+9. 创建成功后返回书架
 
-/* ======================================================
-一、页面整体布局
+注意：
+本模块不直接操作 localStorage。
+所有书籍数据统一交给 WritingStorage 管理。
 ====================================================== */
 
-#app {
-display: flex;
-flex-direction: column;
-width: 100%;
-min-height: 100vh;
-min-height: 100dvh;
-}
-
-.create-book-main {
-display: flex;
-flex-direction: column;
-flex: 1 0 auto;
-width: 100%;
-min-width: 0;
-
-background:
-    radial-gradient(
-        ellipse at 50% 0%,
-        rgba(40, 124, 115, 0.08),
-        transparent 65%
-    ),
-    var(--theme-background);
-
-}
-
-.create-book-page {
-display: flex;
-flex-direction: column;
-align-items: center;
-width: 100%;
-flex: 1 0 auto;
-padding: 38px 24px 48px;
-}
-
-/* ======================================================
-二、页面标题
-====================================================== */
-
-.create-book-heading {
-display: flex;
-flex-direction: column;
-align-items: center;
-width: 100%;
-max-width: 650px;
-margin: 0 auto 34px;
-text-align: center;
-}
-
-.create-book-heading__eyebrow {
-margin: 0 0 8px;
-color: var(–color-cyan-dark);
-font-family: Georgia, “Times New Roman”, serif;
-font-size: 10px;
-font-weight: 600;
-letter-spacing: 0.24em;
-line-height: 1.6;
-}
-
-.create-book-heading__title {
-margin: 0;
-color: var(–color-red);
-font-family: “Songti SC”, “STSong”, “SimSun”, serif;
-font-size: clamp(28px, 4vw, 36px);
-font-weight: 700;
-letter-spacing: 0.12em;
-line-height: 1.5;
-}
-
-.create-book-heading__divider {
-display: flex;
-align-items: center;
-justify-content: center;
-width: 130px;
-gap: 8px;
-margin: 14px 0;
-}
-
-.create-book-heading__divider::before,
-.create-book-heading__divider::after {
-content: “”;
-display: block;
-flex: 1;
-height: 1px;
-
-background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-yellow-dark)
-);
-
-}
-
-.create-book-heading__divider::after {
-background: linear-gradient(
-90deg,
-var(–color-yellow-dark),
-transparent
-);
-}
-
-.create-book-heading__divider span {
-display: block;
-width: 5px;
-height: 5px;
-flex-shrink: 0;
-background: var(–color-yellow);
-transform: rotate(45deg);
-}
-
-.create-book-heading__divider span:nth-child(2) {
-width: 8px;
-height: 8px;
-background: var(–color-red);
-}
-
-.create-book-heading__description {
-margin: 0;
-color: var(–theme-text-secondary);
-font-family: “Songti SC”, “STSong”, “SimSun”, serif;
-font-size: 14px;
-line-height: 1.8;
-letter-spacing: 0.04em;
-}
-
-/* ======================================================
-三、表单整体
-====================================================== */
-
-.create-book-form {
-display: flex;
-flex-direction: column;
-width: 100%;
-max-width: 680px;
-min-width: 0;
-margin: 0 auto;
-}
-
-/* ======================================================
-四、表单分区
-====================================================== */
-
-.create-book-section {
-width: 100%;
-min-width: 0;
-padding: 24px;
-
-background: var(--color-white-pure);
-border: 1px solid var(--theme-border);
-border-radius: 8px;
-box-shadow: 0 3px 14px var(--theme-shadow-color);
-
-}
-
-.create-book-section + .create-book-section {
-margin-top: 20px;
-}
-
-.create-book-section__heading {
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 12px;
-margin-bottom: 22px;
-padding-bottom: 14px;
-border-bottom: 1px solid var(–theme-border);
-}
-
-.create-book-section__title {
-position: relative;
-margin: 0;
-padding-left: 12px;
-
-color: var(--color-black);
-font-family: "Songti SC", "STSong", "SimSun", serif;
-font-size: 17px;
-font-weight: 700;
-line-height: 1.6;
-
-}
-
-.create-book-section__title::before {
-content: “”;
-position: absolute;
-top: 50%;
-left: 0;
-width: 3px;
-height: 17px;
-
-background: var(--color-red);
-border-radius: 2px;
-transform: translateY(-50%);
-
-}
-
-.create-book-section__optional {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-padding: 3px 9px;
-
-color: var(--theme-text-muted);
-font-size: 11px;
-line-height: 1.6;
-background: var(--color-white);
-border: 1px solid var(--theme-border);
-border-radius: 3px;
-
-}
-
-/* ======================================================
-五、封面区域
-====================================================== */
-
-.create-book-cover {
-display: flex;
-flex-direction: column;
-align-items: center;
-width: 100%;
-}
-
-.create-book-cover__preview {
-position: relative;
-display: flex;
-align-items: center;
-justify-content: center;
-
-width: 190px;
-max-width: 100%;
-aspect-ratio: 3 / 4;
-overflow: hidden;
-background: linear-gradient(145deg, #F9F5EB, #EEE4D2);
-border: 1px solid var(--color-white-deep);
-border-radius: 5px;
-box-shadow: 0 5px 16px rgba(33, 31, 28, 0.10);
-
-}
-
-.create-book-cover__preview::before {
-content: “”;
-position: absolute;
-inset: 9px;
-
-border: 1px solid rgba(169, 135, 62, 0.35);
-border-radius: 2px;
-pointer-events: none;
-z-index: 2;
-
-}
-
-.create-book-cover__placeholder {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-
-width: 100%;
-height: 100%;
-padding: 22px;
-text-align: center;
-
-}
-
-.create-book-cover__icon {
-display: block;
-width: 56px;
-height: 56px;
-margin-bottom: 18px;
-color: var(–color-cyan);
-}
-
-.create-book-cover__placeholder-title {
-display: block;
-margin-bottom: 8px;
-
-color: var(--color-cyan-dark);
-font-family: "Songti SC", "STSong", "SimSun", serif;
-font-size: 14px;
-font-weight: 700;
-letter-spacing: 0.04em;
-line-height: 1.6;
-
-}
-
-.create-book-cover__placeholder-description {
-display: block;
-
-color: var(--color-cyan-dark);
-font-family: "Songti SC", "STSong", "SimSun", serif;
-font-size: 10px;
-line-height: 1.8;
-
-}
-
-.create-book-cover__image {
-display: block;
-width: 100%;
-height: 100%;
-object-fit: cover;
-object-position: center;
-}
-
-.create-book-cover__image[hidden] {
-display: none !important;
-}
-
-/* ======================================================
-六、封面按钮
-====================================================== */
-
-.create-book-cover__actions {
-display: flex;
-align-items: center;
-justify-content: center;
-flex-wrap: wrap;
-gap: 12px;
-margin-top: 20px;
-}
-
-.create-book-cover__select-button {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-
-min-height: 42px;
-padding: 10px 20px;
-color: var(--color-white-pure);
-font-size: 13px;
-font-weight: 600;
-line-height: 1.5;
-background: var(--color-cyan);
-border: 1px solid var(--color-cyan);
-border-radius: 5px;
-cursor: pointer;
-transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
-
-}
-
-.create-book-cover__select-button > span:first-child {
-font-size: 18px;
-line-height: 1;
-}
-
-@media (hover: hover) {
-.create-book-cover__select-button:hover {
-background: var(–color-cyan-dark);
-border-color: var(–color-cyan-dark);
-}
-}
-
-.create-book-cover__select-button:focus-within {
-outline: 3px solid rgba(40, 124, 115, 0.22);
-outline-offset: 3px;
-}
-
-.create-book-cover__remove-button {
-min-height: 42px;
-padding: 9px 16px;
-
-color: var(--color-red);
-font-family: inherit;
-font-size: 12px;
-font-weight: 500;
-background: var(--color-white-pure);
-border: 1px solid rgba(158, 36, 40, 0.35);
-border-radius: 5px;
-cursor: pointer;
-transition:
-    background-color 160ms ease,
-    border-color 160ms ease;
-
-}
-
-@media (hover: hover) {
-.create-book-cover__remove-button:hover {
-background: rgba(158, 36, 40, 0.06);
-border-color: var(–color-red);
-}
-}
-
-.create-book-cover__remove-button[hidden] {
-display: none !important;
-}
-
-.create-book-cover__input {
-position: absolute;
-width: 1px;
-height: 1px;
-padding: 0;
-margin: -1px;
-overflow: hidden;
-clip: rect(0, 0, 0, 0);
-clip-path: inset(50%);
-white-space: nowrap;
-border: 0;
-}
-
-.create-book-cover__help {
-max-width: 100%;
-margin: 14px 0 0;
-
-color: var(--color-cyan-dark);
-font-size: 11px;
-line-height: 1.8;
-text-align: center;
-
-}
-
-.create-book-cover__error {
-width: 100%;
-margin: 12px 0 0;
-
-color: var(--color-red);
-font-size: 12px;
-line-height: 1.7;
-text-align: center;
-
-}
-
-.create-book-cover__error[hidden] {
-display: none !important;
-}
-
-/* ======================================================
-七、书名输入区域
-====================================================== */
-
-.create-book-info-section {
-margin-top: 20px;
-}
-
-.create-book-field {
-display: flex;
-flex-direction: column;
-width: 100%;
-min-width: 0;
-}
-
-.create-book-field__label {
-display: inline-flex;
-align-items: center;
-gap: 5px;
-margin-bottom: 10px;
-
-color: var(--color-black);
-font-size: 14px;
-font-weight: 600;
-line-height: 1.6;
-
-}
-
-.create-book-field__required {
-color: var(–color-red);
-font-size: 16px;
-line-height: 1;
-}
-
-.create-book-field__input {
-display: block;
-box-sizing: border-box;
-
-width: 100%;
-min-width: 0;
-min-height: 48px;
-padding: 12px 14px;
-color: var(--theme-text);
-font-family: inherit;
-font-size: 16px;
-line-height: 1.6;
-background: var(--color-white-pure);
-border: 1px solid var(--color-white-deep);
-border-radius: 5px;
-outline: none;
-transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
-
-}
-
-.create-book-field__input::placeholder {
-color: #A19A8E;
-}
-
-.create-book-field__input:hover {
-border-color: var(–color-cyan);
-}
-
-.create-book-field__input:focus {
-border-color: var(–color-cyan);
-
-box-shadow: 0 0 0 3px rgba(40, 124, 115, 0.12);
-
-}
-
-.create-book-field__footer {
-display: flex;
-align-items: flex-start;
-justify-content: space-between;
-gap: 12px;
-margin-top: 9px;
-}
-
-.create-book-field__help {
-margin: 0;
-color: var(–color-cyan-dark);
-font-size: 11px;
-line-height: 1.8;
-}
-
-.create-book-field__counter {
-flex-shrink: 0;
-color: var(–color-cyan-dark);
-font-size: 11px;
-line-height: 1.8;
-font-variant-numeric: tabular-nums;
-}
-
-.create-book-field__error {
-margin: 10px 0 0;
-padding: 9px 12px;
-
-color: var(--color-red);
-font-size: 12px;
-line-height: 1.7;
-background: rgba(158, 36, 40, 0.06);
-border-left: 3px solid var(--color-red);
-border-radius: 2px;
-
-}
-
-.create-book-field__error[hidden] {
-display: none !important;
-}
-
-.create-book-field__input[aria-invalid=“true”] {
-border-color: var(–color-red);
-box-shadow: 0 0 0 2px rgba(158, 36, 40, 0.08);
-}
-
-/* ======================================================
-八、表单消息
-====================================================== */
-
-.create-book-message {
-margin-top: 20px;
-padding: 13px 16px;
-
-color: var(--color-cyan-dark);
-font-size: 13px;
-line-height: 1.8;
-background: rgba(40, 124, 115, 0.08);
-border: 1px solid rgba(40, 124, 115, 0.22);
-border-radius: 5px;
-
-}
-
-.create-book-message[hidden] {
-display: none !important;
-}
-
-.create-book-message.is-error {
-color: var(–color-red);
-background: rgba(158, 36, 40, 0.06);
-border-color: rgba(158, 36, 40, 0.22);
-}
-
-.create-book-message.is-success {
-color: var(–color-cyan-dark);
-background: rgba(40, 124, 115, 0.08);
-border-color: rgba(40, 124, 115, 0.22);
-}
-
-/* ======================================================
-九、底部操作按钮
-====================================================== */
-
-.create-book-actions {
-display: flex;
-align-items: center;
-justify-content: flex-end;
-flex-wrap: wrap;
-gap: 12px;
-margin-top: 26px;
-}
-
-.create-book-actions__button {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-
-min-width: 112px;
-min-height: 44px;
-padding: 11px 22px;
-font-family: inherit;
-font-size: 13px;
-font-weight: 600;
-line-height: 1.5;
-border: 1px solid transparent;
-border-radius: 5px;
-cursor: pointer;
-transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    box-shadow 160ms ease,
-    opacity 160ms ease;
-
-}
-
-.create-book-actions__button–cancel {
-color: var(–color-black-soft);
-background: var(–color-white-pure);
-border-color: var(–color-white-deep);
-}
-
-@media (hover: hover) {
-.create-book-actions__button–cancel:hover {
-color: var(–color-red);
-background: var(–color-white);
-border-color: var(–color-yellow-dark);
-}
-}
-
-.create-book-actions__button–submit {
-color: var(–color-white-pure);
-background: var(–color-cyan);
-border-color: var(–color-cyan);
-
-box-shadow: 0 3px 8px rgba(40, 124, 115, 0.15);
-
-}
-
-@media (hover: hover) {
-.create-book-actions__button–submit:hover {
-background: var(–color-cyan-dark);
-border-color: var(–color-cyan-dark);
-
-    box-shadow: 0 5px 12px rgba(40, 124, 115, 0.22);
-}
-
-}
-
-.create-book-actions__button:focus-visible,
-.create-book-cover__remove-button:focus-visible {
-outline: 3px solid rgba(40, 124, 115, 0.28);
-outline-offset: 3px;
-}
-
-.create-book-actions__button:disabled,
-.create-book-cover__remove-button:disabled {
-opacity: 0.55;
-cursor: not-allowed;
-box-shadow: none;
-}
-
-/* ======================================================
-十、底部说明
-====================================================== */
-
-.create-book-footnote {
-margin: 18px 0 0;
-
-color: var(--color-cyan-dark);
-font-size: 11px;
-line-height: 1.9;
-text-align: center;
-
-}
-
-/* ======================================================
-十一、底部导航栏固定
-====================================================== */
-
-#app > .app-footer {
-position: fixed;
-right: 0;
-bottom: 0;
-left: 0;
-z-index: 1000;
-
-width: 100%;
-flex: 0 0 auto;
-padding-bottom: env(safe-area-inset-bottom, 0px);
-background: var(--color-black);
-
-}
-
-#app > .app-footer .bottom-nav {
-width: 100%;
-}
-
-#app > .create-book-main {
-box-sizing: border-box;
-
-padding-bottom: calc(
-    100px + env(safe-area-inset-bottom, 0px)
-);
-
-}
-
-/* ======================================================
-十二、平板适配
-====================================================== */
-
-@media (max-width: 768px) {
-.create-book-page {
-padding: 32px 20px 40px;
-}
-
-.create-book-heading {
-    margin-bottom: 28px;
-}
-.create-book-form {
-    max-width: 600px;
-}
-.create-book-section {
-    padding: 22px;
-}
-
-}
-
-/* ======================================================
-十三、手机适配
-====================================================== */
-
-@media (max-width: 520px) {
-.create-book-page {
-padding: 28px 15px 34px;
-}
-
-.create-book-heading {
-    margin-bottom: 24px;
-}
-.create-book-heading__title {
-    font-size: 29px;
-}
-.create-book-heading__description {
-    max-width: 310px;
-    font-size: 12px;
-}
-.create-book-section {
-    padding: 18px 16px;
-    border-radius: 6px;
-}
-.create-book-section__heading {
-    margin-bottom: 18px;
-    padding-bottom: 12px;
-}
-.create-book-section__title {
-    font-size: 16px;
-}
-.create-book-cover__preview {
-    width: 170px;
-}
-.create-book-cover__actions {
-    gap: 9px;
-}
-.create-book-cover__select-button {
-    min-height: 40px;
-    padding: 9px 17px;
-}
-.create-book-field__input {
-    min-height: 46px;
-    font-size: 16px;
-}
-.create-book-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 10px;
-    margin-top: 22px;
-}
-.create-book-actions__button {
-    min-width: 0;
-    width: 100%;
-    padding: 11px 10px;
-}
-.create-book-footnote {
-    font-size: 10px;
-}
-#app > .app-footer {
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-#app > .create-book-main {
-    padding-bottom: calc(
-        96px + env(safe-area-inset-bottom, 0px)
+(function () {
+“use strict”;
+
+/* ==================================================
+   一、配置
+================================================== */
+var MAX_TITLE_LENGTH = 100;
+var MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+var MAX_IMAGE_DIMENSION = 1200;
+var IMAGE_QUALITY = 0.82;
+/* ==================================================
+   二、页面元素
+================================================== */
+var elements = {
+    form: document.getElementById("create-book-form"),
+    title: document.getElementById("book-title"),
+    titleCounter: document.getElementById("book-title-counter"),
+    titleError: document.getElementById("book-title-error"),
+    coverInput: document.getElementById("book-cover-input"),
+    coverPlaceholder: document.getElementById("cover-placeholder"),
+    coverPreviewImage: document.getElementById("cover-preview-image"),
+    coverSelectLabel: document.getElementById("cover-select-label"),
+    removeCoverButton: document.getElementById("remove-cover-button"),
+    coverError: document.getElementById("cover-error"),
+    message: document.getElementById("create-book-message"),
+    submitButton: document.getElementById("create-book-submit"),
+    cancelButton: document.getElementById("cancel-create-book"),
+    cancelTopButton: document.getElementById("cancel-create-book-top")
+};
+/* ==================================================
+   三、运行状态
+================================================== */
+var selectedCoverData = "";
+var isSubmitting = false;
+var isProcessingImage = false;
+var imageSelectionToken = 0;
+/* 保存创建按钮原始内容，避免更新状态时丢失图标 */
+var submitButtonOriginalHTML = elements.submitButton
+    ? elements.submitButton.innerHTML
+    : "";
+/* ==================================================
+   四、检查页面结构
+================================================== */
+function validatePageElements() {
+    return Boolean(
+        elements.form &&
+        elements.title &&
+        elements.coverInput &&
+        elements.submitButton
     );
 }
+if (!validatePageElements()) {
+    console.error(
+        "[WritingCreateBook] 页面缺少必要元素，初始化终止。"
+    );
+    return;
+}
+/* ==================================================
+   五、提示信息
+================================================== */
+function showMessage(message, type) {
+    if (!elements.message) {
+        return;
+    }
+    elements.message.textContent = message;
+    elements.message.classList.remove(
+        "is-success",
+        "is-error",
+        "is-info"
+    );
+    if (type === "success") {
+        elements.message.classList.add("is-success");
+    } else if (type === "error") {
+        elements.message.classList.add("is-error");
+    } else {
+        elements.message.classList.add("is-info");
+    }
+    elements.message.hidden = false;
+}
+function hideMessage() {
+    if (!elements.message) {
+        return;
+    }
+    elements.message.textContent = "";
+    elements.message.hidden = true;
+    elements.message.classList.remove(
+        "is-success",
+        "is-error",
+        "is-info"
+    );
+}
+/* ==================================================
+   六、书名验证
+================================================== */
+function getTitleValue() {
+    return elements.title.value.trim();
+}
+function setTitleError(message) {
+    if (elements.titleError) {
+        elements.titleError.textContent = message;
+        elements.titleError.hidden = !message;
+    }
+    elements.title.setAttribute(
+        "aria-invalid",
+        message ? "true" : "false"
+    );
+}
+function validateTitle() {
+    var title = getTitleValue();
+    if (!title) {
+        setTitleError("请输入书名。");
+        return false;
+    }
+    if (title.length > MAX_TITLE_LENGTH) {
+        setTitleError(
+            "书名不能超过 " + MAX_TITLE_LENGTH + " 个字符。"
+        );
+        return false;
+    }
+    setTitleError("");
+    return true;
+}
+function updateTitleCounter() {
+    if (!elements.titleCounter) {
+        return;
+    }
+    elements.titleCounter.textContent =
+        elements.title.value.length +
+        " / " +
+        MAX_TITLE_LENGTH;
+}
+/* ==================================================
+   七、封面错误提示
+================================================== */
+function setCoverError(message) {
+    if (elements.coverError) {
+        elements.coverError.textContent = message;
+        elements.coverError.hidden = !message;
+    }
+    elements.coverInput.setAttribute(
+        "aria-invalid",
+        message ? "true" : "false"
+    );
+}
+function clearCoverError() {
+    setCoverError("");
+}
+/* ==================================================
+   八、封面预览
+================================================== */
+function updateCoverPreview() {
+    var hasCover = Boolean(selectedCoverData);
+    if (elements.coverPreviewImage) {
+        if (hasCover) {
+            elements.coverPreviewImage.src = selectedCoverData;
+            elements.coverPreviewImage.hidden = false;
+        } else {
+            elements.coverPreviewImage.removeAttribute("src");
+            elements.coverPreviewImage.hidden = true;
+        }
+    }
+    if (elements.coverPlaceholder) {
+        elements.coverPlaceholder.hidden = hasCover;
+    }
+    if (elements.removeCoverButton) {
+        elements.removeCoverButton.hidden = !hasCover;
+    }
+    if (elements.coverSelectLabel) {
+        elements.coverSelectLabel.textContent =
+            hasCover ? "更换封面" : "选择封面";
+    }
+}
+/* ==================================================
+   九、移除封面
+================================================== */
+function clearCoverPreview() {
+    imageSelectionToken += 1;
+    selectedCoverData = "";
+    elements.coverInput.value = "";
+    isProcessingImage = false;
+    clearCoverError();
+    updateCoverPreview();
+    updateSubmitButton();
+}
+/* ==================================================
+   十、读取图片
+================================================== */
+function loadImageFromFile(file) {
+    return new Promise(function (resolve, reject) {
+        var objectUrl = URL.createObjectURL(file);
+        var image = new Image();
+        var completed = false;
+        function cleanup() {
+            if (completed) {
+                return;
+            }
+            completed = true;
+            URL.revokeObjectURL(objectUrl);
+        }
+        image.onload = function () {
+            cleanup();
+            resolve(image);
+        };
+        image.onerror = function () {
+            cleanup();
+            reject(
+                new Error(
+                    "无法读取这张图片，请换一张常见格式的图片。"
+                )
+            );
+        };
+        image.src = objectUrl;
+    });
+}
+/* ==================================================
+   十一、压缩图片
+================================================== */
+async function compressImage(file) {
+    var image = await loadImageFromFile(file);
+    var originalWidth = image.naturalWidth;
+    var originalHeight = image.naturalHeight;
+    if (!originalWidth || !originalHeight) {
+        throw new Error("图片尺寸无效，请重新选择。");
+    }
+    var scale = Math.min(
+        1,
+        MAX_IMAGE_DIMENSION /
+            Math.max(originalWidth, originalHeight)
+    );
+    var width = Math.max(
+        1,
+        Math.round(originalWidth * scale)
+    );
+    var height = Math.max(
+        1,
+        Math.round(originalHeight * scale)
+    );
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    var context = canvas.getContext("2d");
+    if (!context) {
+        throw new Error("图片处理失败，请重新尝试。");
+    }
+    /*
+     * JPEG 不支持透明背景。
+     * 将透明区域处理为白色，避免封面背景变黑。
+     */
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, width, height);
+    context.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+    var dataUrl;
+    try {
+        dataUrl = canvas.toDataURL(
+            "image/jpeg",
+            IMAGE_QUALITY
+        );
+    } finally {
+        canvas.width = 0;
+        canvas.height = 0;
+    }
+    if (
+        dataUrl.indexOf("data:image/jpeg;base64,") !== 0
+    ) {
+        throw new Error("图片压缩失败，请重新选择。");
+    }
+    return dataUrl;
+}
+/* ==================================================
+   十二、选择封面
+================================================== */
+async function handleCoverSelection() {
+    clearCoverError();
+    hideMessage();
+    var file =
+        elements.coverInput.files &&
+        elements.coverInput.files[0];
+    if (!file) {
+        return;
+    }
+    var currentToken = ++imageSelectionToken;
+    if (
+        !file.type ||
+        file.type.indexOf("image/") !== 0
+    ) {
+        elements.coverInput.value = "";
+        setCoverError("请选择图片文件。");
+        return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+        elements.coverInput.value = "";
+        setCoverError(
+            "图片不能超过 10 MB，请选择较小的图片。"
+        );
+        return;
+    }
+    isProcessingImage = true;
+    updateSubmitButton();
+    showMessage("正在处理封面，请稍候……", "info");
+    try {
+        var compressedData = await compressImage(file);
+        /*
+         * 如果用户在处理过程中重新选择或移除了封面，
+         * 忽略已经过期的图片处理结果。
+         */
+        if (currentToken !== imageSelectionToken) {
+            return;
+        }
+        selectedCoverData = compressedData;
+        updateCoverPreview();
+        hideMessage();
+    } catch (error) {
+        if (currentToken !== imageSelectionToken) {
+            return;
+        }
+        console.error(
+            "[WritingCreateBook] 封面处理失败：",
+            error
+        );
+        elements.coverInput.value = "";
+        setCoverError(
+            error && error.message
+                ? error.message
+                : "封面处理失败，请重新选择图片。"
+        );
+        hideMessage();
+    } finally {
+        if (currentToken === imageSelectionToken) {
+            isProcessingImage = false;
+            updateSubmitButton();
+        }
+    }
+}
+/* ==================================================
+   十三、提交按钮状态
+================================================== */
+function updateSubmitButton() {
+    if (!elements.submitButton) {
+        return;
+    }
+    elements.submitButton.disabled =
+        isSubmitting || isProcessingImage;
+    /*
+     * 使用 textContent 会删除原按钮中的图标和其他 HTML。
+     * 这里保留原始内容，恢复时不破坏页面结构。
+     */
+    if (isSubmitting) {
+        elements.submitButton.textContent = "正在创建……";
+    } else if (isProcessingImage) {
+        elements.submitButton.textContent = "正在处理封面……";
+    } else {
+        elements.submitButton.innerHTML =
+            submitButtonOriginalHTML || "创建书籍";
+    }
+}
+/* ==================================================
+   十四、获取存储接口
+================================================== */
+function getStorage() {
+    var storage = window.WritingStorage;
+    if (!storage) {
+        throw new Error(
+            "找不到 WritingStorage 存储模块。请检查 storage.js 是否加载成功。"
+        );
+    }
+    if (typeof storage.createBook !== "function") {
+        throw new Error(
+            "存储模块没有提供 createBook() 方法。请核对 storage.js 的实际接口。"
+        );
+    }
+    return storage;
+}
+/* ==================================================
+   十五、创建书籍
+================================================== */
+function handleSubmit(event) {
+    event.preventDefault();
+    if (isSubmitting || isProcessingImage) {
+        return;
+    }
+    hideMessage();
+    if (!validateTitle()) {
+        elements.title.focus();
+        return;
+    }
+    var storage;
+    try {
+        storage = getStorage();
+    } catch (error) {
+        console.error(
+            "[WritingCreateBook] 存储接口检查失败：",
+            error
+        );
+        showMessage(error.message, "error");
+        return;
+    }
+    isSubmitting = true;
+    updateSubmitButton();
+    try {
+        var book = storage.createBook({
+            title: getTitleValue(),
+            description: "",
+            cover: selectedCoverData
+        });
+        if (!book || !book.id) {
+            throw new Error(
+                "存储模块没有返回有效的书籍数据，无法确认创建结果。"
+            );
+        }
+        showMessage(
+            "《" +
+                (book.title || getTitleValue()) +
+                "》创建成功！正在返回书架……",
+            "success"
+        );
+        window.setTimeout(function () {
+            /*
+             * 创建成功后仍然返回书架，
+             * 保留原来的项目导航逻辑。
+             */
+            if (
+                window.WritingNavigation &&
+                typeof window.WritingNavigation.goHome === "function"
+            ) {
+                window.WritingNavigation.goHome();
+                return;
+            }
+            window.location.href = "../index.html";
+        }, 500);
+    } catch (error) {
+        console.error(
+            "[WritingCreateBook] 创建失败：",
+            error
+        );
+        var message =
+            error && error.message
+                ? error.message
+                : "创建失败，请重试。";
+        if (error && error.code === "STORAGE_FULL") {
+            message =
+                "浏览器存储空间不足，请移除封面或更换较小的图片后重试。";
+        } else if (
+            error &&
+            error.code === "STORAGE_UNAVAILABLE"
+        ) {
+            message =
+                "当前浏览器无法使用本地存储，请检查浏览器设置。";
+        } else if (
+            error &&
+            error.code === "TITLE_REQUIRED"
+        ) {
+            message = "请输入书名。";
+        } else if (
+            error &&
+            error.code === "INVALID_COVER"
+        ) {
+            message =
+                "封面格式不正确，请重新选择图片。";
+        }
+        showMessage(message, "error");
+        isSubmitting = false;
+        updateSubmitButton();
+    }
+}
+/* ==================================================
+   十六、取消创建：返回新建页面
+================================================== */
+function hasUnsavedInput() {
+    return Boolean(
+        elements.title.value.trim() ||
+        selectedCoverData ||
+        (
+            elements.coverInput.files &&
+            elements.coverInput.files.length > 0
+        )
+    );
+}
+function handleCancel(event) {
+    /*
+     * 防止按钮位于 form 内时触发表单提交。
+     */
+    if (event) {
+        event.preventDefault();
+    }
+    if (isSubmitting) {
+        return;
+    }
+    if (isProcessingImage) {
+        var stopProcessing = window.confirm(
+            "封面仍在处理中，确定放弃本次创建吗？"
+        );
+        if (!stopProcessing) {
+            return;
+        }
+        /*
+         * 使正在处理的图片结果失效，
+         * 防止异步处理完成后又覆盖状态。
+         */
+        imageSelectionToken += 1;
+        isProcessingImage = false;
+    } else if (hasUnsavedInput()) {
+        var confirmed = window.confirm(
+            "当前书籍尚未创建，确定放弃本次填写吗？"
+        );
+        if (!confirmed) {
+            return;
+        }
+    }
+    /*
+     * 统一返回 pages/create.html。
+     * 本脚本位于 pages/create-book.html，
+     * 因此相对路径应为 ./create.html。
+     */
+    window.location.href = "./create.html";
+}
+/* ==================================================
+   十七、绑定事件
+================================================== */
+elements.title.addEventListener("input", function () {
+    updateTitleCounter();
+    if (
+        elements.titleError &&
+        !elements.titleError.hidden
+    ) {
+        validateTitle();
+    }
+    hideMessage();
+});
+elements.title.addEventListener("blur", function () {
+    if (elements.title.value.trim()) {
+        validateTitle();
+    }
+});
+elements.coverInput.addEventListener(
+    "change",
+    handleCoverSelection
+);
+if (elements.removeCoverButton) {
+    elements.removeCoverButton.addEventListener(
+        "click",
+        function (event) {
+            event.preventDefault();
+            if (isSubmitting || isProcessingImage) {
+                return;
+            }
+            clearCoverPreview();
+            hideMessage();
+        }
+    );
+}
+elements.form.addEventListener(
+    "submit",
+    handleSubmit
+);
+if (elements.cancelButton) {
+    elements.cancelButton.addEventListener(
+        "click",
+        handleCancel
+    );
+}
+if (elements.cancelTopButton) {
+    elements.cancelTopButton.addEventListener(
+        "click",
+        handleCancel
+    );
+}
+/* ==================================================
+   十八、初始化
+================================================== */
+function initialize() {
+    elements.title.maxLength = MAX_TITLE_LENGTH;
+    /*
+     * 确保取消、返回和移除封面按钮不会误提交表单。
+     */
+    if (elements.cancelButton) {
+        elements.cancelButton.type = "button";
+    }
+    if (elements.cancelTopButton) {
+        elements.cancelTopButton.type = "button";
+    }
+    if (elements.removeCoverButton) {
+        elements.removeCoverButton.type = "button";
+    }
+    updateTitleCounter();
+    updateCoverPreview();
+    updateSubmitButton();
+    setTitleError("");
+    clearCoverError();
+    hideMessage();
+}
+/* ==================================================
+   十九、公开接口
+================================================== */
+window.WritingCreateBook = Object.freeze({
+    validateTitle: validateTitle,
+    clearCoverPreview: clearCoverPreview
+});
+initialize();
 
-}
-
-/* ======================================================
-十四、小屏手机
-====================================================== */
-
-@media (max-width: 360px) {
-.create-book-page {
-padding-right: 12px;
-padding-left: 12px;
-}
-
-.create-book-section {
-    padding: 16px 13px;
-}
-.create-book-cover__preview {
-    width: 155px;
-}
-.create-book-field__footer {
-    flex-wrap: wrap;
-    gap: 4px 10px;
-}
-
-}
-
-/* ======================================================
-十五、减少动态效果
-====================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-.create-book-cover__select-button,
-.create-book-cover__remove-button,
-.create-book-field__input,
-.create-book-actions__button {
-transition: none;
-}
-}
+})();
