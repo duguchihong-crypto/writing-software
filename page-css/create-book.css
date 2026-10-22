@@ -12,6 +12,7 @@
 6. 错误提示与操作按钮
 7. 手机端适配
 8. 固定底部导航栏
+9. 为 iPhone 键盘弹出时的导航栏处理预留样式
     ====================================================== */
 
 /* ======================================================
@@ -121,18 +122,16 @@ content: “”;
 display: block;
 flex: 1;
 height: 1px;
-background:
-    linear-gradient(
-        90deg,
-        transparent,
-        var(--color-yellow-dark)
-    );
+background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-yellow-dark)
+);
 
 }
 
 .create-book-heading__divider::after {
-background:
-linear-gradient(
+background: linear-gradient(
 90deg,
 var(–color-yellow-dark),
 transparent
@@ -290,12 +289,11 @@ width: 190px;
 max-width: 100%;
 aspect-ratio: 3 / 4;
 overflow: hidden;
-background:
-    linear-gradient(
-        145deg,
-        #F9F5EB,
-        #EEE4D2
-    );
+background: linear-gradient(
+    145deg,
+    #F9F5EB,
+    #EEE4D2
+);
 border: 1px solid var(--color-white-deep);
 border-radius: 5px;
 box-shadow:
@@ -440,8 +438,8 @@ outline-offset: 3px;
 
 .create-book-cover__remove-button {
 min-height: 42px;
-
 padding: 9px 16px;
+
 color: var(--color-red);
 font-family: inherit;
 font-size: 12px;
@@ -486,8 +484,8 @@ border: 0;
 
 .create-book-cover__help {
 max-width: 100%;
-
 margin: 14px 0 0;
+
 color: var(--theme-text-muted);
 font-size: 11px;
 line-height: 1.8;
@@ -497,8 +495,8 @@ text-align: center;
 
 .create-book-cover__error {
 width: 100%;
-
 margin: 12px 0 0;
+
 color: var(--color-red);
 font-size: 12px;
 line-height: 1.7;
@@ -616,8 +614,8 @@ font-variant-numeric: tabular-nums;
 
 .create-book-field__error {
 margin: 10px 0 0;
-
 padding: 9px 12px;
+
 color: var(--color-red);
 font-size: 12px;
 line-height: 1.7;
@@ -645,8 +643,8 @@ box-shadow:
 
 .create-book-message {
 margin-top: 20px;
-
 padding: 13px 16px;
+
 color: var(--color-cyan-dark);
 font-size: 13px;
 line-height: 1.8;
@@ -747,8 +745,8 @@ box-shadow:
 @media (hover: hover) {
 .create-book-actions__button–submit:hover {
 background: var(–color-cyan-dark);
+border-color: var(–color-cyan-dark);
 
-    border-color: var(--color-cyan-dark);
     box-shadow:
         0 5px 12px rgba(40, 124, 115, 0.22);
 }
@@ -789,12 +787,12 @@ text-align: center;
 ====================================================== */
 
 /*
-关键设置：
+说明：
 
-1. position: fixed 脱离页面正常布局。
-2. bottom: 0 固定在可视视口底边。
-3. 高层级避免被表单内容覆盖。
-4. 不改变公共 footer.css，限制在新建书籍页面。
+1. 导航栏脱离页面正常布局。
+2. 正常状态下固定在页面底部。
+3. 为导航栏保留独立层级。
+4. 不修改公共 footer.css，避免影响其他页面。
     */
 
 #app > .app-footer {
@@ -805,33 +803,30 @@ bottom: 0;
 left: 0;
 z-index: 1000;
 width: 100%;
-flex-shrink: 0;
+flex: 0 0 auto;
 padding-bottom: env(safe-area-inset-bottom, 0px);
 background: var(--color-black);
-/*
-   避免导航栏因内容高度变化而拉伸。
-*/
-flex-grow: 0;
 
 }
 
-/*
-底部导航内容
-*/
+/* 底部导航内容 */
 
 #app > .app-footer .bottom-nav {
 width: 100%;
 }
 
 /*
-为滚动内容预留空间，避免表单按钮
-被固定的底部导航遮住。
+为页面内容预留导航栏空间，
+防止表单底部按钮被导航栏遮住。
 */
 
 #app > .create-book-main {
+box-sizing: border-box;
+
 padding-bottom: calc(
-100px + env(safe-area-inset-bottom, 0px)
+    100px + env(safe-area-inset-bottom, 0px)
 );
+
 }
 
 /* ======================================================
@@ -839,10 +834,10 @@ padding-bottom: calc(
 ====================================================== */
 
 @media (max-width: 768px) {
-
 .create-book-page {
-    padding: 32px 20px 40px;
+padding: 32px 20px 40px;
 }
+
 .create-book-heading {
     margin-bottom: 28px;
 }
@@ -860,10 +855,10 @@ padding-bottom: calc(
 ====================================================== */
 
 @media (max-width: 520px) {
-
 .create-book-page {
-    padding: 28px 15px 34px;
+padding: 28px 15px 34px;
 }
+
 .create-book-heading {
     margin-bottom: 24px;
 }
@@ -898,8 +893,8 @@ padding-bottom: calc(
 .create-book-field__input {
     min-height: 46px;
     /*
-       16px 可避免 iPhone Safari 在输入时
-       因字体过小而自动放大页面。
+    保持 16px，减少 iPhone Safari
+    点击输入框时自动放大页面的情况。
     */
     font-size: 16px;
 }
@@ -920,7 +915,7 @@ padding-bottom: calc(
     font-size: 10px;
 }
 /*
-   手机导航栏保持固定。
+手机端导航栏仍固定在页面底部。
 */
 #app > .app-footer {
     right: 0;
@@ -928,7 +923,7 @@ padding-bottom: calc(
     left: 0;
 }
 /*
-   预留导航栏和 iPhone 底部安全区域。
+为导航栏及 iPhone 底部安全区域预留空间。
 */
 #app > .create-book-main {
     padding-bottom: calc(
@@ -943,11 +938,11 @@ padding-bottom: calc(
 ====================================================== */
 
 @media (max-width: 360px) {
-
 .create-book-page {
-    padding-right: 12px;
-    padding-left: 12px;
+padding-right: 12px;
+padding-left: 12px;
 }
+
 .create-book-section {
     padding: 16px 13px;
 }
@@ -966,12 +961,10 @@ padding-bottom: calc(
 ====================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-
 .create-book-cover__select-button,
 .create-book-cover__remove-button,
 .create-book-field__input,
 .create-book-actions__button {
-    transition: none;
+transition: none;
 }
-
 }
