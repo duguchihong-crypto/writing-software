@@ -1,6 +1,5 @@
 /* ============================================================
    写作软件 · 顶部导航栏
-
    文件：css/header.css
 
    文件职责：
@@ -8,23 +7,38 @@
    2. 设置软件名称样式。
    3. 设置青色新建按钮。
    4. 设置白色设置按钮。
-   5. 处理平板、手机与极窄屏幕适配。
+   5. 适配平板、手机、极窄屏幕与横屏。
+   6. 与固定顶部、可滚动主体的页面布局配合。
 
-   设计要求：
+   设计规范：
    - 顶部背景：朱红色。
    - 软件名称：纯白色。
-   - 新建按钮：明确的青色，不使用绿色。
+   - 新建按钮：青色。
    - 设置按钮：白色背景、朱红色文字。
-   - 装饰边框：鎏金色。
+   - 底部装饰边框：鎏金色。
 
    文件边界：
-   本文件只管理顶部导航栏，
-   不负责页面主体、底部导航栏或数据存储。
+   本文件只负责顶部导航栏。
+   不负责书架主体、底部导航、弹窗或数据存储。
 ============================================================ */
 
 
 /* ============================================================
-   一、顶部导航栏主体
+   一、顶部高度变量
+
+   与 page-css/home.css 中的顶部高度保持一致。
+   如果后续修改导航栏高度，请同步修改 home.css。
+============================================================ */
+
+:root {
+    --home-header-height: 64px;
+    --home-header-height-tablet: 60px;
+    --home-header-height-mobile: 56px;
+}
+
+
+/* ============================================================
+   二、顶部导航栏主体
 ============================================================ */
 
 .app-header {
@@ -36,71 +50,105 @@
 
     /* 尺寸 */
 
+    box-sizing: border-box;
     width: 100%;
-    min-height: 64px;
+    min-width: 0;
+    min-height: var(--home-header-height);
 
     /* 间距 */
 
     padding: 10px 20px;
     gap: 16px;
 
-    /* 主题颜色 */
+    /* 颜色 */
 
-    background-color: var(--theme-header-background);
-    color: var(--theme-header-text);
+    background-color: var(--theme-header-background, #A82020);
+    color: var(--theme-header-text, #FFFFFF);
 
     /* 鎏金色底边 */
 
-    border-bottom: 1px solid var(--theme-header-border);
+    border: 0;
+    border-bottom: 1px solid var(--theme-header-border, #C7A45C);
 
-    /* 层级 */
+    /* 固定在屏幕顶部 */
 
-    position: relative;
-    z-index: 100;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
 
-    /* 防止挤压 */
+    z-index: 1000;
+
+    /* 防止宽度和内边距造成横向溢出 */
 
     flex-shrink: 0;
+
+    /* 防止滚动内容覆盖导航栏 */
+
+    isolation: isolate;
+
+    /* iPhone 安全区域 */
+
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+
+    /* 避免文字被意外选中 */
+
+    -webkit-tap-highlight-color: transparent;
 }
 
 
 /* ============================================================
-   二、软件名称区域
+   三、软件名称区域
 ============================================================ */
 
 .app-header__brand {
     display: flex;
     align-items: center;
 
+    flex: 1 1 auto;
+
     min-width: 0;
-    flex: 1;
+    overflow: hidden;
 }
 
 
 /* ============================================================
-   三、软件名称
+   四、软件名称
 ============================================================ */
 
 .app-header__brand-name {
-    display: inline-block;
+    display: block;
+
+    max-width: 100%;
 
     margin: 0;
+    padding: 0;
 
-    color: var(--theme-brand-text);
+    color: var(--theme-brand-text, #FFFFFF);
 
+    font-family: inherit;
     font-size: 20px;
     font-weight: 700;
 
     line-height: 1.4;
     letter-spacing: 1px;
 
+    /* 默认不换行 */
+
     white-space: nowrap;
+
+    /* 名称太长时避免挤压按钮 */
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
     user-select: none;
+    -webkit-user-select: none;
 }
 
 
 /* ============================================================
-   四、右侧操作区域
+   五、右侧操作区域
 ============================================================ */
 
 .app-header__actions {
@@ -110,12 +158,13 @@
 
     gap: 10px;
 
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    min-width: 0;
 }
 
 
 /* ============================================================
-   五、顶部按钮公共样式
+   六、顶部按钮公共样式
 ============================================================ */
 
 .app-header__button {
@@ -123,9 +172,13 @@
     align-items: center;
     justify-content: center;
 
+    box-sizing: border-box;
+
     /* 尺寸 */
 
+    min-width: 0;
     min-height: 40px;
+
     padding: 8px 14px;
 
     /* 文字 */
@@ -135,6 +188,7 @@
     font-weight: 600;
 
     line-height: 1.4;
+    text-align: center;
     white-space: nowrap;
 
     /* 外观 */
@@ -147,8 +201,13 @@
     text-decoration: none;
     cursor: pointer;
     user-select: none;
+    -webkit-user-select: none;
 
     -webkit-tap-highlight-color: transparent;
+
+    /* 防止按钮参与不必要的缩放 */
+
+    flex-shrink: 0;
 
     /* 动画 */
 
@@ -162,61 +221,42 @@
 
 
 /* ============================================================
-   六、新建按钮
-   必须使用青色，不使用绿色或朱红色。
-
-   直接调用主题变量：
-   --theme-action
-   --theme-action-hover
-
-   同时明确指定青色边框，
-   避免按钮背景与边框颜色不一致。
+   七、新建按钮
+   必须使用青色，不使用绿色。
 ============================================================ */
 
 .app-header__button--create {
-    /* 青色背景 */
-
-    background-color: #008C95;
     background-color: var(--theme-action, #008C95);
-
-    /* 白色文字 */
-
     color: var(--theme-action-text, #FFFFFF);
 
-    /* 青色边框 */
-
-    border-color: #008C95;
     border-color: var(--theme-action-border, #008C95);
 
-    /* 柔和阴影 */
-
-    box-shadow:
-        0 2px 5px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
 }
 
 
 /* ============================================================
-   七、新建按钮：鼠标悬停
+   八、新建按钮：鼠标悬停
 ============================================================ */
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
 
     .app-header__button--create:hover {
-        background-color: #006D75;
         background-color: var(--theme-action-hover, #006D75);
 
-        border-color: #006D75;
-        border-color: var(--theme-action-border-hover, #006D75);
+        border-color: var(
+            --theme-action-border-hover,
+            #006D75
+        );
 
-        box-shadow:
-            0 3px 8px rgba(0, 0, 0, 0.16);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
     }
 
 }
 
 
 /* ============================================================
-   八、新建按钮：按下
+   九、新建按钮：按下
 ============================================================ */
 
 .app-header__button--create:active {
@@ -227,17 +267,17 @@
 
 
 /* ============================================================
-   九、新建按钮：键盘焦点
+   十、新建按钮：键盘焦点
 ============================================================ */
 
 .app-header__button--create:focus-visible {
-    outline: 2px solid var(--color-yellow-light);
+    outline: 2px solid var(--color-yellow-light, #F2D477);
     outline-offset: 3px;
 }
 
 
 /* ============================================================
-   十、新建按钮图标
+   十一、新建按钮图标
 ============================================================ */
 
 .app-header__button-icon {
@@ -245,7 +285,7 @@
     align-items: center;
     justify-content: center;
 
-    flex-shrink: 0;
+    flex: 0 0 auto;
 
     margin-right: 4px;
 
@@ -257,36 +297,36 @@
 
 
 /* ============================================================
-   十一、设置按钮
-   使用白色背景和朱红色文字。
+   十二、设置按钮
+   白色背景、朱红色文字。
 ============================================================ */
 
 .app-header__button--settings {
-    background-color: var(--color-white-pure);
+    background-color: var(--color-white-pure, #FFFFFF);
 
-    color: var(--color-red);
+    color: var(--color-red, #A82020);
 
-    border-color: var(--color-white-dark);
+    border-color: var(--color-white-dark, #E6E0D5);
 }
 
 
 /* ============================================================
-   十二、设置按钮：鼠标悬停
+   十三、设置按钮：鼠标悬停
 ============================================================ */
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
 
     .app-header__button--settings:hover {
-        background-color: var(--color-white-dark);
+        background-color: var(--color-white-dark, #E6E0D5);
 
-        border-color: var(--color-white-dark);
+        border-color: var(--color-white-dark, #E6E0D5);
     }
 
 }
 
 
 /* ============================================================
-   十三、设置按钮：按下
+   十四、设置按钮：按下
 ============================================================ */
 
 .app-header__button--settings:active {
@@ -295,25 +335,27 @@
 
 
 /* ============================================================
-   十四、设置按钮：键盘焦点
+   十五、设置按钮：键盘焦点
 ============================================================ */
 
 .app-header__button--settings:focus-visible {
-    outline: 2px solid var(--color-yellow-light);
+    outline: 2px solid var(--color-yellow-light, #F2D477);
     outline-offset: 3px;
 }
 
 
 /* ============================================================
-   十五、平板设备适配
+   十六、平板适配
 ============================================================ */
 
 @media (max-width: 768px) {
 
     .app-header {
-        min-height: 60px;
+        min-height: var(--home-header-height-tablet);
 
         padding: 9px 16px;
+        padding-top: max(9px, env(safe-area-inset-top, 0px));
+
         gap: 12px;
     }
 
@@ -337,15 +379,17 @@
 
 
 /* ============================================================
-   十六、手机设备适配
+   十七、手机适配
 ============================================================ */
 
 @media (max-width: 480px) {
 
     .app-header {
-        min-height: 56px;
+        min-height: var(--home-header-height-mobile);
 
         padding: 8px 12px;
+        padding-top: max(8px, env(safe-area-inset-top, 0px));
+
         gap: 8px;
     }
 
@@ -378,7 +422,7 @@
 
 
 /* ============================================================
-   十七、极窄屏幕适配
+   十八、极窄屏幕适配
 ============================================================ */
 
 @media (max-width: 340px) {
@@ -400,17 +444,46 @@
     }
 
     .app-header__button {
+        min-height: 34px;
+
         padding-right: 7px;
         padding-left: 7px;
 
         font-size: 12px;
     }
 
+    .app-header__button-icon {
+        font-size: 16px;
+    }
+
 }
 
 
 /* ============================================================
-   十八、减少动态效果
+   十九、横屏手机适配
+============================================================ */
+
+@media (max-height: 450px) and (orientation: landscape) {
+
+    .app-header {
+        padding-top: max(5px, env(safe-area-inset-top, 0px));
+        padding-bottom: 5px;
+
+        gap: 8px;
+    }
+
+    .app-header__button {
+        min-height: 32px;
+
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+}
+
+
+/* ============================================================
+   二十、减少动态效果
 ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
@@ -419,21 +492,30 @@
         transition: none;
     }
 
+    .app-header__button:active {
+        transform: none;
+    }
+
 }
 
 
 /* ============================================================
-   十九、文件职责边界
+   二十一、文件职责边界
 
    本文件只管理顶部导航栏。
 
    不在这里添加：
-   - 底部导航栏样式。
-   - 书架内容样式。
-   - 作品卡片样式。
-   - 新建作品表单。
-   - 设置页面布局。
+   - 书架主体布局。
+   - 书籍卡片与分组样式。
+   - 底部导航栏。
+   - 设置弹窗样式。
+   - 新建书籍或分组表单。
    - 数据存储逻辑。
 
-   所有颜色优先调用全局主题变量。
+   修改顶部高度时：
+   请同步检查 page-css/home.css 中的
+   --home-header-height 和主体区域 top 值。
+
+   所有主题颜色优先使用全局 CSS 变量，
+   同时为关键颜色提供安全回退值。
 ============================================================ */
