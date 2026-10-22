@@ -12,7 +12,7 @@
 6. 错误提示与操作按钮
 7. 手机端适配
 8. 固定底部导航栏
-9. 为 iPhone 键盘弹出时的导航栏处理预留样式
+9. 青色主题统一
     ====================================================== */
 
 /* ======================================================
@@ -22,24 +22,22 @@
 #app {
 display: flex;
 flex-direction: column;
-
 width: 100%;
 min-height: 100vh;
 min-height: 100dvh;
-
 }
 
 .create-book-main {
 display: flex;
 flex-direction: column;
-
 flex: 1 0 auto;
 width: 100%;
 min-width: 0;
+
 background:
     radial-gradient(
         ellipse at 50% 0%,
-        rgba(214, 177, 94, 0.10),
+        rgba(40, 124, 115, 0.08),
         transparent 65%
     ),
     var(--theme-background);
@@ -50,11 +48,9 @@ background:
 display: flex;
 flex-direction: column;
 align-items: center;
-
 width: 100%;
 flex: 1 0 auto;
 padding: 38px 24px 48px;
-
 }
 
 /* ======================================================
@@ -65,63 +61,48 @@ padding: 38px 24px 48px;
 display: flex;
 flex-direction: column;
 align-items: center;
-
 width: 100%;
 max-width: 650px;
 margin: 0 auto 34px;
 text-align: center;
-
 }
 
 .create-book-heading__eyebrow {
 margin: 0 0 8px;
-
-color: var(--color-cyan-dark);
-font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+color: var(–color-cyan-dark);
+font-family: Georgia, “Times New Roman”, serif;
 font-size: 10px;
 font-weight: 600;
 letter-spacing: 0.24em;
 line-height: 1.6;
-
 }
 
 .create-book-heading__title {
 margin: 0;
-
-color: var(--color-red);
-font-family:
-    "Songti SC",
-    "STSong",
-    "SimSun",
-    serif;
+color: var(–color-red);
+font-family: “Songti SC”, “STSong”, “SimSun”, serif;
 font-size: clamp(28px, 4vw, 36px);
 font-weight: 700;
 letter-spacing: 0.12em;
 line-height: 1.5;
-
 }
 
 .create-book-heading__divider {
 display: flex;
 align-items: center;
 justify-content: center;
-
 width: 130px;
 gap: 8px;
 margin: 14px 0;
-
 }
 
 .create-book-heading__divider::before,
 .create-book-heading__divider::after {
 content: “”;
-
 display: block;
 flex: 1;
 height: 1px;
+
 background: linear-gradient(
     90deg,
     transparent,
@@ -140,36 +121,26 @@ transparent
 
 .create-book-heading__divider span {
 display: block;
-
 width: 5px;
 height: 5px;
 flex-shrink: 0;
-background: var(--color-yellow);
+background: var(–color-yellow);
 transform: rotate(45deg);
-
 }
 
 .create-book-heading__divider span:nth-child(2) {
 width: 8px;
 height: 8px;
-
-background: var(--color-red);
-
+background: var(–color-red);
 }
 
 .create-book-heading__description {
 margin: 0;
-
-color: var(--theme-text-secondary);
-font-family:
-    "Songti SC",
-    "STSong",
-    "SimSun",
-    serif;
+color: var(–theme-text-secondary);
+font-family: “Songti SC”, “STSong”, “SimSun”, serif;
 font-size: 14px;
 line-height: 1.8;
 letter-spacing: 0.04em;
-
 }
 
 /* ======================================================
@@ -179,12 +150,10 @@ letter-spacing: 0.04em;
 .create-book-form {
 display: flex;
 flex-direction: column;
-
 width: 100%;
 max-width: 680px;
 min-width: 0;
 margin: 0 auto;
-
 }
 
 /* ======================================================
@@ -194,13 +163,12 @@ margin: 0 auto;
 .create-book-section {
 width: 100%;
 min-width: 0;
-
 padding: 24px;
+
 background: var(--color-white-pure);
 border: 1px solid var(--theme-border);
 border-radius: 8px;
-box-shadow:
-    0 3px 14px var(--theme-shadow-color);
+box-shadow: 0 3px 14px var(--theme-shadow-color);
 
 }
 
@@ -212,25 +180,19 @@ margin-top: 20px;
 display: flex;
 align-items: center;
 justify-content: space-between;
-
 gap: 12px;
 margin-bottom: 22px;
 padding-bottom: 14px;
-border-bottom: 1px solid var(--theme-border);
-
+border-bottom: 1px solid var(–theme-border);
 }
 
 .create-book-section__title {
 position: relative;
-
 margin: 0;
 padding-left: 12px;
+
 color: var(--color-black);
-font-family:
-    "Songti SC",
-    "STSong",
-    "SimSun",
-    serif;
+font-family: "Songti SC", "STSong", "SimSun", serif;
 font-size: 17px;
 font-weight: 700;
 line-height: 1.6;
@@ -239,12 +201,12 @@ line-height: 1.6;
 
 .create-book-section__title::before {
 content: “”;
-
 position: absolute;
 top: 50%;
 left: 0;
 width: 3px;
 height: 17px;
+
 background: var(--color-red);
 border-radius: 2px;
 transform: translateY(-50%);
@@ -255,8 +217,8 @@ transform: translateY(-50%);
 display: inline-flex;
 align-items: center;
 justify-content: center;
-
 padding: 3px 9px;
+
 color: var(--theme-text-muted);
 font-size: 11px;
 line-height: 1.6;
@@ -274,38 +236,31 @@ border-radius: 3px;
 display: flex;
 flex-direction: column;
 align-items: center;
-
 width: 100%;
-
 }
 
 .create-book-cover__preview {
 position: relative;
-
 display: flex;
 align-items: center;
 justify-content: center;
+
 width: 190px;
 max-width: 100%;
 aspect-ratio: 3 / 4;
 overflow: hidden;
-background: linear-gradient(
-    145deg,
-    #F9F5EB,
-    #EEE4D2
-);
+background: linear-gradient(145deg, #F9F5EB, #EEE4D2);
 border: 1px solid var(--color-white-deep);
 border-radius: 5px;
-box-shadow:
-    0 5px 16px rgba(33, 31, 28, 0.10);
+box-shadow: 0 5px 16px rgba(33, 31, 28, 0.10);
 
 }
 
 .create-book-cover__preview::before {
 content: “”;
-
 position: absolute;
 inset: 9px;
+
 border: 1px solid rgba(169, 135, 62, 0.35);
 border-radius: 2px;
 pointer-events: none;
@@ -328,24 +283,18 @@ text-align: center;
 
 .create-book-cover__icon {
 display: block;
-
 width: 56px;
 height: 56px;
 margin-bottom: 18px;
-color: var(--color-yellow-dark);
-
+color: var(–color-cyan);
 }
 
 .create-book-cover__placeholder-title {
 display: block;
-
 margin-bottom: 8px;
-color: var(--color-red);
-font-family:
-    "Songti SC",
-    "STSong",
-    "SimSun",
-    serif;
+
+color: var(--color-cyan-dark);
+font-family: "Songti SC", "STSong", "SimSun", serif;
 font-size: 14px;
 font-weight: 700;
 letter-spacing: 0.04em;
@@ -356,12 +305,8 @@ line-height: 1.6;
 .create-book-cover__placeholder-description {
 display: block;
 
-color: var(--theme-text-muted);
-font-family:
-    "Songti SC",
-    "STSong",
-    "SimSun",
-    serif;
+color: var(--color-cyan-dark);
+font-family: "Songti SC", "STSong", "SimSun", serif;
 font-size: 10px;
 line-height: 1.8;
 
@@ -369,12 +314,10 @@ line-height: 1.8;
 
 .create-book-cover__image {
 display: block;
-
 width: 100%;
 height: 100%;
 object-fit: cover;
 object-position: center;
-
 }
 
 .create-book-cover__image[hidden] {
@@ -389,19 +332,17 @@ display: none !important;
 display: flex;
 align-items: center;
 justify-content: center;
-
 flex-wrap: wrap;
 gap: 12px;
 margin-top: 20px;
-
 }
 
 .create-book-cover__select-button {
 display: inline-flex;
 align-items: center;
 justify-content: center;
-
 gap: 8px;
+
 min-height: 42px;
 padding: 10px 20px;
 color: var(--color-white-pure);
@@ -465,11 +406,8 @@ border-color: var(–color-red);
 display: none !important;
 }
 
-/* 原生文件选择框：视觉隐藏，但保留可访问性 */
-
 .create-book-cover__input {
 position: absolute;
-
 width: 1px;
 height: 1px;
 padding: 0;
@@ -479,14 +417,13 @@ clip: rect(0, 0, 0, 0);
 clip-path: inset(50%);
 white-space: nowrap;
 border: 0;
-
 }
 
 .create-book-cover__help {
 max-width: 100%;
 margin: 14px 0 0;
 
-color: var(--theme-text-muted);
+color: var(--color-cyan-dark);
 font-size: 11px;
 line-height: 1.8;
 text-align: center;
@@ -519,18 +456,16 @@ margin-top: 20px;
 .create-book-field {
 display: flex;
 flex-direction: column;
-
 width: 100%;
 min-width: 0;
-
 }
 
 .create-book-field__label {
 display: inline-flex;
 align-items: center;
-
 gap: 5px;
 margin-bottom: 10px;
+
 color: var(--color-black);
 font-size: 14px;
 font-weight: 600;
@@ -540,14 +475,13 @@ line-height: 1.6;
 
 .create-book-field__required {
 color: var(–color-red);
-
 font-size: 16px;
 line-height: 1;
-
 }
 
 .create-book-field__input {
 display: block;
+box-sizing: border-box;
 
 width: 100%;
 min-width: 0;
@@ -572,14 +506,13 @@ color: #A19A8E;
 }
 
 .create-book-field__input:hover {
-border-color: var(–color-yellow-dark);
+border-color: var(–color-cyan);
 }
 
 .create-book-field__input:focus {
 border-color: var(–color-cyan);
 
-box-shadow:
-    0 0 0 3px rgba(40, 124, 115, 0.12);
+box-shadow: 0 0 0 3px rgba(40, 124, 115, 0.12);
 
 }
 
@@ -587,29 +520,23 @@ box-shadow:
 display: flex;
 align-items: flex-start;
 justify-content: space-between;
-
 gap: 12px;
 margin-top: 9px;
-
 }
 
 .create-book-field__help {
 margin: 0;
-
-color: var(--theme-text-muted);
+color: var(–color-cyan-dark);
 font-size: 11px;
 line-height: 1.8;
-
 }
 
 .create-book-field__counter {
 flex-shrink: 0;
-
-color: var(--theme-text-muted);
+color: var(–color-cyan-dark);
 font-size: 11px;
 line-height: 1.8;
 font-variant-numeric: tabular-nums;
-
 }
 
 .create-book-field__error {
@@ -631,10 +558,7 @@ display: none !important;
 
 .create-book-field__input[aria-invalid=“true”] {
 border-color: var(–color-red);
-
-box-shadow:
-    0 0 0 2px rgba(158, 36, 40, 0.08);
-
+box-shadow: 0 0 0 2px rgba(158, 36, 40, 0.08);
 }
 
 /* ======================================================
@@ -660,18 +584,14 @@ display: none !important;
 
 .create-book-message.is-error {
 color: var(–color-red);
-
 background: rgba(158, 36, 40, 0.06);
 border-color: rgba(158, 36, 40, 0.22);
-
 }
 
 .create-book-message.is-success {
 color: var(–color-cyan-dark);
-
 background: rgba(40, 124, 115, 0.08);
 border-color: rgba(40, 124, 115, 0.22);
-
 }
 
 /* ======================================================
@@ -682,19 +602,17 @@ border-color: rgba(40, 124, 115, 0.22);
 display: flex;
 align-items: center;
 justify-content: flex-end;
-
 flex-wrap: wrap;
 gap: 12px;
 margin-top: 26px;
-
 }
 
 .create-book-actions__button {
 display: inline-flex;
 align-items: center;
 justify-content: center;
-
 gap: 8px;
+
 min-width: 112px;
 min-height: 44px;
 padding: 11px 22px;
@@ -716,29 +634,24 @@ transition:
 
 .create-book-actions__button–cancel {
 color: var(–color-black-soft);
-
-background: var(--color-white-pure);
-border-color: var(--color-white-deep);
-
+background: var(–color-white-pure);
+border-color: var(–color-white-deep);
 }
 
 @media (hover: hover) {
 .create-book-actions__button–cancel:hover {
 color: var(–color-red);
-
-    background: var(--color-white);
-    border-color: var(--color-yellow-dark);
+background: var(–color-white);
+border-color: var(–color-yellow-dark);
 }
-
 }
 
 .create-book-actions__button–submit {
 color: var(–color-white-pure);
+background: var(–color-cyan);
+border-color: var(–color-cyan);
 
-background: var(--color-cyan);
-border-color: var(--color-cyan);
-box-shadow:
-    0 3px 8px rgba(40, 124, 115, 0.15);
+box-shadow: 0 3px 8px rgba(40, 124, 115, 0.15);
 
 }
 
@@ -747,8 +660,7 @@ box-shadow:
 background: var(–color-cyan-dark);
 border-color: var(–color-cyan-dark);
 
-    box-shadow:
-        0 5px 12px rgba(40, 124, 115, 0.22);
+    box-shadow: 0 5px 12px rgba(40, 124, 115, 0.22);
 }
 
 }
@@ -762,10 +674,8 @@ outline-offset: 3px;
 .create-book-actions__button:disabled,
 .create-book-cover__remove-button:disabled {
 opacity: 0.55;
-
 cursor: not-allowed;
 box-shadow: none;
-
 }
 
 /* ======================================================
@@ -775,7 +685,7 @@ box-shadow: none;
 .create-book-footnote {
 margin: 18px 0 0;
 
-color: var(--theme-text-muted);
+color: var(--color-cyan-dark);
 font-size: 11px;
 line-height: 1.9;
 text-align: center;
@@ -786,22 +696,13 @@ text-align: center;
 十一、底部导航栏固定
 ====================================================== */
 
-/*
-说明：
-
-1. 导航栏脱离页面正常布局。
-2. 正常状态下固定在页面底部。
-3. 为导航栏保留独立层级。
-4. 不修改公共 footer.css，避免影响其他页面。
-    */
-
 #app > .app-footer {
 position: fixed;
-
 right: 0;
 bottom: 0;
 left: 0;
 z-index: 1000;
+
 width: 100%;
 flex: 0 0 auto;
 padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -809,16 +710,9 @@ background: var(--color-black);
 
 }
 
-/* 底部导航内容 */
-
 #app > .app-footer .bottom-nav {
 width: 100%;
 }
-
-/*
-为页面内容预留导航栏空间，
-防止表单底部按钮被导航栏遮住。
-*/
 
 #app > .create-book-main {
 box-sizing: border-box;
@@ -892,17 +786,11 @@ padding: 28px 15px 34px;
 }
 .create-book-field__input {
     min-height: 46px;
-    /*
-    保持 16px，减少 iPhone Safari
-    点击输入框时自动放大页面的情况。
-    */
     font-size: 16px;
 }
 .create-book-actions {
     display: grid;
-    grid-template-columns:
-        minmax(0, 1fr)
-        minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 10px;
     margin-top: 22px;
 }
@@ -914,17 +802,11 @@ padding: 28px 15px 34px;
 .create-book-footnote {
     font-size: 10px;
 }
-/*
-手机端导航栏仍固定在页面底部。
-*/
 #app > .app-footer {
     right: 0;
     bottom: 0;
     left: 0;
 }
-/*
-为导航栏及 iPhone 底部安全区域预留空间。
-*/
 #app > .create-book-main {
     padding-bottom: calc(
         96px + env(safe-area-inset-bottom, 0px)
