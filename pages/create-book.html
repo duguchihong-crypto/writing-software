@@ -1,623 +1,353 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#9E2428"
-    >
-
-    <meta
-        name="description"
-        content="创建新书籍，填写书名并选择专属封面。"
-    >
-
-    <title>新建书籍 - 写作软件</title>
-
-    <!-- =========================
-         公共样式
-    ========================== -->
-
-    <link
-        rel="stylesheet"
-        href="../css/theme.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/base.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/header.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/footer.css"
-    >
-
-    <!-- =========================
-         新建书籍页面样式
-    ========================== -->
-
-    <link
-        rel="stylesheet"
-        href="../page-css/create-book.css"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#9E2428">
+    <meta name="description" content="创建新书籍，填写书名并选择专属封面。">
+<title>新建书籍 - 写作软件</title>
+<!-- 公共样式 -->
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/header.css">
+<link rel="stylesheet" href="../css/footer.css">
+<!-- 新建书籍页面样式 -->
+<link rel="stylesheet" href="../page-css/create-book.css">
 </head>
-
 <body>
-
 <div id="app">
-
-    <!-- =========================
-         顶部导航栏
-    ========================== -->
-
-    <header
-        class="app-header"
-        id="app-header"
-    >
-
-        <div class="app-header__brand">
-
-            <span class="app-header__brand-name">
-                写作软件
-            </span>
-
-        </div>
-
-        <div class="app-header__actions">
-
-            <button
-                class="app-header__button app-header__button--settings"
-                id="cancel-create-book-top"
-                type="button"
-            >
-                返回
-            </button>
-
-        </div>
-
-    </header>
-
-
-    <!-- =========================
-         页面主体
-    ========================== -->
-
-    <main class="app-main create-book-main">
-
-        <section
-            class="create-book-page"
-            aria-labelledby="create-book-title"
+<!-- 顶部导航 -->
+<header class="app-header" id="app-header">
+    <div class="app-header__brand">
+        <span class="app-header__brand-name">写作软件</span>
+    </div>
+    <div class="app-header__actions">
+        <button
+            class="app-header__button app-header__button--settings"
+            id="cancel-create-book-top"
+            type="button"
         >
-
-            <!-- =========================
-                 页面标题
-            ========================== -->
-
-            <div class="create-book-heading">
-
-                <p class="create-book-heading__eyebrow">
-                    NEW BOOK
-                </p>
-
-                <h1
-                    class="create-book-heading__title"
-                    id="create-book-title"
-                >
-                    新建书籍
-                </h1>
-
-                <div
-                    class="create-book-heading__divider"
-                    aria-hidden="true"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-
-                <p class="create-book-heading__description">
-                    为你的故事取一个名字，选择一张专属封面。
-                </p>
-
-            </div>
-
-
-            <!-- =========================
-                 新建书籍表单
-            ========================== -->
-
-            <form
-                class="create-book-form"
-                id="create-book-form"
-                novalidate
+            返回
+        </button>
+    </div>
+</header>
+<!-- 页面主体 -->
+<main class="app-main create-book-main">
+    <section
+        class="create-book-page"
+        aria-labelledby="create-book-title"
+    >
+        <!-- 页面标题 -->
+        <div class="create-book-heading">
+            <p class="create-book-heading__eyebrow">NEW BOOK</p>
+            <h1
+                class="create-book-heading__title"
+                id="create-book-title"
             >
-
-                <!-- =========================
-                     书籍封面
-                ========================== -->
-
-                <section
-                    class="create-book-section create-book-cover-section"
-                    aria-labelledby="cover-section-title"
-                >
-
-                    <div class="create-book-section__heading">
-
-                        <h2
-                            class="create-book-section__title"
-                            id="cover-section-title"
-                        >
-                            书籍封面
-                        </h2>
-
-                        <span class="create-book-section__optional">
-                            选填
-                        </span>
-
-                    </div>
-
-
-                    <!-- 封面预览区域 -->
-
-                    <div class="create-book-cover">
-
+                新建书籍
+            </h1>
+            <div
+                class="create-book-heading__divider"
+                aria-hidden="true"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p class="create-book-heading__description">
+                为你的故事取一个名字，选择一张专属封面。
+            </p>
+        </div>
+        <!-- 新建书籍表单 -->
+        <form
+            class="create-book-form"
+            id="create-book-form"
+            novalidate
+        >
+            <!-- 书籍封面 -->
+            <section
+                class="create-book-section create-book-cover-section"
+                aria-labelledby="cover-section-title"
+            >
+                <div class="create-book-section__heading">
+                    <h2
+                        class="create-book-section__title"
+                        id="cover-section-title"
+                    >
+                        书籍封面
+                    </h2>
+                    <span class="create-book-section__optional">
+                        选填
+                    </span>
+                </div>
+                <div class="create-book-cover">
+                    <!-- 封面预览 -->
+                    <div
+                        class="create-book-cover__preview"
+                        id="cover-preview"
+                    >
                         <div
-                            class="create-book-cover__preview"
-                            id="cover-preview"
+                            class="create-book-cover__placeholder"
+                            id="cover-placeholder"
                         >
-
-                            <!-- 未选择图片时显示 -->
-
-                            <div
-                                class="create-book-cover__placeholder"
-                                id="cover-placeholder"
-                            >
-
-                                <svg
-                                    class="create-book-cover__icon"
-                                    viewBox="0 0 64 64"
-                                    fill="none"
-                                    aria-hidden="true"
-                                >
-
-                                    <path
-                                        d="M15 7.5H40L50 17.5V55.5H15V7.5Z"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linejoin="round"
-                                    />
-
-                                    <path
-                                        d="M40 7.5V18H50"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linejoin="round"
-                                    />
-
-                                    <path
-                                        d="M23 29H42"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                    />
-
-                                    <path
-                                        d="M23 36H42"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                    />
-
-                                    <path
-                                        d="M23 43H36"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                    />
-
-                                </svg>
-
-                                <span class="create-book-cover__placeholder-title">
-                                    尚未选择封面
-                                </span>
-
-                                <span class="create-book-cover__placeholder-description">
-                                    让每一个故事拥有自己的面貌
-                                </span>
-
-                            </div>
-
-
-                            <!-- 选择图片后显示 -->
-
-                            <img
-                                class="create-book-cover__image"
-                                id="cover-preview-image"
-                                alt="书籍封面预览"
-                                hidden
-                            >
-
-                        </div>
-
-
-                        <!-- 封面操作 -->
-
-                        <div class="create-book-cover__actions">
-
-                            <label
-                                class="create-book-cover__select-button"
-                                for="book-cover-input"
-                            >
-
-                                <span aria-hidden="true">
-                                    ＋
-                                </span>
-
-                                <span id="cover-select-label">
-                                    选择封面
-                                </span>
-
-                            </label>
-
-                            <button
-                                class="create-book-cover__remove-button"
-                                id="remove-cover-button"
-                                type="button"
-                                hidden
-                            >
-                                移除封面
-                            </button>
-
-                        </div>
-
-
-                        <p
-                            class="create-book-cover__help"
-                            id="cover-help"
-                        >
-                            支持常见图片格式，建议使用清晰的竖版封面。
-                        </p>
-
-
-                        <!-- 图片选择输入框 -->
-
-                        <input
-                            class="create-book-cover__input"
-                            id="book-cover-input"
-                            name="cover"
-                            type="file"
-                            accept="image/*"
-                            aria-describedby="cover-help cover-error"
-                        >
-
-                        <!-- 封面错误提示 -->
-
-                        <p
-                            class="create-book-cover__error"
-                            id="cover-error"
-                            role="alert"
-                            hidden
-                        ></p>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =========================
-                     书籍基本信息
-                ========================== -->
-
-                <section
-                    class="create-book-section create-book-info-section"
-                    aria-labelledby="info-section-title"
-                >
-
-                    <div class="create-book-section__heading">
-
-                        <h2
-                            class="create-book-section__title"
-                            id="info-section-title"
-                        >
-                            基本信息
-                        </h2>
-
-                    </div>
-
-
-                    <!-- 书名 -->
-
-                    <div class="create-book-field">
-
-                        <label
-                            class="create-book-field__label"
-                            for="book-title"
-                        >
-
-                            书名
-
-                            <span
-                                class="create-book-field__required"
+                            <svg
+                                class="create-book-cover__icon"
+                                viewBox="0 0 64 64"
+                                fill="none"
                                 aria-hidden="true"
                             >
-                                *
+                                <path
+                                    d="M15 7.5H40L50 17.5V55.5H15V7.5Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M40 7.5V18H50"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M23 29H42"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                />
+                                <path
+                                    d="M23 36H42"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                />
+                                <path
+                                    d="M23 43H36"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
+                            <span class="create-book-cover__placeholder-title">
+                                尚未选择封面
                             </span>
-
-                        </label>
-
-
-                        <input
-                            class="create-book-field__input"
-                            id="book-title"
-                            name="title"
-                            type="text"
-                            placeholder="请输入书名"
-                            maxlength="100"
-                            autocomplete="off"
-                            required
-                            aria-describedby="book-title-help book-title-error"
-                        >
-
-
-                        <div class="create-book-field__footer">
-
-                            <p
-                                class="create-book-field__help"
-                                id="book-title-help"
-                            >
-                                一个好名字，是故事的开始。
-                            </p>
-
-                            <span
-                                class="create-book-field__counter"
-                                id="book-title-counter"
-                            >
-                                0 / 100
+                            <span class="create-book-cover__placeholder-description">
+                                让每一个故事拥有自己的面貌
                             </span>
-
                         </div>
-
-
-                        <p
-                            class="create-book-field__error"
-                            id="book-title-error"
-                            role="alert"
+                        <img
+                            class="create-book-cover__image"
+                            id="cover-preview-image"
+                            alt="书籍封面预览"
                             hidden
-                        ></p>
-
+                        >
                     </div>
-
-                </section>
-
-
-                <!-- =========================
-                     表单消息
-                ========================== -->
-
-                <div
-                    class="create-book-message"
-                    id="create-book-message"
-                    role="status"
-                    aria-live="polite"
-                    hidden
-                ></div>
-
-
-                <!-- =========================
-                     操作按钮
-                ========================== -->
-
-                <div class="create-book-actions">
-
-                    <button
-                        class="create-book-actions__button create-book-actions__button--cancel"
-                        id="cancel-create-book"
-                        type="button"
+                    <!-- 封面操作 -->
+                    <div class="create-book-cover__actions">
+                        <label
+                            class="create-book-cover__select-button"
+                            for="book-cover-input"
+                        >
+                            <span aria-hidden="true">＋</span>
+                            <span id="cover-select-label">选择封面</span>
+                        </label>
+                        <button
+                            class="create-book-cover__remove-button"
+                            id="remove-cover-button"
+                            type="button"
+                            hidden
+                        >
+                            移除封面
+                        </button>
+                    </div>
+                    <p
+                        class="create-book-cover__help"
+                        id="cover-help"
                     >
-                        取消
-                    </button>
-
-
-                    <button
-                        class="create-book-actions__button create-book-actions__button--submit"
-                        id="create-book-submit"
-                        type="submit"
+                        支持常见图片格式，建议使用清晰的竖版封面。
+                    </p>
+                    <!-- 图片输入 -->
+                    <input
+                        class="create-book-cover__input"
+                        id="book-cover-input"
+                        name="cover"
+                        type="file"
+                        accept="image/*"
+                        aria-describedby="cover-help cover-error"
                     >
-
-                        <span aria-hidden="true">
-                            ＋
-                        </span>
-
-                        创建书籍
-
-                    </button>
-
+                    <p
+                        class="create-book-cover__error"
+                        id="cover-error"
+                        role="alert"
+                        hidden
+                    ></p>
                 </div>
-
-
-                <!-- 底部提示 -->
-
-                <p class="create-book-footnote">
-                    创建后，你可以继续为这部作品添加章节、人物与世界观。
-                </p>
-
-            </form>
-
-        </section>
-
-    </main>
-
-
-    <!-- =========================
-         底部导航栏
-    ========================== -->
-
-    <footer
-        class="app-footer"
-        id="app-footer"
-    >
-
-        <nav
-            class="bottom-nav"
-            aria-label="主导航"
+            </section>
+            <!-- 基本信息 -->
+            <section
+                class="create-book-section create-book-info-section"
+                aria-labelledby="info-section-title"
+            >
+                <div class="create-book-section__heading">
+                    <h2
+                        class="create-book-section__title"
+                        id="info-section-title"
+                    >
+                        基本信息
+                    </h2>
+                </div>
+                <!-- 书名 -->
+                <div class="create-book-field">
+                    <label
+                        class="create-book-field__label"
+                        for="book-title"
+                    >
+                        书名
+                        <span
+                            class="create-book-field__required"
+                            aria-hidden="true"
+                        >*</span>
+                    </label>
+                    <input
+                        class="create-book-field__input"
+                        id="book-title"
+                        name="title"
+                        type="text"
+                        placeholder="请输入书名"
+                        maxlength="100"
+                        autocomplete="off"
+                        required
+                        aria-describedby="book-title-help book-title-error"
+                    >
+                    <div class="create-book-field__footer">
+                        <p
+                            class="create-book-field__help"
+                            id="book-title-help"
+                        >
+                            一个好名字，是故事的开始。
+                        </p>
+                        <span
+                            class="create-book-field__counter"
+                            id="book-title-counter"
+                        >
+                            0 / 100
+                        </span>
+                    </div>
+                    <p
+                        class="create-book-field__error"
+                        id="book-title-error"
+                        role="alert"
+                        hidden
+                    ></p>
+                </div>
+            </section>
+            <!-- 操作结果提示 -->
+            <div
+                class="create-book-message"
+                id="create-book-message"
+                role="status"
+                aria-live="polite"
+                hidden
+            ></div>
+            <!-- 操作按钮 -->
+            <div class="create-book-actions">
+                <button
+                    class="create-book-actions__button create-book-actions__button--cancel"
+                    id="cancel-create-book"
+                    type="button"
+                >
+                    取消
+                </button>
+                <button
+                    class="create-book-actions__button create-book-actions__button--submit"
+                    id="create-book-submit"
+                    type="submit"
+                >
+                    <span aria-hidden="true">＋</span>
+                    创建书籍
+                </button>
+            </div>
+            <p class="create-book-footnote">
+                创建后，你可以继续为这部作品添加章节、人物与世界观。
+            </p>
+        </form>
+    </section>
+</main>
+<!-- 底部导航 -->
+<footer class="app-footer" id="app-footer">
+    <nav class="bottom-nav" aria-label="主导航">
+        <a
+            class="bottom-nav__item"
+            href="../index.html"
+            data-nav="home"
         >
-
-            <!-- 书架 -->
-
-            <a
-                class="bottom-nav__item"
-                href="../index.html"
-                data-nav="home"
-            >
-
-                <span
-                    class="bottom-nav__icon"
-                    aria-hidden="true"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                    >
-
-                        <path
-                            d="M3 10.5L12 3L21 10.5"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-
-                        <path
-                            d="M5.5 9.5V21H18.5V9.5"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
-                        />
-
-                        <path
-                            d="M9 21V14H15V21"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
-                        />
-
-                    </svg>
-
-                </span>
-
-                <span class="bottom-nav__label">
-                    书架
-                </span>
-
-            </a>
-
-
-            <!-- 工具 -->
-
-            <a
-                class="bottom-nav__item"
-                href="./tools.html"
-                data-nav="tools"
-            >
-
-                <span
-                    class="bottom-nav__icon"
-                    aria-hidden="true"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                    >
-
-                        <path
-                            d="M4 5H10V11H4V5Z"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
-                        />
-
-                        <path
-                            d="M14 5H20V11H14V5Z"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
-                        />
-
-                        <path
-                            d="M4 15H10V21H4V15Z"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
-                        />
-
-                        <path
-                            d="M14 15H20V21H14V15Z"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
-                        />
-
-                    </svg>
-
-                </span>
-
-                <span class="bottom-nav__label">
-                    工具
-                </span>
-
-            </a>
-
-        </nav>
-
-    </footer>
-
+            <span class="bottom-nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M3 10.5L12 3L21 10.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M5.5 9.5V21H18.5V9.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M9 21V14H15V21"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </span>
+            <span class="bottom-nav__label">书架</span>
+        </a>
+        <a
+            class="bottom-nav__item"
+            href="./tools.html"
+            data-nav="tools"
+        >
+            <span class="bottom-nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M4 5H10V11H4V5Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M14 5H20V11H14V5Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M4 15H10V21H4V15Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M14 15H20V21H14V15Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </span>
+            <span class="bottom-nav__label">工具</span>
+        </a>
+    </nav>
+</footer>
 </div>
-
-
-<!-- =========================
-     公共数据与导航接口
-========================== -->
-
-<script
-    src="../js/storage.js"
-    defer
-></script>
-
-<script
-    src="../js/navigation.js"
-    defer
-></script>
-
-<script
-    src="../js/components.js"
-    defer
-></script>
-
-
-<!-- =========================
-     新建书籍页面逻辑
-========================== -->
-
-<script
-    src="../page-js/create-book.js"
-    defer
-></script>
-
+<!-- 公共数据与导航接口 -->
+<script src="../js/storage.js" defer></script>
+<script src="../js/navigation.js" defer></script>
+<script src="../js/components.js" defer></script>
+<!-- 新建书籍页面逻辑 -->
+<script src="../page-js/create-book.js" defer></script>
 </body>
-
 </html>
