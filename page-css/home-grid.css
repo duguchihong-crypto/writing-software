@@ -5,13 +5,14 @@
 
 /* ==================================================
 一、网格容器
-默认：手机上一行三部小说
+默认：每行三部小说
+注意：类名必须使用普通连字符 –
 ================================================== */
 
 #shelf-list.shelf-list–grid {
-display: grid;
+display: grid !important;
 
-grid-template-columns: repeat(3, minmax(0, 1fr));
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 gap: 10px;
 align-items: stretch;
 width: 100%;
@@ -93,14 +94,14 @@ box-sizing: border-box;
 }
 
 /* ==================================================
-七、手机屏幕
-宽度小于 360px
-仍然保持一行三部
+七、小屏手机
+屏幕宽度小于 360px
+每行三部小说
 ================================================== */
 
 @media (max-width: 359px) {
 #shelf-list.shelf-list–grid {
-grid-template-columns: repeat(3, minmax(0, 1fr));
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 
     gap: 6px;
 }
@@ -109,13 +110,13 @@ grid-template-columns: repeat(3, minmax(0, 1fr));
 
 /* ==================================================
 八、普通手机
-360px—599px
-一行三部小说
+屏幕宽度 360px—599px
+每行三部小说
 ================================================== */
 
 @media (min-width: 360px) and (max-width: 599px) {
 #shelf-list.shelf-list–grid {
-grid-template-columns: repeat(3, minmax(0, 1fr));
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 
     gap: 10px;
 }
@@ -124,13 +125,13 @@ grid-template-columns: repeat(3, minmax(0, 1fr));
 
 /* ==================================================
 九、平板
-600px—899px
-一行三部小说
+屏幕宽度 600px—899px
+每行三部小说
 ================================================== */
 
 @media (min-width: 600px) and (max-width: 899px) {
 #shelf-list.shelf-list–grid {
-grid-template-columns: repeat(3, minmax(0, 1fr));
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 
     gap: 16px;
 }
@@ -139,13 +140,13 @@ grid-template-columns: repeat(3, minmax(0, 1fr));
 
 /* ==================================================
 十、电脑屏幕
-900px 及以上
-一行四部小说
+屏幕宽度 900px 及以上
+每行四部小说
 ================================================== */
 
 @media (min-width: 900px) {
 #shelf-list.shelf-list–grid {
-grid-template-columns: repeat(4, minmax(0, 1fr));
+grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
 
     gap: 20px;
 }
