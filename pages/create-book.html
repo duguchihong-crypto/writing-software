@@ -13,87 +13,122 @@
 <link rel="stylesheet" href="../css/footer.css">
 <!-- 新建书籍页面样式 -->
 <link rel="stylesheet" href="../page-css/create-book.css">
-<!-- 强制统一本页面按钮颜色 -->
+<!-- 本页面颜色统一设置 -->
 <style>
     :root {
         --create-book-cyan: #159E91;
         --create-book-cyan-hover: #107F75;
         --create-book-cyan-active: #0B6B63;
+        --create-book-white: #FFFFFF;
     }
-    /* 创建书籍和取消按钮 */
+    /* ==============================
+       创建书籍、取消按钮
+    ============================== */
     #create-book-submit,
     #cancel-create-book {
         background: var(--create-book-cyan) !important;
         background-color: var(--create-book-cyan) !important;
-        color: #FFFFFF !important;
+        color: var(--create-book-white) !important;
+        -webkit-text-fill-color: var(--create-book-white) !important;
         border: 1px solid var(--create-book-cyan) !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-        box-shadow: none;
-        opacity: 1 !important;
+        box-shadow: none !important;
+        opacity: 1;
     }
-    /* 按钮内部的文字和图标 */
     #create-book-submit *,
     #cancel-create-book * {
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
+        color: var(--create-book-white) !important;
+        -webkit-text-fill-color: var(--create-book-white) !important;
     }
-    /* 鼠标悬停 */
     #create-book-submit:hover,
     #cancel-create-book:hover {
         background: var(--create-book-cyan-hover) !important;
         background-color: var(--create-book-cyan-hover) !important;
         border-color: var(--create-book-cyan-hover) !important;
-        color: #FFFFFF !important;
+        color: var(--create-book-white) !important;
     }
-    /* 鼠标按下 */
     #create-book-submit:active,
     #cancel-create-book:active {
         background: var(--create-book-cyan-active) !important;
         background-color: var(--create-book-cyan-active) !important;
         border-color: var(--create-book-cyan-active) !important;
     }
-    /* 键盘聚焦 */
     #create-book-submit:focus-visible,
     #cancel-create-book:focus-visible {
         outline: 2px solid var(--create-book-cyan) !important;
         outline-offset: 3px;
     }
-    /* 禁用状态仍保持青色系 */
     #create-book-submit:disabled {
         background: var(--create-book-cyan) !important;
         background-color: var(--create-book-cyan) !important;
         border-color: var(--create-book-cyan) !important;
-        color: #FFFFFF !important;
+        color: var(--create-book-white) !important;
+        -webkit-text-fill-color: var(--create-book-white) !important;
         opacity: 0.65 !important;
         cursor: not-allowed;
     }
-    /* 返回按钮也统一为青色 */
+    /* ==============================
+       顶部返回按钮
+    ============================== */
     #cancel-create-book-top {
         background: var(--create-book-cyan) !important;
         background-color: var(--create-book-cyan) !important;
+        color: var(--create-book-white) !important;
+        -webkit-text-fill-color: var(--create-book-white) !important;
         border-color: var(--create-book-cyan) !important;
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
     }
     #cancel-create-book-top:hover {
         background: var(--create-book-cyan-hover) !important;
         background-color: var(--create-book-cyan-hover) !important;
         border-color: var(--create-book-cyan-hover) !important;
     }
-    /* 选择封面按钮 */
+    /* ==============================
+       选择封面按钮
+       青色背景、白色文字
+    ============================== */
     .create-book-cover__select-button {
-        color: var(--create-book-cyan) !important;
-        border-color: var(--create-book-cyan) !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: var(--create-book-cyan) !important;
+        background-color: var(--create-book-cyan) !important;
+        color: var(--create-book-white) !important;
+        -webkit-text-fill-color: var(--create-book-white) !important;
+        border: 1px solid var(--create-book-cyan) !important;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+    }
+    /* 选择封面按钮内部的加号和文字 */
+    .create-book-cover__select-button *,
+    .create-book-cover__select-button span,
+    #cover-select-label {
+        color: var(--create-book-white) !important;
+        -webkit-text-fill-color: var(--create-book-white) !important;
     }
     .create-book-cover__select-button:hover {
-        color: var(--create-book-cyan-hover) !important;
+        background: var(--create-book-cyan-hover) !important;
+        background-color: var(--create-book-cyan-hover) !important;
         border-color: var(--create-book-cyan-hover) !important;
+        color: var(--create-book-white) !important;
     }
-    /* 必填标记 */
+    .create-book-cover__select-button:active {
+        background: var(--create-book-cyan-active) !important;
+        background-color: var(--create-book-cyan-active) !important;
+        border-color: var(--create-book-cyan-active) !important;
+    }
+    .create-book-cover__select-button:focus-visible {
+        outline: 2px solid var(--create-book-cyan) !important;
+        outline-offset: 3px;
+    }
+    /* ==============================
+       其他青色细节
+    ============================== */
     .create-book-field__required {
         color: var(--create-book-cyan) !important;
     }
-    /* 书名输入框聚焦 */
     .create-book-field__input:focus {
         border-color: var(--create-book-cyan) !important;
         outline-color: var(--create-book-cyan) !important;
