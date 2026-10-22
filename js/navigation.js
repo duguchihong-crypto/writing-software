@@ -1,21 +1,20 @@
 /* ======================================================
-写作软件 · 页面导航模块
-文件：js/navigation.js
 
-功能：
-
-1. 统一管理页面跳转
-2. 返回书架
-3. 进入新建作品页面
-4. 进入编辑器、工具和设置页面
-5. 自动识别当前页面
-6. 更新底部导航选中状态
-7. 兼容 GitHub Pages 项目路径
-8. 提供安全的相对路径解析
-
-注意：
-不管理书籍数据，不修改存储模块。
-====================================================== */
+* 写作软件 · 页面导航模块
+* 文件：js/navigation.js
+* 功能：
+* 1.	统一管理页面跳转
+* 2.	返回书架
+* 3.	进入新建作品页面
+* 4.	进入编辑器、工具和设置页面
+* 5.	自动识别当前页面
+* 6.	更新底部导航选中状态
+* 7.	兼容 GitHub Pages 项目路径
+* 8.	提供安全的相对路径解析
+* 9.	为新建书籍、分组页面提供返回导航
+* 注意：
+* 不管理书籍数据，不修改存储模块。
+* ====================================================== */
 
 (function () {
 “use strict”;
@@ -27,6 +26,8 @@ const MODULE_NAME = "WritingNavigation";
 const ROUTES = Object.freeze({
     home: "index.html",
     create: "pages/create.html",
+    createBook: "pages/create-book.html",
+    createGroup: "pages/create-group.html",
     editor: "pages/editor.html",
     tools: "pages/tools.html",
     settings: "pages/settings.html"
@@ -54,7 +55,7 @@ function getScriptUrl() {
                 return scriptUrl;
             }
         } catch (error) {
-            // 继续检查其他脚本。
+            // 地址解析失败时继续检查其他脚本。
         }
     }
     return null;
@@ -64,27 +65,32 @@ function getScriptUrl() {
 ================================================== */
 function getRootUrl() {
     const scriptUrl = getScriptUrl();
-    if (!scriptUrl) {
+    if (scriptUrl) {
         /*
-         * 备用方案：
-         * 根据当前页面的位置判断项目根目录。
+         * navigation.js 位于项目根目录下的 js 文件夹。
          *
-         * 适用于：
-         * /writing-software/index.html
-         * /writing-software/pages/create.html
+         * 例如：
+         * https://username.github.io/writing-software/js/navigation.js
+         *
+         * 项目根目录：
+         * https://username.github.io/writing-software/
          */
-        const pathname = window.location.pathname;
-        const marker = "/pages/";
-        const markerIndex = pathname.lastIndexOf(marker);
-        if (markerIndex !== -1) {
-            return new URL(
-                pathname.slice(0, markerIndex + 1),
-                window.location.origin
-            );
-        }
-        return new URL("./", window.location.href);
+        return new URL("../", scriptUrl);
     }
-    return new URL("../", scriptUrl);
+    /*
+     * 备用方案：
+     * 通过页面路径识别项目根目录。
+     */
+    const pathname = window.location.pathname;
+    const marker = "/pages/";
+    const markerIndex = pathname.lastIndexOf(marker);
+    if (markerIndex !== -1) {
+        return new URL(
+            pathname.slice(0, markerIndex + 1),
+            window.location.origin
+        );
+    }
+    return new URL("./", window.location.href);
 }
 /* ==================================================
    四、获取完整页面地址
@@ -116,6 +122,12 @@ function goHome() {
 }
 function goCreate() {
     navigate("create");
+}
+function goCreateBook() {
+    navigate("createBook");
+}
+function goCreateGroup() {
+    navigate("createGroup");
 }
 function goEditor(bookId) {
     if (
@@ -201,14 +213,19 @@ function updateBottomNavigation() {
             return;
         }
         const targetName =
-            targetUrl.pathname.split("/").filter(Boolean).pop() || "";
+            targetUrl.pathname
+                .split("/")
+                .filter(Boolean)
+                .pop() || "";
         let targetPage = "unknown";
         if (
             targetName === "" ||
             targetName === "index.html"
         ) {
             targetPage = "home";
-        } else if (targetName === "tools.html") {
+        } else if (
+            targetName === "tools.html"
+        ) {
             targetPage = "tools";
         }
         const isActive =
@@ -225,35 +242,76 @@ function updateBottomNavigation() {
             isActive
         );
         if (isActive) {
-            item.setAttribute("aria-current", "page");
+            item.setAttribute(
+                "aria-current",
+                "page"
+            );
         } else {
             item.removeAttribute("aria-current");
         }
     });
 }
 /* ==================================================
-   九、初始化
+   九、绑定新建页面的返回按钮
+================================================== */
+function bindCreatePageBackButtons() {
+    const currentPage = getCurrentPage();
+    const isCreatePage =
+        currentPage === "create" ||
+        currentPage === "create-book" ||
+        currentPage === "create-group";
+    if (!isCreatePage) {
+        return;
+    }
+    /*
+     * 兼容不同页面使用的返回按钮 ID。
+     */
+    const backButtonIds = [
+        "cancel-create-book-top",
+        "cancel-create-book",
+        "cancel-create-group-top",
+        "cancel-create-group",
+        "cancel-create-top"
+    ];
+    backButtonIds.forEach(function (id) {
+        const button = document.getElementById(id);
+        if (!button || button.dataset.navigationBound === "true") {
+            return;
+        }
+        button.dataset.navigationBound = "true";
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            goHome();
+        });
+    });
+}
+/* ==================================================
+   十、初始化
 ================================================== */
 function init() {
     updateBottomNavigation();
+    bindCreatePageBackButtons();
 }
 /* ==================================================
-   十、公开接口
+   十一、公开接口
 ================================================== */
 window[MODULE_NAME] = Object.freeze({
     navigate: navigate,
     goHome: goHome,
     goCreate: goCreate,
+    goCreateBook: goCreateBook,
+    goCreateGroup: goCreateGroup,
     goEditor: goEditor,
     goTools: goTools,
     goSettings: goSettings,
     getCurrentPage: getCurrentPage,
     getRouteUrl: getRouteUrl,
     updateBottomNavigation: updateBottomNavigation,
+    bindCreatePageBackButtons: bindCreatePageBackButtons,
     init: init
 });
 /* ==================================================
-   十一、自动初始化
+   十二、自动初始化
 ================================================== */
 if (document.readyState === "loading") {
     document.addEventListener(
