@@ -3,65 +3,151 @@
 独立模块：仅控制作品卡片的排列方式
 ================================================== */
 
-/* 默认保持原有书架样式，不影响其他模式 */
+/* ==================================================
+一、网格容器
+默认：手机上一行三部小说
+================================================== */
 
 #shelf-list.shelf-list–grid {
 display: grid;
-grid-template-columns: repeat(2, minmax(0, 1fr));
-gap: 14px;
+
+grid-template-columns: repeat(3, minmax(0, 1fr));
+gap: 10px;
 align-items: stretch;
+width: 100%;
+box-sizing: border-box;
+
 }
 
-/* 网格中的作品卡片 */
+/* ==================================================
+二、网格作品卡片
+================================================== */
 
 #shelf-list.shelf-list–grid > .shelf-card {
 display: flex;
+
 flex-direction: column;
 width: 100%;
 min-width: 0;
+max-width: 100%;
 height: 100%;
 margin: 0;
 box-sizing: border-box;
+
 }
 
-/* 避免标题和简介撑破卡片 */
+/* ==================================================
+三、作品打开区域
+================================================== */
 
-#shelf-list.shelf-list–grid .shelf-card__title,
-#shelf-list.shelf-list–grid .shelf-card__description {
-min-width: 0;
-overflow-wrap: anywhere;
-}
+#shelf-list.shelf-list–grid > .shelf-card .shelf-card__open {
+display: flex;
 
-/* 网格封面统一占满卡片宽度 */
-
-#shelf-list.shelf-list–grid .shelf-card__open {
+flex-direction: column;
+width: 100%;
 min-width: 0;
 max-width: 100%;
+box-sizing: border-box;
+
 }
 
-/* 平板和较宽的屏幕 */
+/* ==================================================
+四、作品标题
+================================================== */
 
-@media (min-width: 600px) {
+#shelf-list.shelf-list–grid .shelf-card__title {
+min-width: 0;
+
+max-width: 100%;
+overflow-wrap: anywhere;
+word-break: break-word;
+box-sizing: border-box;
+
+}
+
+/* ==================================================
+五、作品简介
+================================================== */
+
+#shelf-list.shelf-list–grid .shelf-card__description {
+min-width: 0;
+
+max-width: 100%;
+overflow-wrap: anywhere;
+word-break: break-word;
+box-sizing: border-box;
+
+}
+
+/* ==================================================
+六、作品信息
+================================================== */
+
+#shelf-list.shelf-list–grid .shelf-card__meta {
+min-width: 0;
+
+max-width: 100%;
+overflow-wrap: anywhere;
+box-sizing: border-box;
+
+}
+
+/* ==================================================
+七、手机屏幕
+宽度小于 360px
+仍然保持一行三部
+================================================== */
+
+@media (max-width: 359px) {
 #shelf-list.shelf-list–grid {
 grid-template-columns: repeat(3, minmax(0, 1fr));
-gap: 18px;
-}
+
+    gap: 6px;
 }
 
-/* 桌面屏幕 */
+}
+
+/* ==================================================
+八、普通手机
+360px—599px
+一行三部小说
+================================================== */
+
+@media (min-width: 360px) and (max-width: 599px) {
+#shelf-list.shelf-list–grid {
+grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+}
+
+/* ==================================================
+九、平板
+600px—899px
+一行三部小说
+================================================== */
+
+@media (min-width: 600px) and (max-width: 899px) {
+#shelf-list.shelf-list–grid {
+grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+}
+
+/* ==================================================
+十、电脑屏幕
+900px 及以上
+一行四部小说
+================================================== */
 
 @media (min-width: 900px) {
 #shelf-list.shelf-list–grid {
 grid-template-columns: repeat(4, minmax(0, 1fr));
-gap: 20px;
-}
+
+    gap: 20px;
 }
 
-/* 窄屏手机 */
-
-@media (max-width: 359px) {
-#shelf-list.shelf-list–grid {
-grid-template-columns: repeat(2, minmax(0, 1fr));
-gap: 8px;
-}
 }
