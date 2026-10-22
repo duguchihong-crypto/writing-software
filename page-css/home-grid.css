@@ -1,0 +1,67 @@
+/* ==================================================
+书架网格模式
+独立模块：仅控制作品卡片的排列方式
+================================================== */
+
+/* 默认保持原有书架样式，不影响其他模式 */
+
+#shelf-list.shelf-list–grid {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 14px;
+align-items: stretch;
+}
+
+/* 网格中的作品卡片 */
+
+#shelf-list.shelf-list–grid > .shelf-card {
+display: flex;
+flex-direction: column;
+width: 100%;
+min-width: 0;
+height: 100%;
+margin: 0;
+box-sizing: border-box;
+}
+
+/* 避免标题和简介撑破卡片 */
+
+#shelf-list.shelf-list–grid .shelf-card__title,
+#shelf-list.shelf-list–grid .shelf-card__description {
+min-width: 0;
+overflow-wrap: anywhere;
+}
+
+/* 网格封面统一占满卡片宽度 */
+
+#shelf-list.shelf-list–grid .shelf-card__open {
+min-width: 0;
+max-width: 100%;
+}
+
+/* 平板和较宽的屏幕 */
+
+@media (min-width: 600px) {
+#shelf-list.shelf-list–grid {
+grid-template-columns: repeat(3, minmax(0, 1fr));
+gap: 18px;
+}
+}
+
+/* 桌面屏幕 */
+
+@media (min-width: 900px) {
+#shelf-list.shelf-list–grid {
+grid-template-columns: repeat(4, minmax(0, 1fr));
+gap: 20px;
+}
+}
+
+/* 窄屏手机 */
+
+@media (max-width: 359px) {
+#shelf-list.shelf-list–grid {
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 8px;
+}
+}
