@@ -1,0 +1,281 @@
+/* =========================================================
+   书籍排序模块样式
+   文件：page-css/home-sort.css
+
+   只负责排序模式，不修改基础书架布局。
+   ========================================================= */
+
+
+/* 排序工具栏 */
+
+.home-sort__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  margin-bottom: 20px;
+  padding: 16px;
+
+  background: #f8f3e8;
+  border: 1px solid #c7a45c;
+  border-radius: 10px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.home-sort__toolbar[hidden] {
+  display: none !important;
+}
+
+.home-sort__toolbar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.home-sort__toolbar-title {
+  color: #8d2929;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.home-sort__toolbar-description {
+  color: #75685c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.home-sort__toolbar-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+
+/* 保存与取消按钮 */
+
+.home-sort__button {
+  min-height: 38px;
+  padding: 8px 16px;
+
+  border: 1px solid transparent;
+  border-radius: 7px;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.home-sort__button:active {
+  transform: scale(0.97);
+}
+
+.home-sort__button--save {
+  background: #176b67;
+  border-color: #176b67;
+  color: #fffdf7;
+}
+
+.home-sort__button--save:hover {
+  background: #115752;
+}
+
+.home-sort__button--cancel {
+  background: transparent;
+  border-color: #b8a58a;
+  color: #514338;
+}
+
+.home-sort__button--cancel:hover {
+  background: #eee3d1;
+}
+
+
+/* 排序模式中的书架 */
+
+.shelf-list.is-sorting {
+  position: relative;
+}
+
+.shelf-list.is-sorting .shelf-card {
+  cursor: grab;
+  outline: 1px dashed rgba(141, 41, 41, 0.3);
+  outline-offset: 3px;
+
+  transition:
+    box-shadow 0.18s ease,
+    outline-color 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.shelf-list.is-sorting .shelf-card:hover {
+  outline-color: #8d2929;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.shelf-list.is-sorting .shelf-card:active {
+  cursor: grabbing;
+}
+
+
+/* 当前正在拖动的书 */
+
+.shelf-card.is-sorting-dragged {
+  outline: 2px solid #176b67 !important;
+  outline-offset: 2px;
+  opacity: 0.65;
+}
+
+.shelf-card.is-sorting-ghost {
+  opacity: 0.35;
+}
+
+
+/* 上移、下移按钮 */
+
+.home-sort__move-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+
+  display: flex;
+  gap: 5px;
+
+  padding: 4px;
+
+  background: rgba(255, 253, 247, 0.96);
+  border: 1px solid rgba(141, 41, 41, 0.25);
+  border-radius: 8px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.home-sort__move-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+
+  border: 1px solid #c7a45c;
+  border-radius: 5px;
+
+  background: #f8f3e8;
+  color: #8d2929;
+
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.home-sort__move-button:hover:not(:disabled) {
+  background: #8d2929;
+  color: #fffdf7;
+}
+
+.home-sort__move-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+
+/* 排序状态提示 */
+
+.home-sort__notice {
+  position: fixed;
+  left: 50%;
+  bottom: 88px;
+  z-index: 11000;
+
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+
+  border: 1px solid #c7a45c;
+  border-radius: 8px;
+
+  background: #27211d;
+  color: #fff8ed;
+
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translate(-50%, 10px);
+
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.2s ease;
+
+  pointer-events: none;
+}
+
+.home-sort__notice.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+
+/* 手机适配 */
+
+@media (max-width: 600px) {
+  .home-sort__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+
+    padding: 14px;
+  }
+
+  .home-sort__toolbar-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .home-sort__button {
+    min-height: 42px;
+  }
+
+  .home-sort__move-controls {
+    top: 6px;
+    right: 6px;
+  }
+
+  .home-sort__move-button {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+
+/* 减少动态效果 */
+
+@media (prefers-reduced-motion: reduce) {
+  .home-sort__button,
+  .home-sort__move-button,
+  .home-sort__notice,
+  .shelf-list.is-sorting .shelf-card {
+    transition: none;
+  }
+}
