@@ -21,11 +21,10 @@
         --create-book-cyan-active: #0B6B63;
         --create-book-white: #FFFFFF;
     }
-    /* ==============================
-       创建书籍、取消按钮
-    ============================== */
-    #create-book-submit,
-    #cancel-create-book {
+    /* =================================
+       创建书籍：青色背景、白色文字
+    ================================= */
+    #create-book-submit {
         background: var(--create-book-cyan) !important;
         background-color: var(--create-book-cyan) !important;
         color: var(--create-book-white) !important;
@@ -35,25 +34,21 @@
         opacity: 1;
     }
     #create-book-submit *,
-    #cancel-create-book * {
+    #create-book-submit span {
         color: var(--create-book-white) !important;
         -webkit-text-fill-color: var(--create-book-white) !important;
     }
-    #create-book-submit:hover,
-    #cancel-create-book:hover {
+    #create-book-submit:hover {
         background: var(--create-book-cyan-hover) !important;
         background-color: var(--create-book-cyan-hover) !important;
         border-color: var(--create-book-cyan-hover) !important;
-        color: var(--create-book-white) !important;
     }
-    #create-book-submit:active,
-    #cancel-create-book:active {
+    #create-book-submit:active {
         background: var(--create-book-cyan-active) !important;
         background-color: var(--create-book-cyan-active) !important;
         border-color: var(--create-book-cyan-active) !important;
     }
-    #create-book-submit:focus-visible,
-    #cancel-create-book:focus-visible {
+    #create-book-submit:focus-visible {
         outline: 2px solid var(--create-book-cyan) !important;
         outline-offset: 3px;
     }
@@ -66,25 +61,60 @@
         opacity: 0.65 !important;
         cursor: not-allowed;
     }
-    /* ==============================
-       顶部返回按钮
-    ============================== */
+    /* =================================
+       返回：白色背景、青色文字
+    ================================= */
     #cancel-create-book-top {
-        background: var(--create-book-cyan) !important;
-        background-color: var(--create-book-cyan) !important;
-        color: var(--create-book-white) !important;
-        -webkit-text-fill-color: var(--create-book-white) !important;
-        border-color: var(--create-book-cyan) !important;
+        background: var(--create-book-white) !important;
+        background-color: var(--create-book-white) !important;
+        color: var(--create-book-cyan) !important;
+        -webkit-text-fill-color: var(--create-book-cyan) !important;
+        border: 1px solid var(--create-book-cyan) !important;
+        box-shadow: none !important;
     }
     #cancel-create-book-top:hover {
-        background: var(--create-book-cyan-hover) !important;
-        background-color: var(--create-book-cyan-hover) !important;
+        background: #F0FAF9 !important;
+        background-color: #F0FAF9 !important;
+        color: var(--create-book-cyan-hover) !important;
+        -webkit-text-fill-color: var(--create-book-cyan-hover) !important;
         border-color: var(--create-book-cyan-hover) !important;
     }
-    /* ==============================
-       选择封面按钮
-       青色背景、白色文字
-    ============================== */
+    /* =================================
+       取消：白色背景、青色文字
+    ================================= */
+    #cancel-create-book {
+        background: var(--create-book-white) !important;
+        background-color: var(--create-book-white) !important;
+        color: var(--create-book-cyan) !important;
+        -webkit-text-fill-color: var(--create-book-cyan) !important;
+        border: 1px solid var(--create-book-cyan) !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+    }
+    #cancel-create-book *,
+    #cancel-create-book span {
+        color: var(--create-book-cyan) !important;
+        -webkit-text-fill-color: var(--create-book-cyan) !important;
+    }
+    #cancel-create-book:hover {
+        background: #F0FAF9 !important;
+        background-color: #F0FAF9 !important;
+        color: var(--create-book-cyan-hover) !important;
+        -webkit-text-fill-color: var(--create-book-cyan-hover) !important;
+        border-color: var(--create-book-cyan-hover) !important;
+    }
+    #cancel-create-book:active {
+        background: #E2F4F1 !important;
+        background-color: #E2F4F1 !important;
+        border-color: var(--create-book-cyan-active) !important;
+    }
+    #cancel-create-book:focus-visible {
+        outline: 2px solid var(--create-book-cyan) !important;
+        outline-offset: 3px;
+    }
+    /* =================================
+       选择封面：青色背景、白色文字
+    ================================= */
     .create-book-cover__select-button {
         display: inline-flex;
         align-items: center;
@@ -101,7 +131,6 @@
             background-color 0.2s ease,
             border-color 0.2s ease;
     }
-    /* 选择封面按钮内部的加号和文字 */
     .create-book-cover__select-button *,
     .create-book-cover__select-button span,
     #cover-select-label {
@@ -123,9 +152,9 @@
         outline: 2px solid var(--create-book-cyan) !important;
         outline-offset: 3px;
     }
-    /* ==============================
+    /* =================================
        其他青色细节
-    ============================== */
+    ================================= */
     .create-book-field__required {
         color: var(--create-book-cyan) !important;
     }
