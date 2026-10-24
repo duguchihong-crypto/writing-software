@@ -1,0 +1,133 @@
+/* ========================================
+首页分组卡片样式
+目标：
+
+1. 分组透明框与书籍封面保持 3:4 比例
+2. 分组名称显示在透明框下方
+3. 右上角保留 ⋯ 操作菜单
+4. 隐藏“我的分组”标题
+5. 不修改书籍卡片样式
+    ======================================== */
+
+/* 分组区域 */
+#home-groups {
+display: block;
+width: 100%;
+min-width: 0;
+box-sizing: border-box;
+}
+
+/* 隐藏分组标题 */
+#home-groups .home-groups__header,
+#home-groups .home-groups__title {
+display: none !important;
+}
+
+/* 分组网格 */
+#home-groups .home-groups__list {
+display: grid !important;
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+align-items: start;
+gap: 8px;
+width: 100%;
+min-width: 0;
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+/* 单个分组卡片 */
+#home-groups .home-group-card {
+position: relative;
+display: flex !important;
+flex-direction: column !important;
+align-items: stretch;
+width: 100%;
+min-width: 0;
+margin: 0;
+padding: 0;
+border: none;
+background: transparent;
+box-shadow: none;
+box-sizing: border-box;
+}
+
+/* 分组透明框：与书籍封面保持 3:4 比例 */
+#home-groups .home-group-card__cover {
+display: block;
+position: relative;
+width: 100% !important;
+height: auto !important;
+min-height: 0;
+aspect-ratio: 3 / 4 !important;
+flex: none;
+margin: 0;
+padding: 0;
+border: 1px solid #c9b9a0;
+border-radius: 4px;
+background: transparent;
+box-shadow: none;
+box-sizing: border-box;
+}
+
+/* 不再显示旧版分组复选框 */
+#home-groups .home-group-card__checkbox {
+display: none !important;
+}
+
+/* 分组名称：放在透明框下方 */
+#home-groups .home-group-card__name {
+display: block;
+position: static !important;
+width: 100%;
+min-width: 0;
+height: auto;
+margin: 0;
+padding: 5px 2px 2px;
+overflow: hidden;
+color: #9e2428;
+font-size: 12px;
+font-weight: 400;
+line-height: 1.4;
+text-align: center;
+text-overflow: ellipsis;
+overflow-wrap: anywhere;
+white-space: normal;
+background: transparent;
+box-sizing: border-box;
+}
+
+/* 右上角 ⋯ 操作菜单 */
+#home-groups .home-group-card__menu-button {
+position: absolute !important;
+top: 4px;
+right: 4px;
+z-index: 10;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+/* 平板及较宽屏幕 */
+@media (min-width: 600px) {
+#home-groups .home-groups__list {
+gap: 12px;
+}
+
+#home-groups .home-group-card__name {
+    font-size: 13px;
+}
+
+}
+
+/* 较窄手机屏幕 */
+@media (max-width: 360px) {
+#home-groups .home-groups__list {
+gap: 5px;
+}
+
+#home-groups .home-group-card__name {
+    font-size: 11px;
+}
+
+}
