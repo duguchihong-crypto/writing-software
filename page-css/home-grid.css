@@ -12,13 +12,10 @@
 6. 保留现有 shelf-card 结构
     ================================================== */
 
-/* ==================================================
-一、网格容器
-================================================== */
+/* 一、网格容器 */
 
 #shelf-list.shelf-list–grid {
 display: grid !important;
-
 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 gap: 8px;
 align-items: start;
@@ -27,16 +24,12 @@ max-width: 100%;
 margin: 0;
 padding: 0;
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-二、小说卡片
-================================================== */
+/* 二、小说卡片 */
 
 #shelf-list.shelf-list–grid > .shelf-card {
 display: flex;
-
 flex-direction: column;
 width: 100%;
 min-width: 0;
@@ -47,19 +40,12 @@ margin: 0;
 padding: 0;
 box-sizing: border-box;
 overflow: hidden;
-
 }
 
-/* ==================================================
-三、小说打开区域
-================================================== */
+/* 三、小说打开区域 */
 
-#shelf-list.shelf-list–grid
-
-.shelf-card
-.shelf-card__open {
+#shelf-list.shelf-list–grid .shelf-card__open {
 display: flex;
-
 flex-direction: column;
 width: 100%;
 min-width: 0;
@@ -67,17 +53,12 @@ max-width: 100%;
 margin: 0;
 padding: 0;
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-四、小说封面
-================================================== */
+/* 四、小说封面 */
 
-#shelf-list.shelf-list–grid
-.shelf-card__cover {
+#shelf-list.shelf-list–grid .shelf-card__cover {
 display: block;
-
 position: relative;
 width: 100%;
 max-width: 100%;
@@ -85,88 +66,65 @@ margin: 0;
 aspect-ratio: 3 / 4;
 overflow: hidden;
 box-sizing: border-box;
-
 }
 
-#shelf-list.shelf-list–grid
-.shelf-card__cover img {
+#shelf-list.shelf-list–grid .shelf-card__cover img {
 display: block;
-
 width: 100%;
 height: 100%;
 max-width: 100%;
 object-fit: cover;
 object-position: center;
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-五、小说信息区域
-================================================== */
+/* 五、小说信息区域 */
 
-#shelf-list.shelf-list–grid
-.shelf-card__body {
+#shelf-list.shelf-list–grid .shelf-card__body {
 display: flex;
-
 flex-direction: column;
 width: 100%;
 min-width: 0;
 max-width: 100%;
-padding: 6px;
+padding: 5px;
 gap: 4px;
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-六、小说标题
-================================================== */
+/* 六、小说标题 */
 
-#shelf-list.shelf-list–grid
-.shelf-card__title {
+#shelf-list.shelf-list–grid .shelf-card__title {
 width: 100%;
 min-width: 0;
 max-width: 100%;
-
 margin: 0;
-font-size: 13px;
-line-height: 1.45;
-overflow-wrap: anywhere;
-word-break: break-word;
-box-sizing: border-box;
-
-}
-
-/* ==================================================
-七、小说简介
-================================================== */
-
-#shelf-list.shelf-list–grid
-.shelf-card__description {
-width: 100%;
-min-width: 0;
-max-width: 100%;
-
-margin: 0;
-font-size: 11px;
+font-size: 12px;
 line-height: 1.4;
 overflow-wrap: anywhere;
 word-break: break-word;
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-八、小说信息
-================================================== */
+/* 七、小说简介 */
 
-#shelf-list.shelf-list–grid
-.shelf-card__meta {
+#shelf-list.shelf-list–grid .shelf-card__description {
+width: 100%;
+min-width: 0;
+max-width: 100%;
+margin: 0;
+font-size: 10px;
+line-height: 1.4;
+overflow-wrap: anywhere;
+word-break: break-word;
+box-sizing: border-box;
+}
+
+/* 八、小说信息 */
+
+#shelf-list.shelf-list–grid .shelf-card__meta {
 display: flex;
-
 flex-wrap: wrap;
-gap: 3px 6px;
+gap: 3px 5px;
 width: 100%;
 min-width: 0;
 max-width: 100%;
@@ -175,95 +133,59 @@ line-height: 1.4;
 overflow-wrap: anywhere;
 word-break: break-word;
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-九、卡片菜单按钮
-避免菜单按钮撑大卡片
-================================================== */
+/* 九、卡片菜单按钮 */
 
-#shelf-list.shelf-list–grid
-.shelf-card__menu-button {
+#shelf-list.shelf-list–grid .shelf-card__menu-button {
 max-width: 100%;
-
 box-sizing: border-box;
-
 }
 
-/* ==================================================
-十、超小屏幕
-每行三本小说
-================================================== */
+/* 十、超小屏幕 */
 
 @media (max-width: 359px) {
 #shelf-list.shelf-list–grid {
 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-
-    gap: 5px;
+gap: 5px;
 }
-#shelf-list.shelf-list--grid
-.shelf-card__body {
+
+#shelf-list.shelf-list--grid .shelf-card__body {
     padding: 4px;
     gap: 3px;
 }
-#shelf-list.shelf-list--grid
-.shelf-card__title {
+#shelf-list.shelf-list--grid .shelf-card__title {
     font-size: 11px;
 }
-#shelf-list.shelf-list--grid
-.shelf-card__description {
-    font-size: 10px;
+#shelf-list.shelf-list--grid .shelf-card__description {
+    font-size: 9px;
 }
 
 }
 
-/* ==================================================
-十一、普通手机
-每行三本小说
-================================================== */
+/* 十一、普通手机 */
 
 @media (min-width: 360px) and (max-width: 599px) {
 #shelf-list.shelf-list–grid {
 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-
-    gap: 8px;
+gap: 8px;
 }
-#shelf-list.shelf-list--grid
-.shelf-card__body {
-    padding: 5px;
 }
 
-}
-
-/* ==================================================
-十二、平板
-每行三本小说
-================================================== */
+/* 十二、平板 */
 
 @media (min-width: 600px) and (max-width: 899px) {
 #shelf-list.shelf-list–grid {
 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-
-    gap: 12px;
+gap: 12px;
 }
-#shelf-list.shelf-list--grid
-.shelf-card__body {
-    padding: 7px;
 }
 
-}
-
-/* ==================================================
-十三、电脑屏幕
-仍然每行三本小说
-================================================== */
+/* 十三、电脑屏幕 */
 
 @media (min-width: 900px) {
 #shelf-list.shelf-list–grid {
 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-
-    gap: 14px;
+gap: 14px;
 }
-
 }
