@@ -1,444 +1,580 @@
 /* =========================================================
-   写作软件 · 书架网格模式
-   文件：page-css/home-grid.css
-   功能：
-   1. 书籍与分组均采用三列网格
-   2. 分组透明框与书籍封面保持相同宽度和 3:4 比例
-   3. 分组名称显示在透明框下方
-   4. 保留书籍和分组操作菜单
-   5. 兼容手机、平板及超小屏幕
-   6. 不修改、不删除本地数据
-========================================================= */
+写作软件 · 书架网格模式
+文件：page-css/home-grid.css
+
+功能：
+
+1. 书籍只显示封面和书名
+2. 无封面时显示国风默认封面
+3. 书籍与分组采用三列网格
+4. 分组透明框保持 3:4 比例
+5. 保留书籍和分组操作菜单
+6. 兼容手机、平板及超小屏幕
+7. 不修改、不删除本地数据
+    ========================================================= */
+
 /* =========================================================
-   一、书籍网格容器
+一、书籍网格容器
 ========================================================= */
-#shelf-list.shelf-list--grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    grid-auto-flow: row !important;
-    grid-auto-rows: auto !important;
-    gap: 8px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    align-items: start !important;
-    justify-content: stretch !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid {
+display: grid !important;
+
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+grid-auto-flow: row !important;
+grid-auto-rows: auto !important;
+align-items: start !important;
+justify-content: stretch !important;
+gap: 8px !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+margin: 0 !important;
+padding: 0 !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   二、书籍卡片
+二、书籍卡片
 ========================================================= */
-#shelf-list.shelf-list--grid > .shelf-card {
-    position: relative !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
-    justify-self: stretch !important;
-    align-self: start !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid > .shelf-card {
+position: relative !important;
+
+display: flex !important;
+flex-direction: column !important;
+align-items: stretch !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+margin: 0 !important;
+padding: 0 !important;
+grid-column: auto !important;
+grid-row: auto !important;
+justify-self: stretch !important;
+align-self: start !important;
+overflow: visible !important;
+background: transparent !important;
+border: none !important;
+box-shadow: none !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   三、书籍打开按钮
+三、书籍打开按钮
 ========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__open {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid .shelf-card__open {
+position: relative !important;
+
+display: flex !important;
+flex-direction: column !important;
+align-items: stretch !important;
+flex: 1 1 auto !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+margin: 0 !important;
+padding: 0 !important;
+overflow: visible !important;
+background: transparent !important;
+border: none !important;
+box-shadow: none !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   四、书籍封面
-   固定为 3:4 比例
+四、书籍封面
+固定为 3:4 比例
 ========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__cover {
-    position: relative !important;
-    display: block !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    aspect-ratio: 3 / 4 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid .shelf-card__cover {
+position: relative !important;
+
+display: block !important;
+flex: 0 0 auto !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+aspect-ratio: 3 / 4 !important;
+margin: 0 !important;
+padding: 0 !important;
+overflow: hidden !important;
+box-sizing: border-box !important;
+
 }
-#shelf-list.shelf-list--grid .shelf-card__cover img,
-#shelf-list.shelf-list--grid .shelf-card__cover-image {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    object-fit: cover !important;
-    object-position: center !important;
-    box-sizing: border-box !important;
+
+/* 上传的封面图片 */
+
+#shelf-list.shelf-list–grid .shelf-card__cover img,
+#shelf-list.shelf-list–grid .shelf-card__cover-image {
+display: block !important;
+
+width: 100% !important;
+max-width: 100% !important;
+height: 100% !important;
+margin: 0 !important;
+padding: 0 !important;
+object-fit: cover !important;
+object-position: center !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   五、书籍信息区域
+五、默认国风封面
+仅负责样式，不负责生成封面 HTML
 ========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__body {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 5px !important;
-    gap: 4px !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid .shelf-card__cover–default {
+position: relative !important;
+
+display: flex !important;
+flex-direction: column !important;
+align-items: center !important;
+justify-content: center !important;
+gap: 8px !important;
+width: 100% !important;
+max-width: 100% !important;
+height: auto !important;
+aspect-ratio: 3 / 4 !important;
+margin: 0 !important;
+padding: 10px !important;
+overflow: hidden !important;
+color: #f5e8c8 !important;
+background:
+    radial-gradient(
+        ellipse at 50% 38%,
+        rgba(211, 166, 91, 0.22) 0%,
+        transparent 56%
+    ),
+    linear-gradient(
+        145deg,
+        #38151b 0%,
+        #76232b 42%,
+        #a43b36 70%,
+        #42161d 100%
+    ) !important;
+border: 1px solid #c4a265 !important;
+border-radius: 3px !important;
+box-shadow:
+    inset 0 0 0 3px #42171e,
+    inset 0 0 0 4px rgba(218, 183, 117, 0.75) !important;
+box-sizing: border-box !important;
+
 }
-/* =========================================================
-   六、书名
-========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__title {
-    display: -webkit-box !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    color: var(--color-red) !important;
-    font-size: 12px !important;
-    font-weight: 700 !important;
-    line-height: 1.5 !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 3 !important;
-    box-sizing: border-box !important;
+
+/* 默认封面装饰字 */
+
+#shelf-list.shelf-list–grid
+.shelf-card__cover-decoration {
+display: block !important;
+
+color: #d9b979 !important;
+font-family:
+    "Songti SC",
+    "SimSun",
+    serif !important;
+font-size: 10px !important;
+letter-spacing: 4px !important;
+opacity: 0.95;
+
 }
-/* =========================================================
-   七、书籍简介
-========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__description {
-    display: -webkit-box !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    font-size: 10px !important;
-    line-height: 1.4 !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 2 !important;
-    box-sizing: border-box !important;
+
+/* 默认封面中央大字 */
+
+#shelf-list.shelf-list–grid
+.shelf-card__cover-character {
+display: block !important;
+
+max-width: 100% !important;
+color: #f4dfad !important;
+font-family:
+    "Noto Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif !important;
+font-size: clamp(28px, 9vw, 52px) !important;
+font-weight: 700 !important;
+line-height: 1.2 !important;
+text-align: center !important;
+text-shadow:
+    0 2px 0 rgba(40, 8, 10, 0.65),
+    0 0 14px rgba(219, 177, 100, 0.3) !important;
+
 }
-/* =========================================================
-   八、书籍信息栏
-========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__meta {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    flex-wrap: wrap !important;
-    gap: 3px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    margin-top: auto !important;
-    padding-top: 5px !important;
-    font-size: 10px !important;
-    line-height: 1.4 !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    box-sizing: border-box !important;
+
+/* 默认封面底部书名 */
+
+#shelf-list.shelf-list–grid
+.shelf-card__cover-title {
+display: -webkit-box !important;
+
+width: 100% !important;
+max-width: 100% !important;
+overflow: hidden !important;
+color: #f5e8c8 !important;
+font-family:
+    "Noto Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif !important;
+font-size: 11px !important;
+line-height: 1.6 !important;
+text-align: center !important;
+overflow-wrap: anywhere !important;
+-webkit-box-orient: vertical !important;
+-webkit-line-clamp: 3 !important;
+
 }
+
 /* =========================================================
-   九、书籍菜单按钮
+六、书名区域
 ========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__menu-button {
-    position: absolute !important;
-    z-index: 5 !important;
-    top: 6px !important;
-    right: 6px !important;
-    min-width: 0 !important;
-    max-width: 32px !important;
-    width: 32px !important;
-    height: 32px !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid .shelf-card__body {
+display: block !important;
+
+flex: 0 0 auto !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+margin: 0 !important;
+padding: 5px 2px 0 !important;
+overflow: visible !important;
+background: transparent !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   十、书籍内部元素防溢出
+七、书名
+最多显示三行
 ========================================================= */
-#shelf-list.shelf-list--grid .shelf-card__body > *,
-#shelf-list.shelf-list--grid .shelf-card__open > * {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+
+#shelf-list.shelf-list–grid .shelf-card__title {
+display: -webkit-box !important;
+
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+margin: 0 !important;
+padding: 0 !important;
+overflow: hidden !important;
+color: var(--color-red, #9e2428) !important;
+font-size: 12px !important;
+font-weight: 700 !important;
+line-height: 1.5 !important;
+text-align: center !important;
+white-space: normal !important;
+overflow-wrap: anywhere !important;
+word-break: break-word !important;
+-webkit-box-orient: vertical !important;
+-webkit-line-clamp: 3 !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   十一、分组网格容器
-   HTML：
-   #home-groups
-       └── #home-groups-list.home-groups__list
-   使用与书籍相同的三列布局和间距
+八、隐藏书籍简介、字数和更新时间
 ========================================================= */
+
+#shelf-list.shelf-list–grid .shelf-card__description,
+#shelf-list.shelf-list–grid .shelf-card__meta,
+#shelf-list.shelf-list–grid .shelf-card__word-count,
+#shelf-list.shelf-list–grid .shelf-card__updated-at,
+#shelf-list.shelf-list–grid .shelf-card__author,
+#shelf-list.shelf-list–grid .shelf-card__footer {
+display: none !important;
+}
+
+/* =========================================================
+九、书籍操作菜单
+========================================================= */
+
+#shelf-list.shelf-list–grid .shelf-card__menu-button {
+position: absolute !important;
+
+z-index: 10 !important;
+top: 5px !important;
+right: 5px !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+width: 28px !important;
+height: 28px !important;
+min-width: 0 !important;
+max-width: 28px !important;
+box-sizing: border-box !important;
+
+}
+
+/* =========================================================
+十、书籍内部元素防溢出
+========================================================= */
+
+#shelf-list.shelf-list–grid .shelf-card__body > *,
+#shelf-list.shelf-list–grid .shelf-card__open > * {
+min-width: 0 !important;
+max-width: 100% !important;
+
+box-sizing: border-box !important;
+
+}
+
+/* =========================================================
+十一、分组网格容器
+========================================================= */
+
 #home-groups .home-groups__list {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    grid-auto-flow: row !important;
-    grid-auto-rows: auto !important;
-    align-items: start !important;
-    justify-content: stretch !important;
-    gap: 8px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    box-sizing: border-box !important;
+display: grid !important;
+
+grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+grid-auto-flow: row !important;
+grid-auto-rows: auto !important;
+align-items: start !important;
+justify-content: stretch !important;
+gap: 8px !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+margin: 0 !important;
+padding: 0 !important;
+overflow: visible !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   十二、分组卡片
-   外层不显示背景、边框和阴影
-   仅透明封面框显示边框
+十二、分组卡片
 ========================================================= */
+
 #home-groups .home-groups__list > .home-group-card {
-    position: relative !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    gap: 0 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
-    justify-self: stretch !important;
-    align-self: start !important;
-    overflow: visible !important;
-    color: var(--theme-text) !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    box-sizing: border-box !important;
+position: relative !important;
+
+display: flex !important;
+flex-direction: column !important;
+align-items: stretch !important;
+justify-content: flex-start !important;
+gap: 0 !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+margin: 0 !important;
+padding: 0 !important;
+grid-column: auto !important;
+grid-row: auto !important;
+justify-self: stretch !important;
+align-self: start !important;
+overflow: visible !important;
+color: var(--theme-text, #29231f) !important;
+background: transparent !important;
+border: none !important;
+border-radius: 0 !important;
+box-shadow: none !important;
+transform: none !important;
+box-sizing: border-box !important;
+
 }
-/* =========================================================
-   十三、移除分组卡片原有装饰线
-========================================================= */
+
+/* 去除分组装饰线 */
+
 #home-groups .home-group-card::before,
 #home-groups .home-group-card::after {
-    display: none !important;
-    content: none !important;
+display: none !important;
+
+content: none !important;
+
 }
+
 /* =========================================================
-   十四、分组透明封面框
-   与书籍封面使用相同的：
-   1. 宽度：100%
-   2. 比例：3:4
-   3. 网格列数：3 列
-   透明背景，只保留边框
+十三、分组透明框
+透明背景、透明边框，保持 3:4 比例
 ========================================================= */
+
 #home-groups .home-group-card__cover {
-    position: relative !important;
-    display: block !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    aspect-ratio: 3 / 4 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: 1px solid var(--theme-border) !important;
-    border-radius: 4px !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
+position: relative !important;
+
+display: block !important;
+flex: 0 0 auto !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+aspect-ratio: 3 / 4 !important;
+margin: 0 !important;
+padding: 0 !important;
+background: transparent !important;
+background-color: transparent !important;
+background-image: none !important;
+border: 1px solid transparent !important;
+border-radius: 0 !important;
+box-shadow: none !important;
+overflow: hidden !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   十五、分组名称
-   显示在透明封面框下方
+十四、分组名称
 ========================================================= */
+
 #home-groups .home-group-card__name {
-    position: relative !important;
-    display: -webkit-box !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 5px 2px 2px !important;
-    overflow: hidden !important;
-    color: var(--color-red) !important;
-    font-family:
-        "Noto Serif SC",
-        "Source Han Serif SC",
-        "Songti SC",
-        "SimSun",
-        serif !important;
-    font-size: 12px !important;
-    font-weight: 700 !important;
-    line-height: 1.5 !important;
-    letter-spacing: 0 !important;
-    text-align: center !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 3 !important;
-    box-sizing: border-box !important;
+position: static !important;
+
+display: -webkit-box !important;
+flex: 0 0 auto !important;
+width: 100% !important;
+min-width: 0 !important;
+max-width: 100% !important;
+height: auto !important;
+min-height: 0 !important;
+margin: 0 !important;
+padding: 5px 2px 2px !important;
+overflow: hidden !important;
+color: var(--color-red, #9e2428) !important;
+font-family:
+    "Noto Serif SC",
+    "Source Han Serif SC",
+    "Songti SC",
+    "SimSun",
+    serif !important;
+font-size: 12px !important;
+font-weight: 700 !important;
+line-height: 1.5 !important;
+letter-spacing: 0 !important;
+text-align: center !important;
+white-space: normal !important;
+overflow-wrap: anywhere !important;
+word-break: break-word !important;
+-webkit-box-orient: vertical !important;
+-webkit-line-clamp: 3 !important;
+background: transparent !important;
+border: none !important;
+box-shadow: none !important;
+box-sizing: border-box !important;
+
 }
-/* =========================================================
-   十六、隐藏旧版分组方框
-   新版使用 home-group-card__cover
-========================================================= */
+
+/* 隐藏旧版复选框 */
+
 #home-groups .home-group-card__checkbox {
-    display: none !important;
+display: none !important;
 }
+
 /* =========================================================
-   十七、分组菜单按钮
-   固定在透明封面框右上角
+十五、分组操作菜单
 ========================================================= */
+
 #home-groups .home-group-card__menu-button {
-    position: absolute !important;
-    z-index: 5 !important;
-    top: 4px !important;
-    right: 4px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 26px !important;
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 0 !important;
-    max-width: 26px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    font-size: 20px !important;
-    box-sizing: border-box !important;
+position: absolute !important;
+
+z-index: 10 !important;
+top: 4px !important;
+right: 4px !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+width: 26px !important;
+height: 26px !important;
+min-width: 0 !important;
+max-width: 26px !important;
+margin: 0 !important;
+padding: 0 !important;
+font-size: 20px !important;
+box-sizing: border-box !important;
+
 }
+
 /* =========================================================
-   十八、分组卡片交互效果
-   不添加背景和阴影
+十六、隐藏“我的分组”标题
 ========================================================= */
-@media (hover: hover) {
-    #home-groups .home-group-card:hover {
-        background: transparent !important;
-        box-shadow: none !important;
-        transform: none !important;
-    }
-    #home-groups .home-group-card:hover
-    .home-group-card__cover {
-        border-color: var(--color-yellow-dark) !important;
-    }
+
+#home-groups .home-groups__header,
+#home-groups .home-groups__title {
+display: none !important;
 }
+
 /* =========================================================
-   十九、平板及较大屏幕
+十七、网格间距与平板适配
 ========================================================= */
+
 @media (min-width: 600px) {
-    #shelf-list.shelf-list--grid {
-        gap: 12px !important;
-    }
-    #home-groups .home-groups__list {
-        gap: 12px !important;
-    }
-    #shelf-list.shelf-list--grid .shelf-card__body {
-        padding: 6px !important;
-    }
-    #home-groups .home-group-card__name {
-        font-size: 13px !important;
-        padding-top: 6px !important;
-    }
+
+#shelf-list.shelf-list--grid,
+#home-groups .home-groups__list {
+    gap: 12px !important;
 }
+#shelf-list.shelf-list--grid .shelf-card__body {
+    padding: 6px 3px 0 !important;
+}
+#shelf-list.shelf-list--grid .shelf-card__title,
+#home-groups .home-group-card__name {
+    font-size: 13px !important;
+}
+
+}
+
 /* =========================================================
-   二十、超小屏幕
+十八、超小屏幕
 ========================================================= */
+
 @media (max-width: 359px) {
-    #shelf-list.shelf-list--grid {
-        gap: 5px !important;
-    }
-    #home-groups .home-groups__list {
-        gap: 5px !important;
-    }
-    #shelf-list.shelf-list--grid .shelf-card__body {
-        padding: 3px !important;
-        gap: 3px !important;
-    }
-    #shelf-list.shelf-list--grid .shelf-card__title {
-        font-size: 10px !important;
-    }
-    #shelf-list.shelf-list--grid .shelf-card__description {
-        font-size: 9px !important;
-    }
-    #shelf-list.shelf-list--grid .shelf-card__meta {
-        font-size: 9px !important;
-    }
-    #home-groups .home-group-card__name {
-        font-size: 10px !important;
-        padding: 4px 2px 2px !important;
-    }
-    #home-groups .home-group-card__menu-button {
-        top: 3px !important;
-        right: 3px !important;
-        width: 22px !important;
-        height: 22px !important;
-        max-width: 22px !important;
-        font-size: 17px !important;
-    }
+
+#shelf-list.shelf-list--grid,
+#home-groups .home-groups__list {
+    gap: 5px !important;
 }
+#shelf-list.shelf-list--grid .shelf-card__body {
+    padding: 4px 1px 0 !important;
+}
+#shelf-list.shelf-list--grid .shelf-card__title,
+#home-groups .home-group-card__name {
+    font-size: 10px !important;
+}
+#home-groups .home-group-card__menu-button {
+    top: 3px !important;
+    right: 3px !important;
+    width: 22px !important;
+    height: 22px !important;
+    max-width: 22px !important;
+    font-size: 17px !important;
+}
+
+}
+
 /* =========================================================
-   二十一、减少动态效果
+十九、减少动态效果
 ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
-    #shelf-list.shelf-list--grid .shelf-card,
-    #shelf-list.shelf-list--grid .shelf-card__open,
-    #home-groups .home-group-card,
-    #home-groups .home-group-card__cover {
-        transition: none !important;
-    }
-    #home-groups .home-group-card:hover {
-        transform: none !important;
-    }
+
+#shelf-list.shelf-list--grid .shelf-card,
+#shelf-list.shelf-list--grid .shelf-card__open,
+#home-groups .home-group-card,
+#home-groups .home-group-card__cover {
+    transition: none !important;
+}
+#home-groups .home-group-card:hover {
+    transform: none !important;
+}
+
 }
