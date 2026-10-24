@@ -1043,6 +1043,11 @@
     }
     /* ==================================================
        二十三、创建分组卡片
+       修改内容：
+       1. 使用透明封面框代替原来的复选框
+       2. 分组名称放在透明框下方
+       3. 保留右上角的三个点操作菜单
+       4. 保留原有分组名称、ID 和操作功能
     ================================================== */
     function createGroupCard(group) {
         const card = document.createElement("article");
@@ -1050,10 +1055,10 @@
         const groupName = getGroupName(group);
         const groupId = getGroupId(group);
         card.innerHTML = `
-            <span
-                class="home-group-card__checkbox"
+            <div
+                class="home-group-card__cover"
                 aria-hidden="true"
-            ></span>
+            ></div>
             <h3 class="home-group-card__name">
                 ${escapeHTML(groupName)}
             </h3>
