@@ -1,48 +1,61 @@
 /* ======================================================
 写作软件 · 公共数据存储模块
 文件：js/storage.js
+
 功能：
 1. 统一管理书籍与分组
 2. 创建、读取、修改、删除书籍
 3. 创建、读取、修改、删除分组
-4. 兼容旧版本书籍数据库
-5. 保留旧版封面迁移能力
-6. 通过事件通知其他页面数据变化
-7. 允许其他模块扩展 WritingStorage
+4. 一部小说只能属于一个分组
+5. 支持小说移入、移出和分组查询
+6. 兼容旧版本书籍数据库
+7. 保留旧版封面迁移能力
+8. 通过事件通知其他页面数据变化
+9. 允许其他模块扩展 WritingStorage
+
 注意：
 - 不主动清空已有书籍
 - 保留原有书籍接口
 - 书籍和分组分别存储
 - 不冻结 WritingStorage
+- 移动确认由界面负责
 ====================================================== */
 (function () {
     "use strict";
+
     /* ==================================================
        一、基础配置
     ================================================== */
     var DATABASE_KEY = "writing-software-books";
     var GROUPS_KEY = "writing-software-groups";
     var LEGACY_COVERS_KEY = "writing-software-book-covers";
+
     var DATABASE_VERSION = 2;
     var GROUPS_VERSION = 1;
+
     /* ==================================================
        二、错误处理
     ================================================== */
     function createStorageError(code, message, originalError) {
         var error = new Error(message);
+
         error.name = "WritingStorageError";
         error.code = code;
+
         if (originalError) {
             error.originalError = originalError;
         }
+
         return error;
     }
+
     /* ==================================================
        三、基础工具
     ================================================== */
     function getCurrentTime() {
         return new Date().toISOString();
     }
+
     function createId() {
         if (
             typeof crypto !== "undefined" &&
@@ -50,21 +63,26 @@
         ) {
             return crypto.randomUUID();
         }
+
         return (
             Date.now().toString(36) +
             "-" +
             Math.random().toString(36).slice(2, 12)
         );
     }
+
     function isValidId(id) {
         return typeof id === "string" && id.trim() !== "";
     }
+
     function normalizeText(value) {
         return typeof value === "string" ? value.trim() : "";
     }
+
     function cloneData(data) {
         return JSON.parse(JSON.stringify(data));
     }
+
     function isQuotaError(error) {
         return Boolean(
             error &&
@@ -76,14 +94,18 @@
             )
         );
     }
+
     function normalizeCover(value) {
         if (typeof value !== "string") {
             return "";
         }
+
         var cover = value.trim();
+
         if (!cover) {
             return "";
         }
+
         if (
             !/^data:image\/(?:png|jpe?g|webp|gif|avif);base64,/i.test(
                 cover
@@ -94,8 +116,10 @@
                 "封面格式不正确，请重新选择图片。"
             );
         }
+
         return cover;
     }
+
     function safeRead(key) {
         try {
             return localStorage.getItem(key);
@@ -107,6 +131,7 @@
             );
         }
     }
+
     function safeWrite(key, value) {
         try {
             localStorage.setItem(key, value);
@@ -119,6 +144,7 @@
                     error
                 );
             }
+
             throw createStorageError(
                 "STORAGE_WRITE_FAILED",
                 "保存失败，请检查浏览器存储权限。",
@@ -126,6 +152,7 @@
             );
         }
     }
+
     function safeRemove(key) {
         try {
             localStorage.removeItem(key);
@@ -136,11 +163,13 @@
             );
         }
     }
+
     /* ==================================================
        四、数据变化通知
     ================================================== */
     function notifyChange(detail) {
         detail = detail || {};
+
         try {
             window.dispatchEvent(
                 new CustomEvent("writing-storage-change", {
@@ -159,6 +188,7 @@
             );
         }
     }
+
     /* ==================================================
        五、书籍数据标准化
     ================================================== */
@@ -166,56 +196,68 @@
         if (!book || typeof book !== "object") {
             return null;
         }
+
         if (!isValidId(book.id)) {
             return null;
         }
+
         var now = getCurrentTime();
         var cover = "";
+
         try {
             cover = normalizeCover(book.cover || "");
         } catch (error) {
             cover = "";
         }
+
         return {
             id: book.id,
+
             title:
                 typeof book.title === "string"
                     ? book.title
                     : "未命名书籍",
+
             description:
                 typeof book.description === "string"
                     ? book.description
                     : "",
+
             cover: cover,
+
             createdAt:
                 typeof book.createdAt === "string"
                     ? book.createdAt
                     : now,
+
             updatedAt:
                 typeof book.updatedAt === "string"
                     ? book.updatedAt
                     : now,
+
             wordCount:
                 Number.isFinite(book.wordCount) &&
                 book.wordCount >= 0
                     ? book.wordCount
                     : 0,
+
             chapters: Array.isArray(book.chapters)
                 ? book.chapters
                 : [],
-            metadata:
-                Object.assign(
-                    {},
-                    book.metadata &&
-                    typeof book.metadata === "object"
-                        ? book.metadata
-                        : {},
-                    {
-                        version: DATABASE_VERSION
-                    }
-                )
+
+            metadata: Object.assign(
+                {},
+                book.metadata &&
+                typeof book.metadata === "object"
+                    ? book.metadata
+                    : {},
+                {
+                    version: DATABASE_VERSION
+                }
+            )
         };
     }
+
     /* ==================================================
        六、读取书籍数据库
     ================================================== */
@@ -223,7 +265,9 @@
         if (!rawData) {
             return [];
         }
+
         var parsed;
+
         try {
             parsed = JSON.parse(rawData);
         } catch (error) {
@@ -233,7 +277,9 @@
                 error
             );
         }
+
         var books;
+
         if (Array.isArray(parsed)) {
             books = parsed;
         } else if (
@@ -248,13 +294,16 @@
                 "书籍数据库格式异常，暂时无法读取。"
             );
         }
+
         return books
             .map(normalizeBook)
             .filter(Boolean);
     }
+
     function readBooksDatabase() {
         return parseBooks(safeRead(DATABASE_KEY));
     }
+
     /* ==================================================
        七、保存书籍数据库
     ================================================== */
@@ -264,7 +313,9 @@
             updatedAt: getCurrentTime(),
             books: books
         };
+
         var serialized;
+
         try {
             serialized = JSON.stringify(database);
         } catch (error) {
@@ -274,9 +325,12 @@
                 error
             );
         }
+
         safeWrite(DATABASE_KEY, serialized);
+
         return true;
     }
+
     /* ==================================================
        八、书籍查询接口
     ================================================== */
@@ -288,42 +342,55 @@
             );
         });
     }
+
     function getBook(id) {
         if (!isValidId(id)) {
             return null;
         }
+
         var books = readBooksDatabase();
+
         var book = books.find(function (item) {
             return item.id === id;
         });
+
         return book ? cloneData(book) : null;
     }
+
     function getBookCount() {
         return readBooksDatabase().length;
     }
+
     function hasBook(id) {
         return getBook(id) !== null;
     }
+
     function getBookCover(id) {
         var book = getBook(id);
+
         return book ? book.cover : "";
     }
+
     /* ==================================================
        九、创建书籍
     ================================================== */
     function createBook(options) {
         options = options || {};
+
         var title = normalizeText(options.title);
         var description = normalizeText(options.description);
+
         if (!title) {
             throw createStorageError(
                 "TITLE_REQUIRED",
                 "请输入书名。"
             );
         }
+
         var cover = normalizeCover(options.cover || "");
         var books = readBooksDatabase();
         var now = getCurrentTime();
+
         var book = {
             id: createId(),
             title: title,
@@ -337,14 +404,19 @@
                 version: DATABASE_VERSION
             }
         };
+
         books.unshift(book);
+
         writeBooksDatabase(books);
+
         notifyChange({
             type: "book-created",
             bookId: book.id
         });
+
         return cloneData(book);
     }
+
     /* ==================================================
        十、修改书籍
     ================================================== */
@@ -355,23 +427,29 @@
                 "书籍编号无效。"
             );
         }
+
         if (!changes || typeof changes !== "object") {
             throw createStorageError(
                 "INVALID_CHANGES",
                 "没有提供有效的修改内容。"
             );
         }
+
         var books = readBooksDatabase();
+
         var index = books.findIndex(function (book) {
             return book.id === id;
         });
+
         if (index === -1) {
             throw createStorageError(
                 "BOOK_NOT_FOUND",
                 "没有找到这本书。"
             );
         }
+
         var updatedBook = Object.assign({}, books[index]);
+
         if (
             Object.prototype.hasOwnProperty.call(
                 changes,
@@ -379,14 +457,17 @@
             )
         ) {
             var title = normalizeText(changes.title);
+
             if (!title) {
                 throw createStorageError(
                     "TITLE_REQUIRED",
                     "书名不能为空。"
                 );
             }
+
             updatedBook.title = title;
         }
+
         if (
             Object.prototype.hasOwnProperty.call(
                 changes,
@@ -397,6 +478,7 @@
                 changes.description
             );
         }
+
         if (
             Object.prototype.hasOwnProperty.call(
                 changes,
@@ -407,15 +489,21 @@
                 changes.cover || ""
             );
         }
+
         updatedBook.updatedAt = getCurrentTime();
+
         books[index] = updatedBook;
+
         writeBooksDatabase(books);
+
         notifyChange({
             type: "book-updated",
             bookId: id
         });
+
         return cloneData(updatedBook);
     }
+
     /* ==================================================
        十一、删除书籍
     ================================================== */
@@ -426,21 +514,71 @@
                 "书籍编号无效。"
             );
         }
+
         var books = readBooksDatabase();
+
         var index = books.findIndex(function (book) {
             return book.id === id;
         });
+
         if (index === -1) {
             return false;
         }
+
         books.splice(index, 1);
+
+        /*
+         * 先保存书籍数据库。
+         * 如果保存失败，不继续修改分组关联。
+         */
         writeBooksDatabase(books);
+
+        /*
+         * 清理分组中指向已删除书籍的关联。
+         * 如果分组数据库异常，则保留分组数据，
+         * 避免意外覆盖无法解析的原始记录。
+         */
+        try {
+            var groups = readGroupsDatabase();
+            var changed = false;
+
+            groups = groups.map(function (group) {
+                var nextBookIds = group.bookIds.filter(
+                    function (bookId) {
+                        return bookId !== id;
+                    }
+                );
+
+                if (nextBookIds.length !== group.bookIds.length) {
+                    changed = true;
+
+                    return Object.assign({}, group, {
+                        bookIds: nextBookIds,
+                        updatedAt: getCurrentTime()
+                    });
+                }
+
+                return group;
+            });
+
+            if (changed) {
+                writeGroupsDatabase(groups);
+            }
+        } catch (error) {
+            console.warn(
+                "[WritingStorage] 已删除书籍，但清理分组关联失败。",
+                error
+            );
+        }
+
         notifyChange({
             type: "book-deleted",
             bookId: id
         });
+
         return true;
     }
+
     /* ==================================================
        十二、更新最近编辑时间
     ================================================== */
@@ -448,21 +586,29 @@
         if (!isValidId(id)) {
             return null;
         }
+
         var books = readBooksDatabase();
+
         var index = books.findIndex(function (book) {
             return book.id === id;
         });
+
         if (index === -1) {
             return null;
         }
+
         books[index].updatedAt = getCurrentTime();
+
         writeBooksDatabase(books);
+
         notifyChange({
             type: "book-touched",
             bookId: id
         });
+
         return cloneData(books[index]);
     }
+
     /* ==================================================
        十三、分组数据标准化
     ================================================== */
@@ -470,42 +616,54 @@
         if (!group || typeof group !== "object") {
             return null;
         }
+
         if (!isValidId(group.id)) {
             return null;
         }
+
         var now = getCurrentTime();
+
         return {
             id: group.id,
+
             name:
                 typeof group.name === "string"
                     ? group.name
                     : "未命名分组",
+
             description:
                 typeof group.description === "string"
                     ? group.description
                     : "",
+
             bookIds: Array.isArray(group.bookIds)
                 ? group.bookIds.filter(isValidId)
                 : [],
+
             createdAt:
                 typeof group.createdAt === "string"
                     ? group.createdAt
                     : now,
+
             updatedAt:
                 typeof group.updatedAt === "string"
                     ? group.updatedAt
                     : now
         };
     }
+
     /* ==================================================
        十四、读取分组数据库
     ================================================== */
     function readGroupsDatabase() {
         var rawData = safeRead(GROUPS_KEY);
+
         if (!rawData) {
             return [];
         }
+
         var parsed;
+
         try {
             parsed = JSON.parse(rawData);
         } catch (error) {
@@ -515,7 +673,9 @@
                 error
             );
         }
+
         var groups;
+
         if (Array.isArray(parsed)) {
             groups = parsed;
         } else if (
@@ -530,12 +690,43 @@
                 "分组数据库格式异常，暂时无法读取。"
             );
         }
+
         return groups
             .map(normalizeGroup)
             .filter(Boolean);
     }
+
     /* ==================================================
-       十五、保存分组数据库
+       十五、规范化分组关联
+       保证同一本书最多属于一个分组。
+
+       如果历史数据中存在重复关联，
+       保留排序后最先出现的分组关联。
+       此函数只在创建新关联或迁移数据时使用。
+    ================================================== */
+    function normalizeGroupAssociations(groups) {
+        var assignedBookIds = Object.create(null);
+
+        return groups.map(function (group) {
+            var uniqueBookIds = [];
+
+            group.bookIds.forEach(function (bookId) {
+                if (assignedBookIds[bookId]) {
+                    return;
+                }
+
+                assignedBookIds[bookId] = true;
+                uniqueBookIds.push(bookId);
+            });
+
+            return Object.assign({}, group, {
+                bookIds: uniqueBookIds
+            });
+        });
+    }
+
+    /* ==================================================
+       十六、保存分组数据库
     ================================================== */
     function writeGroupsDatabase(groups) {
         var database = {
@@ -543,7 +734,9 @@
             updatedAt: getCurrentTime(),
             groups: groups
         };
+
         var serialized;
+
         try {
             serialized = JSON.stringify(database);
         } catch (error) {
@@ -553,11 +746,14 @@
                 error
             );
         }
+
         safeWrite(GROUPS_KEY, serialized);
+
         return true;
     }
+
     /* ==================================================
-       十六、查询分组
+       十七、查询分组
     ================================================== */
     function getGroups() {
         return cloneData(readGroupsDatabase()).sort(function (a, b) {
@@ -567,70 +763,103 @@
             );
         });
     }
+
     function getGroup(id) {
         if (!isValidId(id)) {
             return null;
         }
+
         var groups = readGroupsDatabase();
+
         var group = groups.find(function (item) {
             return item.id === id;
         });
+
         return group ? cloneData(group) : null;
     }
+
     function getGroupCount() {
         return readGroupsDatabase().length;
     }
+
     /* ==================================================
-       十七、创建分组
+       十八、创建分组
     ================================================== */
     function createGroup(options) {
         options = options || {};
-        /*
-         * 同时兼容：
-         * createGroup({ name: "分组" })
-         * createGroup("分组")
-         */
+
         var name = normalizeText(
             typeof options === "string"
                 ? options
                 : options.name
         );
+
         if (!name) {
             throw createStorageError(
                 "GROUP_NAME_REQUIRED",
                 "请输入分组名称。"
             );
         }
+
         var groups = readGroupsDatabase();
         var now = getCurrentTime();
+
         var group = {
             id: createId(),
             name: name,
+
             description:
                 typeof options === "object" &&
                 options &&
                 typeof options.description === "string"
                     ? options.description.trim()
                     : "",
+
             bookIds:
                 typeof options === "object" &&
                 options &&
                 Array.isArray(options.bookIds)
                     ? options.bookIds.filter(isValidId)
                     : [],
+
             createdAt: now,
             updatedAt: now
         };
+
+        /*
+         * 新分组如果带有 bookIds，
+         * 需要去除其他分组已有的关联。
+         */
+        if (group.bookIds.length > 0) {
+            var incomingBookIds = group.bookIds.slice();
+
+            groups = groups.map(function (existingGroup) {
+                return Object.assign({}, existingGroup, {
+                    bookIds: existingGroup.bookIds.filter(
+                        function (bookId) {
+                            return incomingBookIds.indexOf(bookId) === -1;
+                        }
+                    )
+                });
+            });
+        }
+
         groups.unshift(group);
+
+        groups = normalizeGroupAssociations(groups);
+
         writeGroupsDatabase(groups);
+
         notifyChange({
             type: "group-created",
             groupId: group.id
         });
+
         return cloneData(group);
     }
+
     /* ==================================================
-       十八、修改分组
+       十九、修改分组
     ================================================== */
     function updateGroup(id, changes) {
         if (!isValidId(id)) {
@@ -639,23 +868,29 @@
                 "分组编号无效。"
             );
         }
+
         if (!changes || typeof changes !== "object") {
             throw createStorageError(
                 "INVALID_CHANGES",
                 "没有提供有效的修改内容。"
             );
         }
+
         var groups = readGroupsDatabase();
+
         var index = groups.findIndex(function (group) {
             return group.id === id;
         });
+
         if (index === -1) {
             throw createStorageError(
                 "GROUP_NOT_FOUND",
                 "没有找到这个分组。"
             );
         }
+
         var updatedGroup = Object.assign({}, groups[index]);
+
         if (
             Object.prototype.hasOwnProperty.call(
                 changes,
@@ -663,14 +898,17 @@
             )
         ) {
             var name = normalizeText(changes.name);
+
             if (!name) {
                 throw createStorageError(
                     "GROUP_NAME_REQUIRED",
                     "分组名称不能为空。"
                 );
             }
+
             updatedGroup.name = name;
         }
+
         if (
             Object.prototype.hasOwnProperty.call(
                 changes,
@@ -681,6 +919,7 @@
                 changes.description
             );
         }
+
         if (
             Object.prototype.hasOwnProperty.call(
                 changes,
@@ -693,22 +932,62 @@
                     "分组中的书籍列表格式不正确。"
                 );
             }
-            updatedGroup.bookIds = changes.bookIds.filter(
-                isValidId
+
+            /*
+             * 本分组只保留有效且不重复的书籍编号。
+             */
+            updatedGroup.bookIds = Array.from(
+                new Set(changes.bookIds.filter(isValidId))
             );
         }
+
         updatedGroup.updatedAt = getCurrentTime();
+
         groups[index] = updatedGroup;
+
+        /*
+         * 所有分组统一去重。
+         * 当前被修改的分组优先保留关联。
+         */
+        var orderedGroups = groups.slice(index, index + 1)
+            .concat(groups.slice(0, index), groups.slice(index + 1));
+
+        orderedGroups = normalizeGroupAssociations(orderedGroups);
+
+        /*
+         * 保留原分组顺序，按原数组写回。
+         * 先使用临时映射获取规范化后的 bookIds。
+         */
+        var normalizedById = Object.create(null);
+
+        orderedGroups.forEach(function (group) {
+            normalizedById[group.id] = group.bookIds;
+        });
+
+        groups = groups.map(function (group) {
+            return Object.assign({}, group, {
+                bookIds: normalizedById[group.id] || []
+            });
+        });
+
         writeGroupsDatabase(groups);
+
         notifyChange({
             type: "group-updated",
             groupId: id
         });
-        return cloneData(updatedGroup);
+
+        return cloneData(
+            groups.find(function (group) {
+                return group.id === id;
+            })
+        );
     }
+
     /* ==================================================
-       十九、删除分组
-    ================================================== */
+       二十、删除分组
+       删除分组不会删除书籍。
+       ================================================== */
     function deleteGroup(id) {
         if (!isValidId(id)) {
             throw createStorageError(
@@ -716,77 +995,240 @@
                 "分组编号无效。"
             );
         }
+
         var groups = readGroupsDatabase();
+
         var index = groups.findIndex(function (group) {
             return group.id === id;
         });
+
         if (index === -1) {
             return false;
         }
+
         groups.splice(index, 1);
+
         writeGroupsDatabase(groups);
+
         notifyChange({
             type: "group-deleted",
             groupId: id
         });
+
         return true;
     }
+
     /* ==================================================
-       二十、分组与书籍关联
+       二十一、分组与书籍关联
     ================================================== */
+
+    /**
+     * 查询一本书所属的分组。
+     * 无分组时返回 null。
+     */
+    function getBookGroup(bookId) {
+        if (!isValidId(bookId)) {
+            return null;
+        }
+
+        var groups = getGroups();
+
+        for (var i = 0; i < groups.length; i++) {
+            if (groups[i].bookIds.indexOf(bookId) !== -1) {
+                return groups[i];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 将书籍加入分组。
+     * 如果书籍已属于其他分组，则拒绝添加。
+     */
     function addBookToGroup(groupId, bookId) {
         var group = getGroup(groupId);
+
         if (!group) {
             throw createStorageError(
                 "GROUP_NOT_FOUND",
                 "没有找到这个分组。"
             );
         }
+
         if (!hasBook(bookId)) {
             throw createStorageError(
                 "BOOK_NOT_FOUND",
                 "没有找到这本书。"
             );
         }
+
+        var currentGroup = getBookGroup(bookId);
+
+        if (currentGroup && currentGroup.id !== groupId) {
+            throw createStorageError(
+                "BOOK_ALREADY_IN_GROUP",
+                "这本小说已经属于分组「" +
+                    currentGroup.name +
+                    "」，请先确认是否移动。"
+            );
+        }
+
         if (group.bookIds.indexOf(bookId) !== -1) {
             return group;
         }
+
         group.bookIds.push(bookId);
+
         return updateGroup(groupId, {
             bookIds: group.bookIds
         });
     }
+
+    /**
+     * 将小说移动到目标分组。
+     *
+     * 此接口不显示确认弹窗。
+     * 界面应在调用前征求用户确认。
+     *
+     * 通过一次 setItem 写入完整分组数据库，
+     * 避免先删旧关联、再写新关联造成中间状态。
+     */
+    function moveBookToGroup(targetGroupId, bookId) {
+        if (!isValidId(targetGroupId)) {
+            throw createStorageError(
+                "INVALID_ID",
+                "目标分组编号无效。"
+            );
+        }
+
+        if (!hasBook(bookId)) {
+            throw createStorageError(
+                "BOOK_NOT_FOUND",
+                "没有找到这本书。"
+            );
+        }
+
+        var groups = readGroupsDatabase();
+
+        var targetExists = groups.some(function (group) {
+            return group.id === targetGroupId;
+        });
+
+        if (!targetExists) {
+            throw createStorageError(
+                "GROUP_NOT_FOUND",
+                "目标分组不存在，移动已取消。"
+            );
+        }
+
+        var currentGroup = null;
+
+        groups.forEach(function (group) {
+            if (
+                !currentGroup &&
+                group.bookIds.indexOf(bookId) !== -1
+            ) {
+                currentGroup = group;
+            }
+        });
+
+        if (currentGroup && currentGroup.id === targetGroupId) {
+            return cloneData(currentGroup);
+        }
+
+        var now = getCurrentTime();
+
+        var updatedGroups = groups.map(function (group) {
+            var bookIds = group.bookIds.filter(function (id) {
+                return id !== bookId;
+            });
+
+            if (group.id === targetGroupId) {
+                bookIds.push(bookId);
+            }
+
+            return Object.assign({}, group, {
+                bookIds: bookIds,
+                updatedAt: getCurrentTime()
+            });
+        });
+
+        /*
+         * 写入前先检查目标分组仍然存在。
+         */
+        if (
+            !updatedGroups.some(function (group) {
+                return group.id === targetGroupId;
+            })
+        ) {
+            throw createStorageError(
+                "GROUP_NOT_FOUND",
+                "目标分组不存在，移动已取消。"
+            );
+        }
+
+        writeGroupsDatabase(updatedGroups);
+
+        notifyChange({
+            type: "book-moved-to-group",
+            bookId: bookId,
+            groupId: targetGroupId
+        });
+
+        return getGroup(targetGroupId);
+    }
+
+    /**
+     * 从指定分组移出书籍。
+     * 不会删除书籍。
+     */
     function removeBookFromGroup(groupId, bookId) {
         var group = getGroup(groupId);
+
         if (!group) {
             throw createStorageError(
                 "GROUP_NOT_FOUND",
                 "没有找到这个分组。"
             );
         }
+
         var bookIds = group.bookIds.filter(function (id) {
             return id !== bookId;
         });
+
+        if (bookIds.length === group.bookIds.length) {
+            return group;
+        }
+
         return updateGroup(groupId, {
             bookIds: bookIds
         });
     }
+
+    /**
+     * 获取指定分组中的书籍。
+     */
     function getGroupBooks(groupId) {
         var group = getGroup(groupId);
+
         if (!group) {
             return [];
         }
+
         return group.bookIds
             .map(function (bookId) {
                 return getBook(bookId);
             })
             .filter(Boolean);
     }
+
     /* ==================================================
-       二十一、旧版封面迁移
+       二十二、旧版封面迁移
     ================================================== */
     function migrateLegacyCovers() {
         var rawLegacyData;
+
         try {
             rawLegacyData = localStorage.getItem(
                 LEGACY_COVERS_KEY
@@ -794,15 +1236,19 @@
         } catch (error) {
             return;
         }
+
         if (!rawLegacyData) {
             return;
         }
+
         var legacyCovers;
+
         try {
             legacyCovers = JSON.parse(rawLegacyData);
         } catch (error) {
             return;
         }
+
         if (
             !legacyCovers ||
             typeof legacyCovers !== "object" ||
@@ -810,18 +1256,24 @@
         ) {
             return;
         }
+
         var books;
+
         try {
             books = readBooksDatabase();
         } catch (error) {
             return;
         }
+
         var changed = false;
+
         books = books.map(function (book) {
             if (book.cover) {
                 return book;
             }
+
             var legacyEntry = legacyCovers[book.id];
+
             if (
                 !legacyEntry ||
                 typeof legacyEntry !== "object" ||
@@ -829,12 +1281,16 @@
             ) {
                 return book;
             }
+
             try {
                 var cover = normalizeCover(legacyEntry.data);
+
                 if (!cover) {
                     return book;
                 }
+
                 changed = true;
+
                 return Object.assign({}, book, {
                     cover: cover
                 });
@@ -842,12 +1298,16 @@
                 return book;
             }
         });
+
         if (!changed) {
             return;
         }
+
         try {
             writeBooksDatabase(books);
+
             safeRemove(LEGACY_COVERS_KEY);
+
             notifyChange({
                 type: "legacy-covers-migrated"
             });
@@ -858,13 +1318,16 @@
             );
         }
     }
+
     /* ==================================================
-       二十二、初始化兼容
+       二十三、初始化兼容
     ================================================== */
     function initialize() {
         var rawData = safeRead(DATABASE_KEY);
+
         if (rawData) {
             var parsed;
+
             try {
                 parsed = JSON.parse(rawData);
             } catch (error) {
@@ -872,14 +1335,18 @@
                     "[WritingStorage] 数据库解析失败，保留原始数据。",
                     error
                 );
+
                 return;
             }
+
             var isLegacyArray = Array.isArray(parsed);
+
             var isCurrentDatabase =
                 parsed &&
                 typeof parsed === "object" &&
                 parsed.version === DATABASE_VERSION &&
                 Array.isArray(parsed.books);
+
             if (isLegacyArray) {
                 writeBooksDatabase(parseBooks(rawData));
             } else if (
@@ -893,28 +1360,28 @@
                 console.warn(
                     "[WritingStorage] 未识别数据库格式，保留原始数据。"
                 );
+
                 return;
             }
         }
+
         /*
-         * 分组数据库采用独立存储。
-         * 第一次使用时只建立空数据库；
-         * 不会删除或覆盖已有书籍。
+         * 第一次使用时只创建空分组数据库。
+         * 已存在的分组数据不会被主动清空。
          */
         var rawGroups = safeRead(GROUPS_KEY);
+
         if (!rawGroups) {
             writeGroupsDatabase([]);
         } else {
-            /*
-             * 先验证数据格式。
-             * 异常时保留原始分组数据，不覆盖。
-             */
             readGroupsDatabase();
         }
+
         migrateLegacyCovers();
     }
+
     /* ==================================================
-       二十三、变化监听
+       二十四、变化监听
     ================================================== */
     function onChange(callback) {
         if (typeof callback !== "function") {
@@ -923,13 +1390,16 @@
                 "监听函数必须是有效的函数。"
             );
         }
+
         function handler(event) {
             callback(event.detail || {});
         }
+
         window.addEventListener(
             "writing-storage-change",
             handler
         );
+
         return function unsubscribe() {
             window.removeEventListener(
                 "writing-storage-change",
@@ -937,8 +1407,9 @@
             );
         };
     }
+
     /* ==================================================
-       二十四、跨标签页同步
+       二十五、跨标签页同步
     ================================================== */
     window.addEventListener("storage", function (event) {
         if (
@@ -951,13 +1422,15 @@
             });
         }
     });
+
     /* ==================================================
-       二十五、公开接口
+       二十六、公开接口
     ================================================== */
     /*
-     * 先复用已有对象，避免其他脚本扩展的接口被覆盖。
+     * 复用已有对象，避免覆盖其他模块扩展的接口。
      */
     var storage = window.WritingStorage || {};
+
     Object.assign(storage, {
         /* 书籍接口 */
         getBooks: getBooks,
@@ -969,6 +1442,7 @@
         updateBook: updateBook,
         deleteBook: deleteBook,
         touchBook: touchBook,
+
         /* 分组接口 */
         getGroups: getGroups,
         getGroup: getGroup,
@@ -976,16 +1450,22 @@
         createGroup: createGroup,
         updateGroup: updateGroup,
         deleteGroup: deleteGroup,
+
         /* 分组与书籍关联 */
         addBookToGroup: addBookToGroup,
+        moveBookToGroup: moveBookToGroup,
+        getBookGroup: getBookGroup,
         removeBookFromGroup: removeBookFromGroup,
         getGroupBooks: getGroupBooks,
+
         /* 变化监听 */
         onChange: onChange
     });
+
     window.WritingStorage = storage;
+
     /* ==================================================
-       二十六、执行初始化
+       二十七、执行初始化
     ================================================== */
     try {
         initialize();
