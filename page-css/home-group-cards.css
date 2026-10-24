@@ -1,15 +1,21 @@
 /* ========================================
 首页分组卡片样式
+
 目标：
 
 1. 分组透明框与书籍封面保持 3:4 比例
-2. 分组名称显示在透明框下方
-3. 右上角保留 ⋯ 操作菜单
-4. 隐藏“我的分组”标题
-5. 不修改书籍卡片样式
+2. 分组框背景完全透明
+3. 分组框边框完全透明
+4. 分组名称显示在透明框下方
+5. 右上角保留 ⋯ 操作菜单
+6. 隐藏“我的分组”标题
+7. 不修改书籍卡片样式
     ======================================== */
 
-/* 分组区域 */
+/* ========================================
+一、分组区域
+======================================== */
+
 #home-groups {
 display: block;
 width: 100%;
@@ -17,15 +23,22 @@ min-width: 0;
 box-sizing: border-box;
 }
 
-/* 隐藏分组标题 */
+/* ========================================
+二、隐藏分组标题
+======================================== */
+
 #home-groups .home-groups__header,
 #home-groups .home-groups__title {
 display: none !important;
 }
 
-/* 分组网格 */
+/* ========================================
+三、分组网格
+======================================== */
+
 #home-groups .home-groups__list {
 display: grid !important;
+
 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 align-items: start;
 gap: 8px;
@@ -34,11 +47,16 @@ min-width: 0;
 margin: 0;
 padding: 0;
 box-sizing: border-box;
+
 }
 
-/* 单个分组卡片 */
+/* ========================================
+四、单个分组卡片
+======================================== */
+
 #home-groups .home-group-card {
 position: relative;
+
 display: flex !important;
 flex-direction: column !important;
 align-items: stretch;
@@ -46,15 +64,25 @@ width: 100%;
 min-width: 0;
 margin: 0;
 padding: 0;
-border: none;
-background: transparent;
-box-shadow: none;
+border: none !important;
+background: transparent !important;
+background-color: transparent !important;
+box-shadow: none !important;
 box-sizing: border-box;
+
 }
 
-/* 分组透明框：与书籍封面保持 3:4 比例 */
+/* ========================================
+五、分组透明框
+
+背景透明
+边框透明
+保持 3:4 比例
+======================================== */
+
 #home-groups .home-group-card__cover {
 display: block;
+
 position: relative;
 width: 100% !important;
 height: auto !important;
@@ -63,21 +91,38 @@ aspect-ratio: 3 / 4 !important;
 flex: none;
 margin: 0;
 padding: 0;
-border: 1px solid #c9b9a0;
-border-radius: 4px;
-background: transparent;
-box-shadow: none;
+/* 背景完全透明 */
+background: transparent !important;
+background-color: transparent !important;
+/* 边框完全透明 */
+border: 1px solid transparent !important;
+/* 去除圆角 */
+border-radius: 0 !important;
+/* 去除阴影 */
+box-shadow: none !important;
+/* 不显示背景图片 */
+background-image: none !important;
 box-sizing: border-box;
+
 }
 
-/* 不再显示旧版分组复选框 */
+/* ========================================
+六、隐藏旧版分组复选框
+======================================== */
+
 #home-groups .home-group-card__checkbox {
 display: none !important;
 }
 
-/* 分组名称：放在透明框下方 */
+/* ========================================
+七、分组名称
+
+显示在透明框下方
+======================================== */
+
 #home-groups .home-group-card__name {
 display: block;
+
 position: static !important;
 width: 100%;
 min-width: 0;
@@ -93,41 +138,68 @@ text-align: center;
 text-overflow: ellipsis;
 overflow-wrap: anywhere;
 white-space: normal;
-background: transparent;
+background: transparent !important;
+background-color: transparent !important;
+border: none !important;
+box-shadow: none !important;
 box-sizing: border-box;
+
 }
 
-/* 右上角 ⋯ 操作菜单 */
+/* ========================================
+八、右上角 ⋯ 操作菜单
+======================================== */
+
 #home-groups .home-group-card__menu-button {
 position: absolute !important;
+
 top: 4px;
 right: 4px;
 z-index: 10;
 display: flex;
 align-items: center;
 justify-content: center;
+
 }
 
-/* 平板及较宽屏幕 */
+/* ========================================
+九、平板及较宽屏幕
+======================================== */
+
 @media (min-width: 600px) {
-#home-groups .home-groups__list {
-gap: 12px;
-}
 
+#home-groups .home-groups__list {
+    gap: 12px;
+}
 #home-groups .home-group-card__name {
     font-size: 13px;
 }
 
 }
 
-/* 较窄手机屏幕 */
-@media (max-width: 360px) {
-#home-groups .home-groups__list {
-gap: 5px;
-}
+/* ========================================
+十、较窄手机屏幕
+======================================== */
 
+@media (max-width: 360px) {
+
+#home-groups .home-groups__list {
+    gap: 5px;
+}
 #home-groups .home-group-card__name {
     font-size: 11px;
 }
 
+}
+
+/* ========================================
+十一、确保透明样式不被覆盖
+======================================== */
+
+#home-groups .home-group-card__cover::before,
+#home-groups .home-group-card__cover::after {
+background: transparent !important;
+background-color: transparent !important;
+border-color: transparent !important;
+box-shadow: none !important;
 }
