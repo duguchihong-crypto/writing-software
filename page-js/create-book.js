@@ -10,7 +10,7 @@
 6. 防止重复提交
 7. 取消时确认放弃
 8. 顶部返回、底部取消返回新建页面
-9. 创建成功后返回书架
+9. 创建成功后返回书架首页
 10. 兼容同步和异步存储接口
 11. 兼容 GitHub Pages 项目路径
 注意：
@@ -433,8 +433,8 @@
         return book;
     }
     /* ==================================================
-       十七、计算目标页面地址
-       GitHub Pages 项目路径兼容
+       十七、计算页面地址
+       兼容 GitHub Pages 项目路径
     ================================================== */
     function getPageUrl(fileName) {
         var currentUrl = new URL(window.location.href);
@@ -457,9 +457,18 @@
         currentUrl.hash = "";
         return currentUrl.href;
     }
+    /* ==================================================
+       十八、获取新建入口页地址
+       取消/返回时使用
+    ================================================== */
     function getCreatePageUrl() {
         return getPageUrl("create.html");
     }
+    /* ==================================================
+       十九、获取书架首页地址
+       关键修复：从 /pages/create-book.html
+       返回项目根目录下的 /index.html
+    ================================================== */
     function getHomeUrl() {
         var currentUrl = new URL(window.location.href);
         var currentPath = currentUrl.pathname;
@@ -469,13 +478,19 @@
                 currentPath.slice(0, -pageSuffix.length) +
                 "/index.html";
         } else {
-            var pagesIndex =
-                currentPath.lastIndexOf("/pages/");
+            /*
+             * 兼容其他目录结构。
+             * 如果当前路径中存在 /pages/，返回项目根目录。
+             */
+            var pagesIndex = currentPath.lastIndexOf("/pages/");
             if (pagesIndex !== -1) {
                 currentUrl.pathname =
                     currentPath.slice(0, pagesIndex) +
                     "/index.html";
             } else {
+                /*
+                 * 兜底：当前页面所在目录下的 index.html
+                 */
                 currentUrl.pathname =
                     currentPath.slice(
                         0,
@@ -489,17 +504,26 @@
         return currentUrl.href;
     }
     /* ==================================================
-       十八、创建成功后返回书架
+       二十、创建成功后返回书架
     ================================================== */
     function navigateToHome() {
         if (redirectTimer !== null) {
             window.clearTimeout(redirectTimer);
             redirectTimer = null;
         }
-        window.location.replace(getHomeUrl());
+        var homeUrl = getHomeUrl();
+        console.info(
+            "[WritingCreateBook] 正在返回书架首页：",
+            homeUrl
+        );
+        /*
+         * replace() 避免用户按返回键再次回到
+         * 已经成功创建书籍的页面。
+         */
+        window.location.replace(homeUrl);
     }
     /* ==================================================
-       十九、创建书籍
+       二十一、创建书籍
     ================================================== */
     async function handleSubmit(event) {
         event.preventDefault();
@@ -526,6 +550,10 @@
         updateSubmitButton();
         try {
             var title = getTitleValue();
+            /*
+             * 统一通过 WritingStorage 创建书籍。
+             * 兼容同步返回值和 Promise 返回值。
+             */
             var result = await Promise.resolve(
                 storage.createBook({
                     title: title,
@@ -534,6 +562,10 @@
                 })
             );
             var book = validateCreatedBook(result);
+            /*
+             * 只有存储模块成功返回有效书籍后，
+             * 才标记创建成功并执行跳转。
+             */
             isSaved = true;
             showMessage(
                 "《" +
@@ -545,6 +577,10 @@
                 "[WritingCreateBook] 创建成功：",
                 book
             );
+            console.info(
+                "[WritingCreateBook] 目标首页：",
+                getHomeUrl()
+            );
             redirectTimer = window.setTimeout(
                 navigateToHome,
                 REDIRECT_DELAY
@@ -554,13 +590,16 @@
                 "[WritingCreateBook] 创建失败：",
                 error
             );
-            showMessage(getCreateErrorMessage(error), "error");
+            showMessage(
+                getCreateErrorMessage(error),
+                "error"
+            );
             isSubmitting = false;
             updateSubmitButton();
         }
     }
     /* ==================================================
-       二十、检查未保存的输入
+       二十二、检查未保存的输入
     ================================================== */
     function hasUnsavedInput() {
         return Boolean(
@@ -573,7 +612,7 @@
         );
     }
     /* ==================================================
-       二十一、统一处理返回与取消
+       二十三、统一处理返回与取消
     ================================================== */
     function handleCancel(event) {
         if (event) {
@@ -603,14 +642,13 @@
         }
         isLeavingPage = true;
         /*
-         * 直接定位到新建入口页。
-         * 不调用 WritingNavigation.goHome()，
-         * 避免公共导航把此操作导向书架首页。
+         * 顶部返回和底部取消仍返回新建入口页。
+         * 只有创建成功后才返回书架首页。
          */
         window.location.assign(getCreatePageUrl());
     }
     /* ==================================================
-       二十二、绑定书名事件
+       二十四、绑定书名事件
     ================================================== */
     elements.title.addEventListener("input", function () {
         updateTitleCounter();
@@ -628,7 +666,7 @@
         }
     });
     /* ==================================================
-       二十三、绑定封面事件
+       二十五、绑定封面事件
     ================================================== */
     elements.coverInput.addEventListener(
         "change",
@@ -649,12 +687,14 @@
         );
     }
     /* ==================================================
-       二十四、绑定表单提交
+       二十六、绑定表单提交
     ================================================== */
-    elements.form.addEventListener("submit", handleSubmit);
+    elements.form.addEventListener(
+        "submit",
+        handleSubmit
+    );
     /* ==================================================
-       二十五、绑定返回和取消
-       使用捕获阶段，优先处理这两个按钮
+       二十七、绑定顶部返回和底部取消
     ================================================== */
     function bindBackButton(button) {
         if (!button) {
@@ -665,10 +705,6 @@
         }
         button.dataset.createBookBackBound = "true";
         button.setAttribute("href", getCreatePageUrl());
-        /*
-         * 使用捕获阶段监听。
-         * stopImmediatePropagation() 阻止同一事件后续监听器执行。
-         */
         button.addEventListener(
             "click",
             function (event) {
@@ -682,7 +718,7 @@
     bindBackButton(elements.cancelTopButton);
     bindBackButton(elements.cancelButton);
     /* ==================================================
-       二十六、离开页面前提示
+       二十八、离开页面前提示
     ================================================== */
     window.addEventListener("beforeunload", function (event) {
         if (isSubmitting || isSaved || isLeavingPage) {
@@ -695,7 +731,7 @@
         event.returnValue = "";
     });
     /* ==================================================
-       二十七、初始化
+       二十九、初始化
     ================================================== */
     function initialize() {
         elements.title.maxLength = MAX_TITLE_LENGTH;
@@ -707,6 +743,10 @@
         hideMessage();
         console.info(
             "[WritingCreateBook] 页面初始化完成。"
+        );
+        console.info(
+            "[WritingCreateBook] 当前页面地址：",
+            window.location.href
         );
         console.info(
             "[WritingCreateBook] WritingStorage 是否存在：",
@@ -729,7 +769,7 @@
         );
     }
     /* ==================================================
-       二十八、公开接口
+       三十、公开接口
     ================================================== */
     window.WritingCreateBook = Object.freeze({
         validateTitle: validateTitle,
