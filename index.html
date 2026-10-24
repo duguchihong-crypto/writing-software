@@ -13,12 +13,16 @@
     >
     <meta name="color-scheme" content="light">
     <title>写作软件 · 书架</title>
-    <!-- 公共样式 -->
+    <!-- ==============================
+         公共样式
+    ============================== -->
     <link rel="stylesheet" href="./css/theme.css">
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/header.css">
     <link rel="stylesheet" href="./css/footer.css">
-    <!-- 首页样式 -->
+    <!-- ==============================
+         首页样式
+    ============================== -->
     <link rel="stylesheet" href="./page-css/home.css">
     <!-- 设置弹窗样式 -->
     <link rel="stylesheet" href="./page-css/home-settings.css">
@@ -30,26 +34,45 @@
     <link rel="stylesheet" href="./page-css/home-grid.css">
     <!-- 列表模式样式 -->
     <link rel="stylesheet" href="./page-css/home-list.css">
-    <!-- 公共 JavaScript -->
+    <!-- ==============================
+         公共 JavaScript
+    ============================== -->
     <script src="./js/storage.js" defer></script>
     <script src="./js/groups-storage.js" defer></script>
     <script src="./js/navigation.js" defer></script>
     <script src="./js/components.js" defer></script>
-    <!-- 书籍管理 -->
+    <!-- ==============================
+         书籍管理
+    ============================== -->
     <script src="./page-js/home-book-delete.js" defer></script>
-    <!-- 分组管理 -->
+    <!-- ==============================
+         分组管理
+    ============================== -->
     <script src="./page-js/home-group-delete.js" defer></script>
-    <!-- 设置模块 -->
+    <!-- ==============================
+         设置模块
+    ============================== -->
     <script src="./page-js/home-settings.js" defer></script>
-    <!-- 书籍排序 -->
+    <!-- ==============================
+         书籍排序
+    ============================== -->
     <script src="./page-js/home-sort.js" defer></script>
-    <!-- 分组排序 -->
+    <!-- ==============================
+         分组排序
+    ============================== -->
     <script src="./page-js/home-group-sort.js" defer></script>
-    <!-- 网格模式 -->
+    <!-- ==============================
+         网格模式
+    ============================== -->
     <script src="./page-js/home-grid.js" defer></script>
-    <!-- 列表模式 -->
+    <!-- ==============================
+         列表模式
+    ============================== -->
     <script src="./page-js/home-list.js" defer></script>
-    <!-- 首页渲染：保留在相关依赖之后 -->
+    <!-- ==============================
+         首页渲染
+         保留在相关依赖之后
+    ============================== -->
     <script src="./page-js/home.js" defer></script>
 </head>
 <body>
@@ -109,7 +132,9 @@
             id="home-page"
             aria-label="书架"
         >
-            <!-- 空书架提示 -->
+            <!-- ==============================
+                 空书架提示
+            ============================== -->
             <section
                 class="empty-state"
                 id="empty-state"
@@ -141,19 +166,15 @@
             </section>
             <!-- ==============================
                  分组区域
-                 保留「我的分组」
+                 不显示「我的分组」标题
+                 保留原有分组容器与列表
             ============================== -->
             <section
                 class="home-groups"
                 id="home-groups"
-                aria-label="我的分组"
+                aria-label="分组"
                 hidden
             >
-                <div class="home-groups__header">
-                    <h2 class="home-groups__title">
-                        我的分组
-                    </h2>
-                </div>
                 <div
                     class="home-groups__list"
                     id="home-groups-list"
