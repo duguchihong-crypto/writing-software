@@ -1,85 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-
     <meta
         name="theme-color"
         content="#9E2428"
     >
-
     <meta
         name="description"
         content="创建新的写作分组，整理你的书籍与作品。"
     >
-
     <title>新建分组 · 写作软件</title>
-
     <!-- ==================================================
          一、公共主题样式
     ================================================== -->
-
     <link
         rel="stylesheet"
         href="../css/theme.css"
     >
-
     <link
         rel="stylesheet"
         href="../css/base.css"
     >
-
     <!-- ==================================================
          二、公共导航样式
     ================================================== -->
-
     <link
         rel="stylesheet"
         href="../css/header.css"
     >
-
     <link
         rel="stylesheet"
         href="../css/footer.css"
     >
-
     <!-- ==================================================
          三、当前页面样式
     ================================================== -->
-
     <link
         rel="stylesheet"
         href="../page-css/create-group.css"
     >
+    <!-- ==================================================
+         四、取消按钮文字颜色
+         仅修改底部取消按钮，不影响其他按钮
+    ================================================== -->
+    <style>
+        .create-group-button--cancel {
+            color: #9E2428;
+        }
+    </style>
 </head>
-
 <body>
-
 <div id="app">
-
     <!-- ==================================================
          一、顶部导航栏
     ================================================== -->
-
     <header
         class="app-header"
         id="app-header"
     >
-
         <div class="app-header__brand">
             <span class="app-header__brand-name">
                 写作软件
             </span>
         </div>
-
         <div class="app-header__actions">
-
             <button
                 class="app-header__button app-header__button--settings"
                 id="cancel-create-group-top"
@@ -89,108 +78,77 @@
                 <span aria-hidden="true">←</span>
                 <span>返回</span>
             </button>
-
         </div>
-
     </header>
-
-
     <!-- ==================================================
          二、页面主体
     ================================================== -->
-
     <main class="app-main">
-
         <section
             class="create-group-page"
             aria-labelledby="create-group-title"
         >
-
             <!-- ==========================================
                  1. 页面标题
             =========================================== -->
-
             <header class="create-group-heading">
-
                 <div
                     class="create-group-heading__ornament"
                     aria-hidden="true"
                 >✦</div>
-
                 <h1
                     class="create-group-heading__title"
                     id="create-group-title"
                 >
                     新建分组
                 </h1>
-
                 <p class="create-group-heading__subtitle">
                     分类整理，让每一部作品各有归处。
                 </p>
-
                 <div
                     class="create-group-heading__divider"
                     aria-hidden="true"
                 >
                     <span></span>
                 </div>
-
             </header>
-
-
             <!-- ==========================================
                  2. 新建分组表单
             =========================================== -->
-
             <form
                 class="create-group-form"
                 id="create-group-form"
                 novalidate
             >
-
-                <!-- ======================================
-                     分组图章
-                ======================================= -->
-
+                <!-- 分组图章 -->
                 <div
                     class="create-group-emblem"
                     aria-hidden="true"
                 >
                     <span class="create-group-emblem__character">组</span>
                 </div>
-
-
                 <!-- ======================================
                      3. 分组名称
                 ======================================= -->
-
                 <div class="create-group-field">
-
                     <div class="create-group-field__label-row">
-
                         <label
                             class="create-group-field__label"
                             for="group-name"
                         >
                             分组名称
-
                             <span
                                 class="create-group-field__required"
                                 aria-hidden="true"
                             >*</span>
                         </label>
-
                         <span
                             class="create-group-field__counter"
                             id="group-name-counter"
                             aria-live="polite"
                         >0 / 50</span>
-
                     </div>
-
-
                     <!-- 分组名称输入框 -->
-
                     <input
                         class="create-group-field__input"
                         id="group-name"
@@ -202,34 +160,24 @@
                         required
                         aria-describedby="group-name-help group-name-error"
                     >
-
-
                     <!-- 输入说明 -->
-
                     <p
                         class="create-group-field__help"
                         id="group-name-help"
                     >
                         为你的作品分类，例如：奇幻小说、历史架空、短篇集。
                     </p>
-
-
                     <!-- 输入错误提示 -->
-
                     <p
                         class="create-group-field__error"
                         id="group-name-error"
                         role="alert"
                         hidden
                     ></p>
-
                 </div>
-
-
                 <!-- ======================================
                      4. 操作反馈
                 ======================================= -->
-
                 <div
                     class="create-group-message"
                     id="create-group-message"
@@ -237,16 +185,11 @@
                     aria-live="polite"
                     hidden
                 ></div>
-
-
                 <!-- ======================================
                      5. 操作按钮
                 ======================================= -->
-
                 <div class="create-group-form__actions">
-
-                    <!-- 取消按钮 -->
-
+                    <!-- 取消按钮：赤色文字 -->
                     <button
                         class="create-group-button create-group-button--cancel"
                         id="cancel-create-group"
@@ -254,10 +197,7 @@
                     >
                         取消
                     </button>
-
-
-                    <!-- 创建分组按钮 -->
-
+                    <!-- 创建分组按钮：保持原样 -->
                     <button
                         class="create-group-button create-group-button--submit"
                         id="create-group-submit"
@@ -266,58 +206,39 @@
                         <span aria-hidden="true">＋</span>
                         <span>创建分组</span>
                     </button>
-
                 </div>
-
             </form>
-
-
             <!-- ==========================================
                  6. 页面底部说明
             =========================================== -->
-
             <aside class="create-group-note">
-
                 <span
                     class="create-group-note__icon"
                     aria-hidden="true"
                 >◈</span>
-
                 <span>
                     分组用于整理书籍，不会改变作品本身的内容。
                 </span>
-
             </aside>
-
         </section>
-
     </main>
-
-
     <!-- ==================================================
          三、底部导航栏
     ================================================== -->
-
     <footer
         class="app-footer"
         id="app-footer"
     >
-
         <nav
             class="bottom-nav"
             aria-label="主导航"
         >
-
-            <!-- ==========================================
-                 书架
-            =========================================== -->
-
+            <!-- 书架 -->
             <a
                 class="bottom-nav__item"
                 href="../index.html"
                 data-nav="home"
             >
-
                 <span
                     class="bottom-nav__icon"
                     aria-hidden="true"
@@ -333,14 +254,12 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         />
-
                         <path
                             d="M5.5 9.5V21H18.5V9.5"
                             stroke="currentColor"
                             stroke-width="1.8"
                             stroke-linejoin="round"
                         />
-
                         <path
                             d="M9 21V14H15V21"
                             stroke="currentColor"
@@ -349,22 +268,14 @@
                         />
                     </svg>
                 </span>
-
                 <span class="bottom-nav__label">书架</span>
-
             </a>
-
-
-            <!-- ==========================================
-                 工具
-            =========================================== -->
-
+            <!-- 工具 -->
             <a
                 class="bottom-nav__item"
                 href="./tools.html"
                 data-nav="tools"
             >
-
                 <span
                     class="bottom-nav__icon"
                     aria-hidden="true"
@@ -379,21 +290,18 @@
                             stroke-width="1.8"
                             stroke-linejoin="round"
                         />
-
                         <path
                             d="M14 5H20V11H14V5Z"
                             stroke="currentColor"
                             stroke-width="1.8"
                             stroke-linejoin="round"
                         />
-
                         <path
                             d="M4 15H10V21H4V15Z"
                             stroke="currentColor"
                             stroke-width="1.8"
                             stroke-linejoin="round"
                         />
-
                         <path
                             d="M14 15H20V21H14V15Z"
                             stroke="currentColor"
@@ -402,47 +310,25 @@
                         />
                     </svg>
                 </span>
-
                 <span class="bottom-nav__label">工具</span>
-
             </a>
-
         </nav>
-
     </footer>
-
 </div>
-
-
 <!-- ======================================================
      四、公共 JavaScript
 ====================================================== -->
-
 <!-- 1. 书籍存储模块 -->
-
 <script src="../js/storage.js"></script>
-
-
 <!-- 2. 分组存储模块 -->
-
 <script src="../js/groups-storage.js"></script>
-
-
 <!-- 3. 公共导航模块 -->
-
 <script src="../js/navigation.js"></script>
-
-
 <!-- 4. 公共组件模块 -->
-
 <script src="../js/components.js"></script>
-
-
 <!-- ======================================================
      五、当前页面 JavaScript
 ====================================================== -->
-
 <script src="../page-js/create-group.js"></script>
-
 </body>
 </html>
