@@ -2,38 +2,81 @@
     "use strict";
     const STORAGE_KEY = "writing-software-home-grid-enabled";
     const LIST_STORAGE_KEY = "writing-software-home-list-enabled";
-    let enabled = false;
-    let initialized = false;
-    let observer = null;
+    const SELECTOR = {
+        shelf: "#shelf-list",
+        button: '[data-settings-action="grid"]',
+        buttonTitle: ".home-settings__option-title",
+        closeButton: "[data-settings-close]:not(.home-settings__backdrop)"
+    };
+    const STATE = {
+        enabled: false,
+        initialized: false,
+        observer: null
+    };
     /**
-     * 获取书架容器
+     * 获取书架
      */
     function getShelf() {
-        return document.getElementById("shelf-list");
+        return document.querySelector(SELECTOR.shelf);
     }
     /**
-     * 读取本地设置
+     * 读取设置
      */
-    function readPreference(key) {
+    function readStorage(key) {
         try {
             return localStorage.getItem(key) === "true";
         } catch (error) {
-            console.warn("读取显示模式失败。", error);
+            console.warn("[HomeGrid] 读取设置失败：", error);
             return false;
         }
     }
     /**
-     * 保存网格模式
+     * 保存设置
      */
-    function savePreference() {
+    function saveStorage(key, value) {
         try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                enabled ? "true" : "false"
-            );
+            localStorage.setItem(key, String(value));
         } catch (error) {
-            console.warn("保存网格模式失败。", error);
+            console.warn("[HomeGrid] 保存设置失败：", error);
         }
+    }
+    /**
+     * 更新按钮状态
+     */
+    function updateButton() {
+        const button = document.querySelector(SELECTOR.button);
+        if (!button) {
+            return;
+        }
+        button.setAttribute(
+            "aria-pressed",
+            String(STATE.enabled)
+        );
+        const title = button.querySelector(
+            SELECTOR.buttonTitle
+        );
+        if (title) {
+            title.textContent = STATE.enabled
+                ? "网格模式（已开启）"
+                : "网格模式";
+        }
+    }
+    /**
+     * 应用网格布局
+     */
+    function applyMode() {
+        const shelf = getShelf();
+        document.documentElement.classList.toggle(
+            "home-grid-enabled",
+            STATE.enabled
+        );
+        if (shelf) {
+            shelf.classList.toggle(
+                "shelf-list--grid",
+                STATE.enabled
+            );
+        }
+        updateButton();
     }
     /**
      * 关闭列表模式
@@ -52,57 +95,17 @@
             document.documentElement.classList.remove(
                 "home-list-enabled"
             );
-            try {
-                localStorage.setItem(LIST_STORAGE_KEY, "false");
-            } catch (error) {
-                console.warn("关闭列表模式失败。", error);
-            }
+            saveStorage(LIST_STORAGE_KEY, false);
         }
-    }
-    /**
-     * 更新网格按钮状态
-     */
-    function updateButton() {
-        const button = document.querySelector(
-            '[data-settings-action="grid"]'
-        );
-        if (!button) {
-            return;
-        }
-        button.setAttribute("aria-pressed", String(enabled));
-        const title = button.querySelector(
-            ".home-settings__option-title"
-        );
-        if (title) {
-            title.textContent = enabled
-                ? "网格模式（已开启）"
-                : "网格模式";
-        }
-    }
-    /**
-     * 应用网格模式
-     */
-    function applyMode() {
-        const shelf = getShelf();
-        document.documentElement.classList.toggle(
-            "home-grid-enabled",
-            enabled
-        );
-        if (shelf) {
-            shelf.classList.toggle(
-                "shelf-list--grid",
-                enabled
-            );
-        }
-        updateButton();
     }
     /**
      * 开启网格模式
      */
     function enable() {
+        // 两种模式互斥。
         disableListMode();
-        enabled = true;
-        savePreference();
+        STATE.enabled = true;
+        saveStorage(STORAGE_KEY, true);
         applyMode();
         return true;
     }
@@ -110,37 +113,33 @@
      * 关闭网格模式
      */
     function disable() {
-        enabled = false;
-        savePreference();
+        STATE.enabled = false;
+        saveStorage(STORAGE_KEY, false);
         applyMode();
         return false;
     }
     /**
      * 切换网格模式
      */
-    function toggleMode() {
-        if (enabled) {
-            disable();
-        } else {
-            enable();
-        }
-        return enabled;
+    function toggle() {
+        return STATE.enabled ? disable() : enable();
     }
     /**
      * 关闭设置弹窗
      */
     function closeSettings() {
-        const closeButton = document.querySelector(
-            "[data-settings-close]:not(.home-settings__backdrop)"
+        const button = document.querySelector(
+            SELECTOR.closeButton
         );
-        if (closeButton) {
-            closeButton.click();
+        if (button) {
+            button.click();
         }
     }
     /**
-     * 绑定网格按钮
+     * 监听网格按钮。
+     * 使用事件委托，避免按钮重新生成后失去监听。
      */
-    function bindGridButton() {
+    function bindButton() {
         document.addEventListener(
             "click",
             function (event) {
@@ -148,35 +147,34 @@
                 if (!(target instanceof Element)) {
                     return;
                 }
-                const button = target.closest(
-                    '[data-settings-action="grid"]'
-                );
+                const button = target.closest(SELECTOR.button);
                 if (!button) {
                     return;
                 }
                 event.preventDefault();
                 event.stopImmediatePropagation();
-                toggleMode();
+                toggle();
                 closeSettings();
             },
             true
         );
     }
     /**
-     * 监听书架变化
+     * 监听书架变化。
+     * 只在书架内容发生变化时重新应用布局。
      */
     function observeShelf() {
         const shelf = getShelf();
         if (!shelf || !window.MutationObserver) {
             return;
         }
-        if (observer) {
-            observer.disconnect();
+        if (STATE.observer) {
+            STATE.observer.disconnect();
         }
-        observer = new MutationObserver(function () {
+        STATE.observer = new MutationObserver(function () {
             applyMode();
         });
-        observer.observe(shelf, {
+        STATE.observer.observe(shelf, {
             childList: true
         });
     }
@@ -186,8 +184,8 @@
     function bindStorageEvents() {
         window.addEventListener("storage", function (event) {
             if (event.key === STORAGE_KEY) {
-                enabled = event.newValue === "true";
-                if (enabled) {
+                STATE.enabled = event.newValue === "true";
+                if (STATE.enabled) {
                     disableListMode();
                 }
                 applyMode();
@@ -197,8 +195,8 @@
                 event.key === LIST_STORAGE_KEY &&
                 event.newValue === "true"
             ) {
-                enabled = false;
-                savePreference();
+                STATE.enabled = false;
+                saveStorage(STORAGE_KEY, false);
                 applyMode();
             }
         });
@@ -206,42 +204,47 @@
     /**
      * 初始化
      */
-    function init() {
-        if (initialized) {
+    function initialize() {
+        if (STATE.initialized) {
             return;
         }
-        initialized = true;
-        enabled = readPreference(STORAGE_KEY);
-        // 如果两个模式都被保存为开启，优先保留列表模式。
-        // 用户之后可以手动切换到网格模式。
-        if (enabled && readPreference(LIST_STORAGE_KEY)) {
-            enabled = false;
-            savePreference();
+        STATE.initialized = true;
+        STATE.enabled = readStorage(STORAGE_KEY);
+        // 如果两个模式同时开启，优先恢复列表模式。
+        if (
+            STATE.enabled &&
+            readStorage(LIST_STORAGE_KEY)
+        ) {
+            STATE.enabled = false;
+            saveStorage(STORAGE_KEY, false);
         }
-        bindGridButton();
+        bindButton();
         bindStorageEvents();
         applyMode();
         observeShelf();
     }
     /**
-     * 对外接口
+     * 对外公开接口
      */
     window.WritingHomeGrid = Object.freeze({
         enable: enable,
         disable: disable,
-        toggle: toggleMode,
+        toggle: toggle,
         isEnabled: function () {
-            return enabled;
+            return STATE.enabled;
         },
         refresh: applyMode
     });
+    /**
+     * 启动
+     */
     if (document.readyState === "loading") {
         document.addEventListener(
             "DOMContentLoaded",
-            init,
+            initialize,
             { once: true }
         );
     } else {
-        init();
+        initialize();
     }
 })();
