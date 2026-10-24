@@ -2,15 +2,12 @@
    写作软件 · 书架网格模式
    文件：page-css/home-grid.css
    功能：
-   1. 书籍网格保持三列
-   2. 分组网格保持三列
-   3. 分组透明封面框位于上方
-   4. 分组名称显示在透明框下方
-   5. 分组卡片与书籍卡片宽度一致
-   6. 保留书籍和分组操作菜单
-   7. 兼容手机、平板及超小屏幕
-   8. 仅在网格模式下控制布局
-   9. 不修改、不删除任何本地数据
+   1. 书籍与分组均采用三列网格
+   2. 分组透明框与书籍封面保持相同宽度和 3:4 比例
+   3. 分组名称显示在透明框下方
+   4. 保留书籍和分组操作菜单
+   5. 兼容手机、平板及超小屏幕
+   6. 不修改、不删除本地数据
 ========================================================= */
 /* =========================================================
    一、书籍网格容器
@@ -38,6 +35,7 @@
     position: relative !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: stretch !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -71,6 +69,7 @@
 }
 /* =========================================================
    四、书籍封面
+   固定为 3:4 比例
 ========================================================= */
 #shelf-list.shelf-list--grid .shelf-card__cover {
     position: relative !important;
@@ -207,9 +206,10 @@
 }
 /* =========================================================
    十一、分组网格容器
-   使用实际 HTML 结构：
+   HTML：
    #home-groups
        └── #home-groups-list.home-groups__list
+   使用与书籍相同的三列布局和间距
 ========================================================= */
 #home-groups .home-groups__list {
     display: grid !important;
@@ -222,13 +222,16 @@
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
+    height: auto !important;
     margin: 0 !important;
+    padding: 0 !important;
     overflow: visible !important;
     box-sizing: border-box !important;
 }
 /* =========================================================
    十二、分组卡片
-   去掉原来的横向长方形卡片样式
+   外层不显示背景、边框和阴影
+   仅透明封面框显示边框
 ========================================================= */
 #home-groups .home-groups__list > .home-group-card {
     position: relative !important;
@@ -254,11 +257,11 @@
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    transform: none !important;
     box-sizing: border-box !important;
 }
 /* =========================================================
    十三、移除分组卡片原有装饰线
-   只保留透明框的边框
 ========================================================= */
 #home-groups .home-group-card::before,
 #home-groups .home-group-card::after {
@@ -267,10 +270,11 @@
 }
 /* =========================================================
    十四、分组透明封面框
-   对应 home.js 中的：
-   .home-group-card__cover
-   透明背景，无图案，无文字。
-   比例与书籍封面一致：3:4。
+   与书籍封面使用相同的：
+   1. 宽度：100%
+   2. 比例：3:4
+   3. 网格列数：3 列
+   透明背景，只保留边框
 ========================================================= */
 #home-groups .home-group-card__cover {
     position: relative !important;
@@ -327,16 +331,15 @@
     box-sizing: border-box !important;
 }
 /* =========================================================
-   十六、兼容旧版分组方框
-   home.js 更新后不再使用 checkbox，
-   因此隐藏旧元素，避免旧结构残留。
+   十六、隐藏旧版分组方框
+   新版使用 home-group-card__cover
 ========================================================= */
 #home-groups .home-group-card__checkbox {
     display: none !important;
 }
 /* =========================================================
    十七、分组菜单按钮
-   固定在透明框右上角
+   固定在透明封面框右上角
 ========================================================= */
 #home-groups .home-group-card__menu-button {
     position: absolute !important;
@@ -349,6 +352,8 @@
     flex: 0 0 26px !important;
     width: 26px !important;
     height: 26px !important;
+    min-width: 0 !important;
+    max-width: 26px !important;
     margin: 0 !important;
     padding: 0 !important;
     font-size: 20px !important;
@@ -356,7 +361,7 @@
 }
 /* =========================================================
    十八、分组卡片交互效果
-   只改变透明框边框，不添加背景或阴影
+   不添加背景和阴影
 ========================================================= */
 @media (hover: hover) {
     #home-groups .home-group-card:hover {
@@ -419,6 +424,7 @@
         right: 3px !important;
         width: 22px !important;
         height: 22px !important;
+        max-width: 22px !important;
         font-size: 17px !important;
     }
 }
