@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#9E2428">
     <meta name="description" content="创建新书籍，填写书名并选择专属封面。">
     <title>新建书籍 - 写作软件</title>
-    <!-- 公共样式 -->
     <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/header.css">
@@ -16,42 +15,13 @@
         :root {
             --create-book-red: #9E2428;
             --create-book-red-hover: #7F1D21;
-            --create-book-red-active: #68171B;
             --create-book-red-pale: #FBF0F0;
             --create-book-red-light: #F4DEDF;
             --create-book-cyan: #159E91;
             --create-book-cyan-hover: #107F75;
             --create-book-cyan-active: #0B6B63;
-            --create-book-cyan-pale: #F0FAF9;
-            --create-book-white: #FFFFFF;
         }
-        /* 顶部返回：白底红字，直接通过链接返回新建页面 */
-        #cancel-create-book-top {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 10;
-            box-sizing: border-box;
-            background: #FFFFFF !important;
-            color: #9E2428 !important;
-            -webkit-text-fill-color: #9E2428 !important;
-            border: 1px solid #9E2428 !important;
-            box-shadow: none !important;
-            text-decoration: none !important;
-            opacity: 1 !important;
-            cursor: pointer;
-        }
-        #cancel-create-book-top:hover {
-            background: #FBF0F0 !important;
-            color: #7F1D21 !important;
-            -webkit-text-fill-color: #7F1D21 !important;
-            border-color: #7F1D21 !important;
-        }
-        #cancel-create-book-top:active {
-            background: #F4DEDF !important;
-        }
-        /* 底部取消：白底红字，直接通过链接返回新建页面 */
+        #cancel-create-book-top,
         #cancel-create-book {
             display: inline-flex;
             align-items: center;
@@ -66,31 +36,30 @@
             opacity: 1 !important;
             cursor: pointer;
         }
+        #cancel-create-book-top:hover,
         #cancel-create-book:hover {
             background: #FBF0F0 !important;
             color: #7F1D21 !important;
             -webkit-text-fill-color: #7F1D21 !important;
             border-color: #7F1D21 !important;
         }
-        #cancel-create-book:active {
-            background: #F4DEDF !important;
-        }
-        /* 创建书籍：青底白字 */
-        #create-book-submit {
+        #create-book-submit,
+        .create-book-cover__select-button {
             background: #159E91 !important;
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
             border: 1px solid #159E91 !important;
-            box-shadow: none !important;
-            opacity: 1;
             cursor: pointer;
         }
         #create-book-submit *,
-        #create-book-submit span {
+        #create-book-submit span,
+        .create-book-cover__select-button *,
+        .create-book-cover__select-button span {
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
         }
-        #create-book-submit:hover:not(:disabled) {
+        #create-book-submit:hover:not(:disabled),
+        .create-book-cover__select-button:hover {
             background: #107F75 !important;
             border-color: #107F75 !important;
         }
@@ -99,46 +68,32 @@
             border-color: #0B6B63 !important;
         }
         #create-book-submit:disabled {
-            background: #159E91 !important;
-            color: #FFFFFF !important;
-            -webkit-text-fill-color: #FFFFFF !important;
-            border-color: #159E91 !important;
             opacity: 0.65 !important;
             cursor: not-allowed;
         }
-        /* 选择封面：青底白字 */
-        .create-book-cover__select-button {
-            background: #159E91 !important;
-            color: #FFFFFF !important;
-            -webkit-text-fill-color: #FFFFFF !important;
-            border: 1px solid #159E91 !important;
-            cursor: pointer;
-        }
-        .create-book-cover__select-button *,
-        .create-book-cover__select-button span {
-            color: #FFFFFF !important;
-            -webkit-text-fill-color: #FFFFFF !important;
-        }
-        .create-book-cover__select-button:hover {
-            background: #107F75 !important;
-            border-color: #107F75 !important;
-        }
-        /* 必填标记 */
         .create-book-field__required {
             color: #9E2428 !important;
         }
-        /* 输入框聚焦 */
         .create-book-field__input:focus {
             border-color: #9E2428 !important;
             outline-color: #9E2428 !important;
             box-shadow: 0 0 0 3px rgba(158, 36, 40, 0.12) !important;
         }
-        /* 键盘聚焦 */
         #cancel-create-book-top:focus-visible,
         #cancel-create-book:focus-visible,
         #create-book-submit:focus-visible {
             outline: 2px solid #159E91 !important;
             outline-offset: 3px;
+        }
+        .create-book-message {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .create-book-message.is-error {
+            color: #9E2428;
+        }
+        .create-book-message.is-success {
+            color: #107F75;
         }
         @media (prefers-reduced-motion: reduce) {
             #cancel-create-book-top,
@@ -152,7 +107,6 @@
 </head>
 <body>
 <div id="app">
-    <!-- 顶部导航 -->
     <header class="app-header" id="app-header">
         <div class="app-header__brand">
             <span class="app-header__brand-name">写作软件</span>
@@ -166,10 +120,8 @@
             >← 返回</a>
         </div>
     </header>
-    <!-- 页面主体 -->
     <main class="app-main create-book-main">
         <section class="create-book-page" aria-labelledby="create-book-title">
-            <!-- 页面标题 -->
             <div class="create-book-heading">
                 <p class="create-book-heading__eyebrow">NEW BOOK</p>
                 <h1 class="create-book-heading__title" id="create-book-title">
@@ -184,9 +136,7 @@
                     为你的故事取一个名字，选择一张专属封面。
                 </p>
             </div>
-            <!-- 新建书籍表单 -->
             <form class="create-book-form" id="create-book-form" novalidate>
-                <!-- 书籍封面 -->
                 <section
                     class="create-book-section create-book-cover-section"
                     aria-labelledby="cover-section-title"
@@ -198,7 +148,6 @@
                         <span class="create-book-section__optional">选填</span>
                     </div>
                     <div class="create-book-cover">
-                        <!-- 封面预览 -->
                         <div class="create-book-cover__preview" id="cover-preview">
                             <div
                                 class="create-book-cover__placeholder"
@@ -223,19 +172,7 @@
                                         stroke-linejoin="round"
                                     />
                                     <path
-                                        d="M23 29H42"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                    />
-                                    <path
-                                        d="M23 36H42"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                    />
-                                    <path
-                                        d="M23 43H36"
+                                        d="M23 29H42M23 36H42M23 43H36"
                                         stroke="currentColor"
                                         stroke-width="1.8"
                                         stroke-linecap="round"
@@ -255,7 +192,6 @@
                                 hidden
                             >
                         </div>
-                        <!-- 封面操作 -->
                         <div class="create-book-cover__actions">
                             <label
                                 class="create-book-cover__select-button"
@@ -269,9 +205,7 @@
                                 id="remove-cover-button"
                                 type="button"
                                 hidden
-                            >
-                                移除封面
-                            </button>
+                            >移除封面</button>
                         </div>
                         <p class="create-book-cover__help" id="cover-help">
                             支持常见图片格式，建议使用清晰的竖版封面。
@@ -292,7 +226,6 @@
                         ></p>
                     </div>
                 </section>
-                <!-- 基本信息 -->
                 <section
                     class="create-book-section create-book-info-section"
                     aria-labelledby="info-section-title"
@@ -302,7 +235,6 @@
                             基本信息
                         </h2>
                     </div>
-                    <!-- 书名 -->
                     <div class="create-book-field">
                         <label class="create-book-field__label" for="book-title">
                             书名
@@ -335,7 +267,6 @@
                         ></p>
                     </div>
                 </section>
-                <!-- 操作结果提示 -->
                 <div
                     class="create-book-message"
                     id="create-book-message"
@@ -343,9 +274,7 @@
                     aria-live="polite"
                     hidden
                 ></div>
-                <!-- 操作按钮 -->
                 <div class="create-book-actions">
-                    <!-- 直接链接到新建页面，不调用 JavaScript -->
                     <a
                         class="create-book-actions__button create-book-actions__button--cancel"
                         id="cancel-create-book"
@@ -367,10 +296,8 @@
             </form>
         </section>
     </main>
-    <!-- 底部导航 -->
     <footer class="app-footer" id="app-footer">
         <nav class="bottom-nav" aria-label="主导航">
-            <!-- 书架：仍然返回首页 -->
             <a class="bottom-nav__item" href="../index.html" data-nav="home">
                 <span class="bottom-nav__icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
@@ -397,7 +324,6 @@
                 </span>
                 <span class="bottom-nav__label">书架</span>
             </a>
-            <!-- 工具 -->
             <a class="bottom-nav__item" href="./tools.html" data-nav="tools">
                 <span class="bottom-nav__icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
@@ -432,10 +358,50 @@
         </nav>
     </footer>
 </div>
-<!-- 公共数据与导航接口：保留原有脚本 -->
+<!--
+    使用相对路径加载公共模块。
+    defer 会保证这些外部脚本按 HTML 中的顺序执行。
+-->
 <script src="../js/storage.js" defer></script>
 <script src="../js/navigation.js" defer></script>
 <script src="../js/components.js" defer></script>
 <script src="../page-js/create-book.js" defer></script>
+<!--
+    独立诊断：
+    如果存储模块没有成功加载，在页面上显示具体提示。
+-->
+<script>
+(function () {
+    "use strict";
+    window.addEventListener("DOMContentLoaded", function () {
+        var message = document.getElementById("create-book-message");
+        var submitButton = document.getElementById("create-book-submit");
+        if (!message || !submitButton) {
+            console.error("[创建书籍] 页面缺少必要元素。");
+            return;
+        }
+        if (
+            !window.WritingStorage ||
+            typeof window.WritingStorage.createBook !== "function"
+        ) {
+            message.hidden = false;
+            message.classList.add("is-error");
+            message.textContent =
+                "存储模块没有成功加载。\n" +
+                "请检查 ../js/storage.js 文件路径、文件内容和浏览器控制台中的错误。";
+            submitButton.disabled = true;
+            console.error(
+                "[创建书籍] WritingStorage 不存在或 createBook 方法不可用。",
+                window.WritingStorage
+            );
+            return;
+        }
+        console.info(
+            "[创建书籍] 存储模块加载成功。",
+            Object.keys(window.WritingStorage)
+        );
+    });
+})();
+</script>
 </body>
 </html>
