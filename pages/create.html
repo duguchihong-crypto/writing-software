@@ -1,435 +1,302 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#9E2428"
-    >
-
-    <title>新建 - 写作软件</title>
-
-    <!-- 公共样式 -->
-    <link rel="stylesheet" href="../css/theme.css">
-    <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/footer.css">
-
-    <!-- 新建页面样式 -->
-    <link rel="stylesheet" href="../page-css/create.css">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+<meta
+    name="theme-color"
+    content="#9E2428"
+>
+<title>新建 - 写作软件</title>
+<!-- 公共样式 -->
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/header.css">
+<link rel="stylesheet" href="../css/footer.css">
+<!-- 新建页面样式 -->
+<link rel="stylesheet" href="../page-css/create.css">
 </head>
-
 <body>
-
 <div id="app">
-
-    <!-- =========================
-         顶部栏
-    ========================== -->
-
-    <header class="app-header" id="app-header">
-
-        <div class="app-header__brand">
-            <span class="app-header__brand-name">
-                写作软件
-            </span>
-        </div>
-
-        <div class="app-header__actions">
-
-            <!-- 返回书架：直接跳转首页 -->
-            <a
-                class="app-header__button app-header__button--settings"
-                id="cancel-create-top"
-                href="../index.html"
-                aria-label="返回书架"
-            >
-                返回书架
-            </a>
-
-        </div>
-
-    </header>
-
-
-    <!-- =========================
-         页面主体
-    ========================== -->
-
-    <main class="app-main create-main">
-
-        <section
-            class="create-page"
-            aria-labelledby="create-page-title"
+<!-- 顶部栏 -->
+<header class="app-header" id="app-header">
+    <div class="app-header__brand">
+        <span class="app-header__brand-name">
+            写作软件
+        </span>
+    </div>
+    <div class="app-header__actions">
+        <!-- 返回书架首页 -->
+        <a
+            class="app-header__button app-header__button--settings"
+            id="cancel-create-top"
+            href="../index.html"
+            aria-label="返回书架"
         >
-
-            <!-- 页面标题 -->
-            <div class="create-page__heading">
-
-                <p class="create-page__eyebrow">
-                    BEGIN A NEW STORY
-                </p>
-
-                <h1
-                    class="create-page__title"
-                    id="create-page-title"
-                >
-                    新建
-                </h1>
-
+            返回书架
+        </a>
+    </div>
+</header>
+<!-- 页面主体 -->
+<main class="app-main create-main">
+    <section
+        class="create-page"
+        aria-labelledby="create-page-title"
+    >
+        <!-- 页面标题 -->
+        <div class="create-page__heading">
+            <p class="create-page__eyebrow">
+                BEGIN A NEW STORY
+            </p>
+            <h1
+                class="create-page__title"
+                id="create-page-title"
+            >
+                新建
+            </h1>
+            <div
+                class="create-page__divider"
+                aria-hidden="true"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p class="create-page__subtitle">
+                选择你想创建的内容
+            </p>
+        </div>
+        <!-- 新建功能 -->
+        <div class="create-options">
+            <!-- 新建书籍 -->
+            <a
+                class="create-option create-option--book"
+                href="./create-book.html"
+                aria-label="新建书籍"
+            >
                 <div
-                    class="create-page__divider"
+                    class="create-option__icon"
                     aria-hidden="true"
                 >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-
-                <p class="create-page__subtitle">
-                    选择你想创建的内容
-                </p>
-
-            </div>
-
-
-            <!-- =========================
-                 新建功能
-            ========================== -->
-
-            <div class="create-options">
-
-                <!-- 新建书籍 -->
-                <a
-                    class="create-option create-option--book"
-                    href="./create-book.html"
-                    aria-label="新建书籍"
-                >
-
-                    <div
-                        class="create-option__icon"
-                        aria-hidden="true"
-                    >
-
-                        <svg
-                            viewBox="0 0 48 48"
-                            fill="none"
-                        >
-                            <path
-                                d="M8 10.5C8 8.8 9.3 7.5 11 7.5H22V39H11C9.3 39 8 37.7 8 36V10.5Z"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                            />
-
-                            <path
-                                d="M40 10.5C40 8.8 38.7 7.5 37 7.5H26V39H37C38.7 39 40 37.7 40 36V10.5Z"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                            />
-
-                            <path
-                                d="M22 11H16"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                            />
-
-                            <path
-                                d="M32 11H26"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                            />
-
-                            <path
-                                d="M22 17H16"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                            />
-
-                            <path
-                                d="M32 17H26"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                            />
-                        </svg>
-
-                    </div>
-
-
-                    <div class="create-option__content">
-
-                        <h2 class="create-option__title">
-                            新建书籍
-                        </h2>
-
-                        <p class="create-option__description">
-                            创建一部新作品，为它取名并选择专属封面。
-                        </p>
-
-                        <span class="create-option__detail">
-                            书名 · 封面
-                        </span>
-
-                    </div>
-
-
-                    <span
-                        class="create-option__arrow"
-                        aria-hidden="true"
-                    >
-                        →
-                    </span>
-
-                </a>
-
-
-                <!-- 新建分组 -->
-                <a
-                    class="create-option create-option--group"
-                    href="./create-group.html"
-                    aria-label="新建分组"
-                >
-
-                    <div
-                        class="create-option__icon"
-                        aria-hidden="true"
-                    >
-
-                        <svg
-                            viewBox="0 0 48 48"
-                            fill="none"
-                        >
-                            <path
-                                d="M5.5 13C5.5 11.3 6.8 10 8.5 10H19L23 14H39.5C41.2 14 42.5 15.3 42.5 17V35C42.5 36.7 41.2 38 39.5 38H8.5C6.8 38 5.5 36.7 5.5 35V13Z"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                            />
-
-                            <path
-                                d="M5.5 19H42.5"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                            />
-
-                            <path
-                                d="M24 24V33"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                            />
-
-                            <path
-                                d="M19.5 28.5H28.5"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                            />
-                        </svg>
-
-                    </div>
-
-
-                    <div class="create-option__content">
-
-                        <h2 class="create-option__title">
-                            新建分组
-                        </h2>
-
-                        <p class="create-option__description">
-                            创建一个分类，将不同的作品整理归类。
-                        </p>
-
-                        <span class="create-option__detail">
-                            分组名称
-                        </span>
-
-                    </div>
-
-
-                    <span
-                        class="create-option__arrow"
-                        aria-hidden="true"
-                    >
-                        →
-                    </span>
-
-                </a>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- =========================
-         底部导航
-    ========================== -->
-
-    <footer class="app-footer" id="app-footer">
-
-        <nav
-            class="bottom-nav"
-            aria-label="主导航"
-        >
-
-            <!-- 书架：首页 -->
-            <a
-                class="bottom-nav__item"
-                href="../index.html"
-                data-nav="home"
-                aria-label="返回书架首页"
-            >
-
-                <span
-                    class="bottom-nav__icon"
-                    aria-hidden="true"
-                >
-
                     <svg
-                        viewBox="0 0 24 24"
+                        viewBox="0 0 48 48"
                         fill="none"
                     >
                         <path
-                            d="M3 10.5L12 3L21 10.5"
+                            d="M8 10.5C8 8.8 9.3 7.5 11 7.5H22V39H11C9.3 39 8 37.7 8 36V10.5Z"
                             stroke="currentColor"
-                            stroke-width="1.8"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M40 10.5C40 8.8 38.7 7.5 37 7.5H26V39H37C38.7 39 40 37.7 40 36V10.5Z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M22 11H16"
+                            stroke="currentColor"
+                            stroke-width="2"
                             stroke-linecap="round"
-                            stroke-linejoin="round"
                         />
-
                         <path
-                            d="M5.5 9.5V21H18.5V9.5"
+                            d="M32 11H26"
                             stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
+                            stroke-width="2"
+                            stroke-linecap="round"
                         />
-
                         <path
-                            d="M9 21V14H15V21"
+                            d="M22 17H16"
                             stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <path
+                            d="M32 17H26"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
                         />
                     </svg>
-
-                </span>
-
-                <span class="bottom-nav__label">
-                    书架
-                </span>
-
-            </a>
-
-
-            <!-- 工具 -->
-            <a
-                class="bottom-nav__item"
-                href="./tools.html"
-                data-nav="tools"
-                aria-label="打开工具"
-            >
-
+                </div>
+                <div class="create-option__content">
+                    <h2 class="create-option__title">
+                        新建书籍
+                    </h2>
+                    <p class="create-option__description">
+                        创建一部新作品，为它取名并选择专属封面。
+                    </p>
+                    <span class="create-option__detail">
+                        书名 · 封面
+                    </span>
+                </div>
                 <span
-                    class="bottom-nav__icon"
+                    class="create-option__arrow"
                     aria-hidden="true"
                 >
-
+                    →
+                </span>
+            </a>
+            <!-- 新建分组 -->
+            <a
+                class="create-option create-option--group"
+                href="./create-group.html"
+                aria-label="新建分组"
+            >
+                <div
+                    class="create-option__icon"
+                    aria-hidden="true"
+                >
                     <svg
-                        viewBox="0 0 24 24"
+                        viewBox="0 0 48 48"
                         fill="none"
                     >
                         <path
-                            d="M4 5H10V11H4V5Z"
+                            d="M5.5 13C5.5 11.3 6.8 10 8.5 10H19L23 14H39.5C41.2 14 42.5 15.3 42.5 17V35C42.5 36.7 41.2 38 39.5 38H8.5C6.8 38 5.5 36.7 5.5 35V13Z"
                             stroke="currentColor"
-                            stroke-width="1.8"
+                            stroke-width="2"
                             stroke-linejoin="round"
                         />
-
                         <path
-                            d="M14 5H20V11H14V5Z"
+                            d="M5.5 19H42.5"
                             stroke="currentColor"
-                            stroke-width="1.8"
+                            stroke-width="2"
                             stroke-linejoin="round"
                         />
-
                         <path
-                            d="M4 15H10V21H4V15Z"
+                            d="M24 24V33"
                             stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
+                            stroke-width="2"
+                            stroke-linecap="round"
                         />
-
                         <path
-                            d="M14 15H20V21H14V15Z"
+                            d="M19.5 28.5H28.5"
                             stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"
+                            stroke-width="2"
+                            stroke-linecap="round"
                         />
                     </svg>
-
+                </div>
+                <div class="create-option__content">
+                    <h2 class="create-option__title">
+                        新建分组
+                    </h2>
+                    <p class="create-option__description">
+                        创建一个分类，将不同的作品整理归类。
+                    </p>
+                    <span class="create-option__detail">
+                        分组名称
+                    </span>
+                </div>
+                <span
+                    class="create-option__arrow"
+                    aria-hidden="true"
+                >
+                    →
                 </span>
-
-                <span class="bottom-nav__label">
-                    工具
-                </span>
-
             </a>
-
-        </nav>
-
-    </footer>
-
+        </div>
+    </section>
+</main>
+<!-- 底部导航 -->
+<footer class="app-footer" id="app-footer">
+    <nav
+        class="bottom-nav"
+        aria-label="主导航"
+    >
+        <!-- 书架首页 -->
+        <a
+            class="bottom-nav__item"
+            href="../index.html"
+            data-nav="home"
+            aria-label="返回书架首页"
+        >
+            <span
+                class="bottom-nav__icon"
+                aria-hidden="true"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                >
+                    <path
+                        d="M3 10.5L12 3L21 10.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M5.5 9.5V21H18.5V9.5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M9 21V14H15V21"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </span>
+            <span class="bottom-nav__label">
+                书架
+            </span>
+        </a>
+        <!-- 工具 -->
+        <a
+            class="bottom-nav__item"
+            href="./tools.html"
+            data-nav="tools"
+            aria-label="打开工具"
+        >
+            <span
+                class="bottom-nav__icon"
+                aria-hidden="true"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                >
+                    <path
+                        d="M4 5H10V11H4V5Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M14 5H20V11H14V5Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M4 15H10V21H4V15Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M14 15H20V21H14V15Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </span>
+            <span class="bottom-nav__label">
+                工具
+            </span>
+        </a>
+    </nav>
+</footer>
 </div>
-
-
-<!-- =========================
-     公共导航脚本
-========================== -->
-
+<!-- 公共导航脚本 -->
 <script src="../js/navigation.js" defer></script>
-
-
-<!-- =========================
-     返回书架保护逻辑
-     通过当前页面地址计算首页地址
-========================== -->
-
-<script>
-(function () {
-    "use strict";
-
-    const homeUrl = new URL("../index.html", window.location.href);
-
-    const backLink = document.getElementById("cancel-create-top");
-
-    if (backLink) {
-        backLink.href = homeUrl.href;
-    }
-
-    const homeLink = document.querySelector(
-        '.bottom-nav__item[data-nav="home"]'
-    );
-
-    if (homeLink) {
-        homeLink.href = homeUrl.href;
-    }
-})();
-</script>
-
 </body>
 </html>
