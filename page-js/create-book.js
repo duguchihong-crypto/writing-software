@@ -1,50 +1,79 @@
 /* ======================================================
+写作软件 · 新建书籍
+文件：page-js/create-book.js
 
-* 写作软件 · 新建书籍
-* 文件：page-js/create-book.js
-* 功能：
-* 1.	输入书名并验证
-* 2.	选择、预览、更换、移除封面
-* 3.	自动压缩封面图片
-* 4.	检查存储模块是否正常
-* 5.	创建书籍并处理错误
-* 6.	防止重复提交
-* 7.	取消时确认放弃
-* 8.	顶部返回、底部取消返回新建页面
-* 9.	创建成功后返回书架
-* 注意：
-* 书籍数据由 WritingStorage 统一管理。
-* 本文件不直接操作 localStorage。
-* ====================================================== */
+功能：
+
+1. 输入书名并验证
+2. 选择、预览、更换、移除封面
+3. 自动压缩封面图片
+4. 检查存储模块是否正常
+5. 创建书籍并处理错误
+6. 防止重复提交
+7. 取消时确认放弃
+8. 顶部返回、底部取消返回新建页面
+9. 创建成功后返回书架
+10. 兼容同步和异步存储接口
+11. 兼容 GitHub Pages 项目路径
+
+注意：
+书籍数据由 WritingStorage 统一管理。
+本文件不直接操作 localStorage。
+====================================================== */
 
 (function () {
 “use strict”;
 
 /* ==================================================
-   一、配置
+   一、基础配置
 ================================================== */
 var MAX_TITLE_LENGTH = 100;
 var MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 var MAX_IMAGE_DIMENSION = 1200;
 var IMAGE_QUALITY = 0.82;
+var REDIRECT_DELAY = 600;
 /* ==================================================
-   二、页面元素
+   二、获取页面元素
 ================================================== */
 var elements = {
     form: document.getElementById("create-book-form"),
     title: document.getElementById("book-title"),
-    titleCounter: document.getElementById("book-title-counter"),
-    titleError: document.getElementById("book-title-error"),
-    coverInput: document.getElementById("book-cover-input"),
-    coverPlaceholder: document.getElementById("cover-placeholder"),
-    coverPreviewImage: document.getElementById("cover-preview-image"),
-    coverSelectLabel: document.getElementById("cover-select-label"),
-    removeCoverButton: document.getElementById("remove-cover-button"),
-    coverError: document.getElementById("cover-error"),
-    message: document.getElementById("create-book-message"),
-    submitButton: document.getElementById("create-book-submit"),
-    cancelButton: document.getElementById("cancel-create-book"),
-    cancelTopButton: document.getElementById("cancel-create-book-top")
+    titleCounter: document.getElementById(
+        "book-title-counter"
+    ),
+    titleError: document.getElementById(
+        "book-title-error"
+    ),
+    coverInput: document.getElementById(
+        "book-cover-input"
+    ),
+    coverPlaceholder: document.getElementById(
+        "cover-placeholder"
+    ),
+    coverPreviewImage: document.getElementById(
+        "cover-preview-image"
+    ),
+    coverSelectLabel: document.getElementById(
+        "cover-select-label"
+    ),
+    removeCoverButton: document.getElementById(
+        "remove-cover-button"
+    ),
+    coverError: document.getElementById(
+        "cover-error"
+    ),
+    message: document.getElementById(
+        "create-book-message"
+    ),
+    submitButton: document.getElementById(
+        "create-book-submit"
+    ),
+    cancelButton: document.getElementById(
+        "cancel-create-book"
+    ),
+    cancelTopButton: document.getElementById(
+        "cancel-create-book-top"
+    )
 };
 /* ==================================================
    三、运行状态
@@ -52,12 +81,15 @@ var elements = {
 var selectedCoverData = "";
 var isSubmitting = false;
 var isProcessingImage = false;
+var isSaved = false;
 var imageSelectionToken = 0;
-var submitButtonOriginalHTML = elements.submitButton
-    ? elements.submitButton.innerHTML
-    : "创建书籍";
+var redirectTimer = null;
+var submitButtonOriginalHTML =
+    elements.submitButton
+        ? elements.submitButton.innerHTML
+        : "创建书籍";
 /* ==================================================
-   四、检查页面
+   四、检查页面元素
 ================================================== */
 function validatePageElements() {
     return Boolean(
@@ -69,7 +101,7 @@ function validatePageElements() {
 }
 if (!validatePageElements()) {
     console.error(
-        "[WritingCreateBook] 初始化失败：页面缺少必要元素。",
+        "[WritingCreateBook] 初始化失败：缺少必要的 HTML 元素。",
         {
             form: Boolean(elements.form),
             title: Boolean(elements.title),
@@ -82,25 +114,40 @@ if (!validatePageElements()) {
 /* ==================================================
    五、提示信息
 ================================================== */
-function showMessage(message, type) {
+function showMessage(text, type) {
     if (!elements.message) {
-        console.error("[WritingCreateBook]", message);
+        console.error(
+            "[WritingCreateBook]",
+            text
+        );
         return;
     }
-    elements.message.textContent = message;
+    elements.message.textContent = String(
+        text || ""
+    );
     elements.message.classList.remove(
         "is-success",
         "is-error",
         "is-info"
     );
     if (type === "success") {
-        elements.message.classList.add("is-success");
+        elements.message.classList.add(
+            "is-success"
+        );
     } else if (type === "error") {
-        elements.message.classList.add("is-error");
+        elements.message.classList.add(
+            "is-error"
+        );
     } else {
-        elements.message.classList.add("is-info");
+        elements.message.classList.add(
+            "is-info"
+        );
     }
     elements.message.hidden = false;
+    elements.message.setAttribute(
+        "role",
+        type === "error" ? "alert" : "status"
+    );
 }
 function hideMessage() {
     if (!elements.message) {
@@ -113,6 +160,7 @@ function hideMessage() {
         "is-error",
         "is-info"
     );
+    elements.message.removeAttribute("role");
 }
 /* ==================================================
    六、书名验证
@@ -120,15 +168,21 @@ function hideMessage() {
 function getTitleValue() {
     return elements.title.value.trim();
 }
-function setTitleError(message) {
+function setTitleError(text) {
     if (elements.titleError) {
-        elements.titleError.textContent = message;
-        elements.titleError.hidden = !message;
+        elements.titleError.textContent = text;
+        elements.titleError.hidden = !text;
     }
-    elements.title.setAttribute(
-        "aria-invalid",
-        message ? "true" : "false"
-    );
+    if (text) {
+        elements.title.setAttribute(
+            "aria-invalid",
+            "true"
+        );
+    } else {
+        elements.title.removeAttribute(
+            "aria-invalid"
+        );
+    }
 }
 function validateTitle() {
     var title = getTitleValue();
@@ -159,15 +213,21 @@ function updateTitleCounter() {
 /* ==================================================
    七、封面错误提示
 ================================================== */
-function setCoverError(message) {
+function setCoverError(text) {
     if (elements.coverError) {
-        elements.coverError.textContent = message;
-        elements.coverError.hidden = !message;
+        elements.coverError.textContent = text;
+        elements.coverError.hidden = !text;
     }
-    elements.coverInput.setAttribute(
-        "aria-invalid",
-        message ? "true" : "false"
-    );
+    if (text) {
+        elements.coverInput.setAttribute(
+            "aria-invalid",
+            "true"
+        );
+    } else {
+        elements.coverInput.removeAttribute(
+            "aria-invalid"
+        );
+    }
 }
 function clearCoverError() {
     setCoverError("");
@@ -179,10 +239,13 @@ function updateCoverPreview() {
     var hasCover = Boolean(selectedCoverData);
     if (elements.coverPreviewImage) {
         if (hasCover) {
-            elements.coverPreviewImage.src = selectedCoverData;
+            elements.coverPreviewImage.src =
+                selectedCoverData;
             elements.coverPreviewImage.hidden = false;
         } else {
-            elements.coverPreviewImage.removeAttribute("src");
+            elements.coverPreviewImage.removeAttribute(
+                "src"
+            );
             elements.coverPreviewImage.hidden = true;
         }
     }
@@ -207,12 +270,24 @@ function updateSubmitButton() {
     elements.submitButton.disabled =
         isSubmitting || isProcessingImage;
     if (isSubmitting) {
-        elements.submitButton.textContent = "正在创建……";
+        elements.submitButton.textContent =
+            "正在创建……";
     } else if (isProcessingImage) {
-        elements.submitButton.textContent = "正在处理封面……";
+        elements.submitButton.textContent =
+            "正在处理封面……";
     } else {
         elements.submitButton.innerHTML =
             submitButtonOriginalHTML || "创建书籍";
+    }
+    if (isSubmitting || isProcessingImage) {
+        elements.submitButton.setAttribute(
+            "aria-busy",
+            "true"
+        );
+    } else {
+        elements.submitButton.removeAttribute(
+            "aria-busy"
+        );
     }
 }
 /* ==================================================
@@ -220,8 +295,7 @@ function updateSubmitButton() {
 ================================================== */
 function clearCoverPreview() {
     /*
-     * 使正在执行的旧图片处理任务失效，
-     * 防止旧任务结束后覆盖新的封面状态。
+     * 让旧图片处理任务失效。
      */
     imageSelectionToken++;
     selectedCoverData = "";
@@ -238,20 +312,12 @@ function loadImageFromFile(file) {
     return new Promise(function (resolve, reject) {
         var objectUrl = URL.createObjectURL(file);
         var image = new Image();
-        var completed = false;
-        function cleanup() {
-            if (completed) {
-                return;
-            }
-            completed = true;
-            URL.revokeObjectURL(objectUrl);
-        }
         image.onload = function () {
-            cleanup();
+            URL.revokeObjectURL(objectUrl);
             resolve(image);
         };
         image.onerror = function () {
-            cleanup();
+            URL.revokeObjectURL(objectUrl);
             reject(
                 new Error(
                     "无法读取这张图片，请更换图片后重试。"
@@ -269,7 +335,9 @@ async function compressImage(file) {
     var originalWidth = image.naturalWidth;
     var originalHeight = image.naturalHeight;
     if (!originalWidth || !originalHeight) {
-        throw new Error("图片尺寸无效，请重新选择。");
+        throw new Error(
+            "图片尺寸无效，请重新选择。"
+        );
     }
     var scale = Math.min(
         1,
@@ -289,10 +357,17 @@ async function compressImage(file) {
     canvas.height = height;
     var context = canvas.getContext("2d");
     if (!context) {
-        throw new Error("图片处理失败，请重新尝试。");
+        throw new Error(
+            "图片处理失败，请重新尝试。"
+        );
     }
     context.fillStyle = "#FFFFFF";
-    context.fillRect(0, 0, width, height);
+    context.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
     context.drawImage(
         image,
         0,
@@ -312,9 +387,13 @@ async function compressImage(file) {
     }
     if (
         typeof dataUrl !== "string" ||
-        dataUrl.indexOf("data:image/jpeg;base64,") !== 0
+        dataUrl.indexOf(
+            "data:image/jpeg;base64,"
+        ) !== 0
     ) {
-        throw new Error("图片压缩失败，请重新选择。");
+        throw new Error(
+            "图片压缩失败，请重新选择。"
+        );
     }
     return dataUrl;
 }
@@ -336,7 +415,9 @@ async function handleCoverSelection() {
         file.type.indexOf("image/") !== 0
     ) {
         elements.coverInput.value = "";
-        setCoverError("请选择有效的图片文件。");
+        setCoverError(
+            "请选择有效的图片文件。"
+        );
         return;
     }
     if (file.size > MAX_IMAGE_SIZE) {
@@ -348,7 +429,10 @@ async function handleCoverSelection() {
     }
     isProcessingImage = true;
     updateSubmitButton();
-    showMessage("正在处理封面，请稍候……", "info");
+    showMessage(
+        "正在处理封面，请稍候……",
+        "info"
+    );
     try {
         var compressedData = await compressImage(file);
         if (currentToken !== imageSelectionToken) {
@@ -380,26 +464,26 @@ async function handleCoverSelection() {
     }
 }
 /* ==================================================
-   十四、获取存储模块
+   十四、获取书籍存储模块
 ================================================== */
 function getStorage() {
     var storage = window.WritingStorage;
     if (!storage) {
         throw new Error(
-            "书籍存储模块未加载。请检查 pages/create-book.html " +
-            "是否正确引入 ../js/storage.js。"
+            "书籍存储模块未加载。请检查 pages/create-book.html 是否引入 ../js/storage.js。"
         );
     }
-    if (typeof storage.createBook !== "function") {
+    if (
+        typeof storage.createBook !== "function"
+    ) {
         throw new Error(
-            "书籍存储模块缺少 createBook() 方法。" +
-            "需要检查 js/storage.js 中的接口名称。"
+            "书籍存储模块缺少 createBook() 方法。请检查 js/storage.js 的实际接口。"
         );
     }
     return storage;
 }
 /* ==================================================
-   十五、处理创建结果
+   十五、错误信息转换
 ================================================== */
 function getCreateErrorMessage(error) {
     if (!error) {
@@ -420,11 +504,108 @@ function getCreateErrorMessage(error) {
     return error.message || "创建失败，请重试。";
 }
 /* ==================================================
-   十六、创建书籍
+   十六、检查创建结果
+================================================== */
+function validateCreatedBook(book) {
+    if (!book || typeof book !== "object") {
+        throw new Error(
+            "存储模块没有返回有效的书籍数据。请检查 createBook()。"
+        );
+    }
+    if (
+        book.id === undefined ||
+        book.id === null ||
+        String(book.id).trim() === ""
+    ) {
+        throw new Error(
+            "书籍创建结果缺少 ID，无法确认保存成功。请检查 storage.js 的返回值。"
+        );
+    }
+    return book;
+}
+/* ==================================================
+   十七、计算首页地址
+================================================== */
+function getHomeUrl() {
+    var currentUrl = new URL(
+        window.location.href
+    );
+    var currentPath = currentUrl.pathname;
+    var pageSuffix =
+        "/pages/create-book.html";
+    if (currentPath.endsWith(pageSuffix)) {
+        currentUrl.pathname =
+            currentPath.slice(
+                0,
+                -pageSuffix.length
+            ) + "/index.html";
+    } else {
+        var pagesSuffix = "/pages/";
+        var pagesIndex =
+            currentPath.lastIndexOf(
+                pagesSuffix
+            );
+        if (pagesIndex !== -1) {
+            currentUrl.pathname =
+                currentPath.slice(
+                    0,
+                    pagesIndex
+                ) + "/index.html";
+        } else {
+            currentUrl.pathname =
+                currentPath.slice(
+                    0,
+                    currentPath.lastIndexOf("/") + 1
+                ) + "index.html";
+        }
+    }
+    currentUrl.search = "";
+    currentUrl.hash = "";
+    return currentUrl.href;
+}
+/* ==================================================
+   十八、返回书架
+================================================== */
+function navigateToHome() {
+    if (redirectTimer !== null) {
+        window.clearTimeout(redirectTimer);
+        redirectTimer = null;
+    }
+    if (
+        window.WritingNavigation &&
+        typeof window.WritingNavigation.goHome === "function"
+    ) {
+        try {
+            window.WritingNavigation.goHome();
+            return;
+        } catch (error) {
+            console.error(
+                "[WritingCreateBook] 导航模块跳转失败：",
+                error
+            );
+        }
+    }
+    try {
+        window.location.replace(
+            getHomeUrl()
+        );
+    } catch (error) {
+        console.error(
+            "[WritingCreateBook] 无法返回书架：",
+            error
+        );
+        showMessage(
+            "书籍已经创建，但无法自动返回书架。请手动返回首页。",
+            "success"
+        );
+    }
+}
+/* ==================================================
+   十九、创建书籍
 ================================================== */
 async function handleSubmit(event) {
     event.preventDefault();
-    if (isSubmitting || isProcessingImage) {
+    if (isSubmitting || isProcessingImage || isSaved) {
         return;
     }
     hideMessage();
@@ -441,7 +622,7 @@ async function handleSubmit(event) {
             error
         );
         showMessage(
-            error.message || "无法连接书籍存储模块。",
+            getCreateErrorMessage(error),
             "error"
         );
         return;
@@ -449,39 +630,39 @@ async function handleSubmit(event) {
     isSubmitting = true;
     updateSubmitButton();
     try {
+        var title = getTitleValue();
         /*
-         * 兼容同步和异步存储接口。
-         * 最终的数据结构仍以 storage.js 的实现为准。
+         * 继续由 WritingStorage 负责保存。
+         * 兼容同步和异步返回值。
          */
-        var book = await Promise.resolve(
+        var result = await Promise.resolve(
             storage.createBook({
-                title: getTitleValue(),
+                title: title,
                 description: "",
                 cover: selectedCoverData
             })
         );
-        if (!book || book.id === undefined || book.id === null) {
-            throw new Error(
-                "存储模块未返回有效的书籍 ID。" +
-                "请检查 createBook() 的返回值。"
-            );
-        }
+        var book = validateCreatedBook(result);
+        /*
+         * 只有收到有效结果后才标记成功。
+         */
+        isSaved = true;
         showMessage(
             "《" +
-                (book.title || getTitleValue()) +
-                "》创建成功！正在返回书架……",
+            (book.title || title) +
+            "》创建成功！正在返回书架……",
             "success"
         );
-        window.setTimeout(function () {
-            if (
-                window.WritingNavigation &&
-                typeof window.WritingNavigation.goHome === "function"
-            ) {
-                window.WritingNavigation.goHome();
-            } else {
-                window.location.href = "../index.html";
-            }
-        }, 500);
+        console.info(
+            "[WritingCreateBook] 创建成功：",
+            book
+        );
+        redirectTimer = window.setTimeout(
+            function () {
+                navigateToHome();
+            },
+            REDIRECT_DELAY
+        );
     } catch (error) {
         console.error(
             "[WritingCreateBook] 创建失败：",
@@ -496,7 +677,7 @@ async function handleSubmit(event) {
     }
 }
 /* ==================================================
-   十七、取消创建
+   二十、取消创建
 ================================================== */
 function hasUnsavedInput() {
     return Boolean(
@@ -512,7 +693,7 @@ function handleCancel(event) {
     if (event) {
         event.preventDefault();
     }
-    if (isSubmitting) {
+    if (isSubmitting || isSaved) {
         return;
     }
     if (isProcessingImage) {
@@ -522,6 +703,9 @@ function handleCancel(event) {
         if (!stopProcessing) {
             return;
         }
+        /*
+         * 让旧图片处理任务失效。
+         */
         imageSelectionToken++;
         isProcessingImage = false;
         updateSubmitButton();
@@ -536,28 +720,38 @@ function handleCancel(event) {
     window.location.href = "./create.html";
 }
 /* ==================================================
-   十八、绑定事件
+   二十一、绑定书名事件
 ================================================== */
-elements.title.addEventListener("input", function () {
-    updateTitleCounter();
-    if (
-        elements.titleError &&
-        !elements.titleError.hidden
-    ) {
-        validateTitle();
+elements.title.addEventListener(
+    "input",
+    function () {
+        updateTitleCounter();
+        if (
+            elements.titleError &&
+            !elements.titleError.hidden
+        ) {
+            validateTitle();
+        }
+        hideMessage();
     }
-    hideMessage();
-});
-elements.title.addEventListener("blur", function () {
-    if (elements.title.value.trim()) {
-        validateTitle();
+);
+elements.title.addEventListener(
+    "blur",
+    function () {
+        if (elements.title.value.trim()) {
+            validateTitle();
+        }
     }
-});
+);
+/* ==================================================
+   二十二、绑定封面事件
+================================================== */
 elements.coverInput.addEventListener(
     "change",
     handleCoverSelection
 );
 if (elements.removeCoverButton) {
+    elements.removeCoverButton.type = "button";
     elements.removeCoverButton.addEventListener(
         "click",
         function (event) {
@@ -570,10 +764,16 @@ if (elements.removeCoverButton) {
         }
     );
 }
+/* ==================================================
+   二十三、绑定表单提交
+================================================== */
 elements.form.addEventListener(
     "submit",
     handleSubmit
 );
+/* ==================================================
+   二十四、绑定取消按钮
+================================================== */
 if (elements.cancelButton) {
     elements.cancelButton.type = "button";
     elements.cancelButton.addEventListener(
@@ -589,13 +789,26 @@ if (elements.cancelTopButton) {
     );
 }
 /* ==================================================
-   十九、初始化
+   二十五、离开页面前提示
+================================================== */
+window.addEventListener(
+    "beforeunload",
+    function (event) {
+        if (isSubmitting || isSaved) {
+            return;
+        }
+        if (!hasUnsavedInput()) {
+            return;
+        }
+        event.preventDefault();
+        event.returnValue = "";
+    }
+);
+/* ==================================================
+   二十六、初始化
 ================================================== */
 function initialize() {
     elements.title.maxLength = MAX_TITLE_LENGTH;
-    if (elements.removeCoverButton) {
-        elements.removeCoverButton.type = "button";
-    }
     updateTitleCounter();
     updateCoverPreview();
     updateSubmitButton();
@@ -603,11 +816,22 @@ function initialize() {
     clearCoverError();
     hideMessage();
     console.info(
-        "[WritingCreateBook] 新建书籍页面初始化完成。"
+        "[WritingCreateBook] 页面初始化完成。"
+    );
+    console.info(
+        "[WritingCreateBook] WritingStorage 是否存在：",
+        Boolean(window.WritingStorage)
+    );
+    console.info(
+        "[WritingCreateBook] createBook() 是否可用：",
+        Boolean(
+            window.WritingStorage &&
+            typeof window.WritingStorage.createBook === "function"
+        )
     );
 }
 /* ==================================================
-   二十、公开接口
+   二十七、公开接口
 ================================================== */
 window.WritingCreateBook = Object.freeze({
     validateTitle: validateTitle,
