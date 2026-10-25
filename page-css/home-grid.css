@@ -5,7 +5,7 @@
    1. 书籍固定三列
    2. 书籍封面固定 3:4 比例
    3. 封面图片完整显示，不裁切
-   4. 无封面时显示空白框
+   4. 无封面时显示透明空白框
    5. 仅显示封面和书名
    6. 分组固定三列
    7. 分组透明框固定 3:4 比例
@@ -68,8 +68,7 @@ html.home-grid-enabled #shelf-list > .shelf-card,
     box-sizing: border-box !important;
 }
 /* =========================================================
-   三、强制删除书籍卡片上方的黄色装饰线
-   同时清除卡片、打开按钮、封面上的伪元素装饰。
+   三、删除书籍卡片顶部装饰线
 ========================================================= */
 html.home-grid-enabled #shelf-list > .shelf-card::before,
 html.home-grid-enabled #shelf-list > .shelf-card::after,
@@ -117,7 +116,7 @@ html.home-grid-enabled #shelf-list .shelf-card__open,
     box-sizing: border-box !important;
 }
 /* =========================================================
-   五、书籍封面
+   五、书籍封面容器
    固定 3:4 比例
 ========================================================= */
 html.home-grid-enabled #shelf-list .shelf-card__cover,
@@ -143,7 +142,7 @@ html.home-grid-enabled #shelf-list .shelf-card__cover,
 }
 /* =========================================================
    六、封面图片
-   完整显示，不裁切
+   图片完整显示，不裁切
 ========================================================= */
 html.home-grid-enabled #shelf-list .shelf-card__cover img,
 html.home-grid-enabled #shelf-list .shelf-card__cover-image,
@@ -156,36 +155,40 @@ html.home-grid-enabled #shelf-list .shelf-card__cover-image,
     left: 0 !important;
     display: block !important;
     width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
     height: 100% !important;
+    min-width: 0 !important;
     min-height: 0 !important;
+    max-width: 100% !important;
     max-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     object-fit: contain !important;
     object-position: center center !important;
+    background: transparent !important;
     border: none !important;
-    border-radius: inherit !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
     box-sizing: border-box !important;
 }
 /* =========================================================
    七、默认封面
-   没有图片时显示空白框
-   固定 3:4 比例
+   无图片时显示透明空白框
 ========================================================= */
 html.home-grid-enabled #shelf-list .shelf-card__cover--default,
 #shelf-list.shelf-list--grid .shelf-card__cover--default {
-    position: relative !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
     display: block !important;
     flex: 0 0 auto !important;
     width: 100% !important;
+    height: 100% !important;
     min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: 3 / 4 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
@@ -194,7 +197,6 @@ html.home-grid-enabled #shelf-list .shelf-card__cover--default,
     background-color: transparent !important;
     background-image: none !important;
     border: 1px solid #c9b9a0 !important;
-    border-top: 1px solid #c9b9a0 !important;
     border-radius: 3px !important;
     box-shadow: none !important;
     box-sizing: border-box !important;
@@ -444,7 +446,7 @@ html.home-grid-enabled #home-groups-list .home-group-card__name,
     box-sizing: border-box !important;
 }
 /* =========================================================
-   十九、隐藏旧版分组复选框
+   十九、隐藏分组复选框
 ========================================================= */
 #home-groups .home-group-card__checkbox,
 #home-groups-list .home-group-card__checkbox {
@@ -554,9 +556,8 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
 }
 /* =========================================================
    二十五、最终强制覆盖
-   放在文件末尾，防止旧样式覆盖关键设置
 ========================================================= */
-/* 书籍和分组都固定三列 */
+/* 书籍和分组固定三列 */
 html.home-grid-enabled #shelf-list,
 #shelf-list.shelf-list--grid,
 html.home-grid-enabled #home-groups-list,
@@ -564,48 +565,54 @@ html.home-grid-enabled #home-groups-list,
 #home-groups .home-groups__list {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
-/* 书籍封面强制 3:4 */
+/* 书籍封面固定 3:4 */
 html.home-grid-enabled #shelf-list .shelf-card__cover,
-#shelf-list.shelf-list--grid .shelf-card__cover,
-html.home-grid-enabled #shelf-list .shelf-card__cover--default,
-#shelf-list.shelf-list--grid .shelf-card__cover--default {
+#shelf-list.shelf-list--grid .shelf-card__cover {
     aspect-ratio: 3 / 4 !important;
 }
-/* 分组透明框强制 3:4 */
+/* 默认封面跟随封面容器，不单独改变布局 */
+html.home-grid-enabled #shelf-list .shelf-card__cover > .shelf-card__cover--default,
+#shelf-list.shelf-list--grid .shelf-card__cover > .shelf-card__cover--default {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+}
+/* 分组透明框固定 3:4 */
 html.home-grid-enabled #home-groups-list .home-group-card__cover,
 #home-groups-list.home-groups-list--grid .home-group-card__cover,
 #home-groups .home-group-card__cover {
     aspect-ratio: 3 / 4 !important;
 }
-/* 清除书籍卡片顶部边框、伪元素和装饰线 */
+/* 清除书籍卡片顶部边框和阴影 */
 html.home-grid-enabled #shelf-list > .shelf-card,
 #shelf-list.shelf-list--grid > .shelf-card {
     border-top: none !important;
     box-shadow: none !important;
 }
-html.home-grid-enabled #shelf-list > .shelf-card::before,
-html.home-grid-enabled #shelf-list > .shelf-card::after,
-html.home-grid-enabled #shelf-list .shelf-card__open::before,
-html.home-grid-enabled #shelf-list .shelf-card__open::after,
-html.home-grid-enabled #shelf-list .shelf-card__cover::before,
-html.home-grid-enabled #shelf-list .shelf-card__cover::after,
-#shelf-list.shelf-list--grid > .shelf-card::before,
-#shelf-list.shelf-list--grid > .shelf-card::after,
-#shelf-list.shelf-list--grid .shelf-card__open::before,
-#shelf-list.shelf-list--grid .shelf-card__open::after,
-#shelf-list.shelf-list--grid .shelf-card__cover::before,
-#shelf-list.shelf-list--grid .shelf-card__cover::after {
-    display: none !important;
-    content: none !important;
-    border: none !important;
-    background: none !important;
-    box-shadow: none !important;
-}
-/* 确保封面图片完整显示 */
+/* 确保封面图片按完整内容显示 */
 html.home-grid-enabled #shelf-list .shelf-card__cover img,
 html.home-grid-enabled #shelf-list .shelf-card__cover-image,
 #shelf-list.shelf-list--grid .shelf-card__cover img,
 #shelf-list.shelf-list--grid .shelf-card__cover-image {
     object-fit: contain !important;
     object-position: center center !important;
+}
+/* 封面内部图片不产生额外间距 */
+html.home-grid-enabled #shelf-list .shelf-card__cover,
+#shelf-list.shelf-list--grid .shelf-card__cover {
+    line-height: 0 !important;
+    font-size: 0 !important;
+}
+/* 恢复书名区域的正常文字排版 */
+html.home-grid-enabled #shelf-list .shelf-card__body,
+#shelf-list.shelf-list--grid .shelf-card__body {
+    line-height: normal !important;
+    font-size: 12px !important;
 }
