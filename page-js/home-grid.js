@@ -2,16 +2,16 @@
    写作软件 · 首页网格模式
    文件：page-js/home-grid.js
    功能：
-   1. 开启或关闭网格模式
+   1. 网格模式每行显示三本书
    2. 网格模式与列表模式互斥
-   3. 记住用户的布局选择
-   4. 监听设置变化并同步布局
-   5. 支持书籍与分组共用的首页网格
-   6. 保留原有公开接口和设置按钮
+   3. 保存用户布局选择
+   4. 支持动态生成的书籍和分组
+   5. 监听其他标签页的设置变化
+   6. 保留原有公开接口
    7. 避免重复初始化
    8. 不修改书籍、分组数据
    9. 不清除其他本地数据
-  10. 支持书架容器延迟生成
+  10. 不阻断其他脚本的点击事件
 ====================================================== */
 (function () {
     "use strict";
@@ -22,14 +22,21 @@
         );
         return;
     }
-    const STORAGE_KEY = "writing-software-home-grid-enabled";
-    const LIST_STORAGE_KEY = "writing-software-home-list-enabled";
+    /* ======================================================
+       一、常量与状态
+    ====================================================== */
+    const STORAGE_KEY =
+        "writing-software-home-grid-enabled";
+    const LIST_STORAGE_KEY =
+        "writing-software-home-list-enabled";
     const SELECTOR = {
         shelf: "#shelf-list",
         groups: "#home-groups-list",
-        button: '[data-settings-action="grid"]',
+        gridButton: '[data-settings-action="grid"]',
+        listButton: '[data-settings-action="list"]',
         buttonTitle: ".home-settings__option-title",
-        closeButton: "[data-settings-close]:not(.home-settings__backdrop)"
+        closeButton:
+            '[data-settings-close]:not(.home-settings__backdrop)'
     };
     const STATE = {
         enabled: false,
@@ -39,12 +46,8 @@
         pendingRefresh: false
     };
     /* ======================================================
-       基础工具
+       二、本地设置
     ====================================================== */
-    /**
-     * 安全读取本地设置。
-     * 只读取指定的布局设置键。
-     */
     function readStorage(key) {
         try {
             return window.localStorage.getItem(key) === "true";
@@ -56,10 +59,6 @@
             return false;
         }
     }
-    /**
-     * 安全保存本地设置。
-     * 不修改其他本地数据。
-     */
     function saveStorage(key, value) {
         try {
             window.localStorage.setItem(
@@ -73,183 +72,132 @@
             );
         }
     }
-    /**
-     * 获取书籍容器。
-     */
-    function getShelf() {
-        return document.querySelector(SELECTOR.shelf);
+    function saveCurrentMode() {
+        saveStorage(STORAGE_KEY, STATE.enabled);
+        saveStorage(LIST_STORAGE_KEY, !STATE.enabled);
     }
-    /**
-     * 获取分组容器。
-     */
-    function getGroups() {
-        return document.querySelector(SELECTOR.groups);
-    }
-    /**
-     * 获取页面根元素。
-     */
+    /* ======================================================
+       三、获取页面元素
+    ====================================================== */
     function getRoot() {
         return document.documentElement;
     }
-    /* ======================================================
-       更新设置按钮
-    ====================================================== */
-    function updateButton() {
-        const buttons = document.querySelectorAll(
-            SELECTOR.button
-        );
-        buttons.forEach(function (button) {
-            button.setAttribute(
-                "aria-pressed",
-                String(STATE.enabled)
-            );
-            const title = button.querySelector(
-                SELECTOR.buttonTitle
-            );
-            if (title) {
-                title.textContent = STATE.enabled
-                    ? "网格模式（已开启）"
-                    : "网格模式";
-            }
-        });
+    function getShelf() {
+        return document.querySelector(SELECTOR.shelf);
+    }
+    function getGroups() {
+        return document.querySelector(SELECTOR.groups);
     }
     /* ======================================================
-       应用网格布局
+       四、同步设置按钮状态
     ====================================================== */
-    /**
-     * 同步网格布局类名。
-     *
-     * 根元素：
-     *   home-grid-enabled
-     *
-     * 书籍容器：
-     *   shelf-list--grid
-     *
-     * 分组容器：
-     *   home-groups-list--grid
-     *
-     * 注意：
-     * 不重建卡片，不改变书籍顺序，
-     * 不修改书籍或分组数据。
-     */
+    function updateButtons() {
+        document.querySelectorAll(SELECTOR.gridButton)
+            .forEach(function (button) {
+                button.setAttribute(
+                    "aria-pressed",
+                    String(STATE.enabled)
+                );
+                const title = button.querySelector(
+                    SELECTOR.buttonTitle
+                );
+                if (title) {
+                    title.textContent = STATE.enabled
+                        ? "网格模式（已开启）"
+                        : "网格模式";
+                }
+            });
+        document.querySelectorAll(SELECTOR.listButton)
+            .forEach(function (button) {
+                button.setAttribute(
+                    "aria-pressed",
+                    String(!STATE.enabled)
+                );
+                const title = button.querySelector(
+                    SELECTOR.buttonTitle
+                );
+                if (title) {
+                    title.textContent = STATE.enabled
+                        ? "列表模式"
+                        : "列表模式（已开启）";
+                }
+            });
+    }
+    /* ======================================================
+       五、应用布局类名
+    ====================================================== */
     function applyClassesOnly() {
         const root = getRoot();
         const shelf = getShelf();
         const groups = getGroups();
+        /*
+         * 根元素只保留一种布局状态。
+         */
         root.classList.toggle(
             "home-grid-enabled",
             STATE.enabled
         );
+        root.classList.toggle(
+            "home-list-enabled",
+            !STATE.enabled
+        );
+        /*
+         * 书籍容器只保留一种布局状态。
+         */
         if (shelf) {
             shelf.classList.toggle(
                 "shelf-list--grid",
                 STATE.enabled
             );
+            shelf.classList.toggle(
+                "shelf-list--list",
+                !STATE.enabled
+            );
         }
+        /*
+         * 分组容器只保留一种布局状态。
+         */
         if (groups) {
             groups.classList.toggle(
                 "home-groups-list--grid",
                 STATE.enabled
             );
+            groups.classList.toggle(
+                "home-groups-list--list",
+                !STATE.enabled
+            );
         }
-        updateButton();
+        updateButtons();
     }
-    /**
-     * 完整应用当前布局。
-     */
     function applyMode() {
         applyClassesOnly();
         observePage();
     }
     /* ======================================================
-       列表模式互斥
+       六、切换模式
     ====================================================== */
-    /**
-     * 关闭列表模式。
-     *
-     * 优先调用原有列表模块的 disable() 接口，
-     * 保留其他脚本的既有逻辑。
-     */
-    function disableListMode() {
-        const listModule = window.WritingHomeList;
-        if (
-            listModule &&
-            typeof listModule.disable === "function"
-        ) {
-            listModule.disable();
-        } else {
-            const shelf = getShelf();
-            if (shelf) {
-                shelf.classList.remove(
-                    "shelf-list--list"
-                );
-            }
-            getRoot().classList.remove(
-                "home-list-enabled"
-            );
-            saveStorage(
-                LIST_STORAGE_KEY,
-                false
-            );
-        }
-        /*
-         * 再次明确关闭列表模式对应的设置键，
-         * 防止列表模块未同步存储状态。
-         */
-        saveStorage(
-            LIST_STORAGE_KEY,
-            false
-        );
-    }
-    /* ======================================================
-       对外操作接口
-    ====================================================== */
-    /**
-     * 开启网格模式。
-     */
     function enable() {
-        disableListMode();
         STATE.enabled = true;
-        saveStorage(
-            STORAGE_KEY,
-            true
-        );
-        saveStorage(
-            LIST_STORAGE_KEY,
-            false
-        );
+        saveCurrentMode();
         applyMode();
+        console.info("[HomeGrid] 已启用网格模式。");
         return true;
     }
-    /**
-     * 关闭网格模式。
-     */
     function disable() {
         STATE.enabled = false;
-        saveStorage(
-            STORAGE_KEY,
-            false
-        );
+        saveCurrentMode();
         applyMode();
+        console.info("[HomeGrid] 已关闭网格模式。");
         return false;
     }
-    /**
-     * 切换网格模式。
-     */
     function toggle() {
-        if (STATE.enabled) {
-            return disable();
-        }
-        return enable();
+        return STATE.enabled
+            ? disable()
+            : enable();
     }
     /* ======================================================
-       设置弹窗
+       七、关闭设置窗口
     ====================================================== */
-    /**
-     * 关闭设置弹窗。
-     *
-     * 如果页面没有关闭按钮，则不执行任何操作。
-     */
     function closeSettings() {
         const button = document.querySelector(
             SELECTOR.closeButton
@@ -258,39 +206,43 @@
             button.click();
         }
     }
-    /**
-     * 绑定网格模式设置按钮。
-     *
-     * 使用事件委托，兼容按钮重新生成。
-     */
-    function bindButton() {
-        document.addEventListener(
-            "click",
-            function (event) {
-                const target = event.target;
-                if (!(target instanceof Element)) {
-                    return;
-                }
-                const button = target.closest(
-                    SELECTOR.button
-                );
-                if (!button) {
-                    return;
-                }
+    /* ======================================================
+       八、绑定设置按钮
+    ====================================================== */
+    function bindButtons() {
+        /*
+         * 使用事件委托，支持设置按钮动态生成。
+         *
+         * 不使用 stopImmediatePropagation，
+         * 避免阻断其他功能的事件监听。
+         */
+        document.addEventListener("click", function (event) {
+            const target = event.target;
+            if (!(target instanceof Element)) {
+                return;
+            }
+            const gridButton = target.closest(
+                SELECTOR.gridButton
+            );
+            if (gridButton) {
                 event.preventDefault();
-                event.stopImmediatePropagation();
-                toggle();
+                enable();
                 closeSettings();
-            },
-            true
-        );
+                return;
+            }
+            const listButton = target.closest(
+                SELECTOR.listButton
+            );
+            if (listButton) {
+                event.preventDefault();
+                disable();
+                closeSettings();
+            }
+        });
     }
     /* ======================================================
-       监听页面变化
+       九、监听动态页面变化
     ====================================================== */
-    /**
-     * 延迟刷新布局，合并短时间内的多次 DOM 变化。
-     */
     function scheduleRefresh() {
         if (STATE.pendingRefresh) {
             return;
@@ -299,22 +251,9 @@
         window.requestAnimationFrame(function () {
             STATE.pendingRefresh = false;
             applyClassesOnly();
-            /*
-             * 如果书架容器刚刚被创建，
-             * 确保新的容器也能被观察。
-             */
             observePage();
         });
     }
-    /**
-     * 观察页面中的书籍、分组容器。
-     *
-     * 页面可能先加载 JS，之后才生成书架。
-     * 因此观察 body，兼容容器延迟出现。
-     *
-     * 这里只监听子节点变化，不监听 class 属性，
-     * 避免切换布局时产生观察循环。
-     */
     function observePage() {
         if (!window.MutationObserver) {
             return;
@@ -333,98 +272,77 @@
             STATE.observer.disconnect();
         }
         STATE.observedRoot = root;
-        STATE.observer = new MutationObserver(
-            function (mutations) {
-                let shouldRefresh = false;
-                for (const mutation of mutations) {
-                    if (
-                        mutation.type === "childList" &&
-                        (
-                            mutation.addedNodes.length > 0 ||
-                            mutation.removedNodes.length > 0
-                        )
-                    ) {
-                        shouldRefresh = true;
-                        break;
-                    }
-                }
-                if (shouldRefresh) {
+        STATE.observer = new MutationObserver(function (mutations) {
+            for (const mutation of mutations) {
+                if (
+                    mutation.type === "childList" &&
+                    (
+                        mutation.addedNodes.length > 0 ||
+                        mutation.removedNodes.length > 0
+                    )
+                ) {
                     scheduleRefresh();
+                    return;
                 }
             }
-        );
+        });
         STATE.observer.observe(root, {
             childList: true,
             subtree: true
         });
     }
     /* ======================================================
-       监听其他标签页的设置变化
+       十、同步其他标签页
     ====================================================== */
     function bindStorageEvents() {
-        window.addEventListener(
-            "storage",
-            function (event) {
-                if (event.key === STORAGE_KEY) {
-                    STATE.enabled =
-                        event.newValue === "true";
-                    if (STATE.enabled) {
-                        disableListMode();
-                    }
-                    applyMode();
-                    return;
-                }
-                if (
-                    event.key === LIST_STORAGE_KEY &&
-                    event.newValue === "true"
-                ) {
-                    STATE.enabled = false;
-                    saveStorage(
-                        STORAGE_KEY,
-                        false
-                    );
-                    applyMode();
-                }
+        window.addEventListener("storage", function (event) {
+            if (
+                event.key !== STORAGE_KEY &&
+                event.key !== LIST_STORAGE_KEY
+            ) {
+                return;
             }
-        );
+            /*
+             * 两个键都为 true 时，优先列表模式，
+             * 与原有规则保持一致。
+             */
+            const gridEnabled = readStorage(STORAGE_KEY);
+            const listEnabled = readStorage(LIST_STORAGE_KEY);
+            STATE.enabled =
+                gridEnabled && !listEnabled;
+            applyMode();
+        });
     }
     /* ======================================================
-       初始化
+       十一、初始化
     ====================================================== */
     function initialize() {
         if (STATE.initialized) {
             return;
         }
         STATE.initialized = true;
-        const gridEnabled = readStorage(
-            STORAGE_KEY
-        );
-        const listEnabled = readStorage(
-            LIST_STORAGE_KEY
-        );
-        /*
-         * 如果两个模式同时开启，
-         * 保留原有规则：优先恢复列表模式。
-         */
-        if (gridEnabled && listEnabled) {
-            STATE.enabled = false;
-            saveStorage(
-                STORAGE_KEY,
-                false
-            );
+        const gridEnabled = readStorage(STORAGE_KEY);
+        const listEnabled = readStorage(LIST_STORAGE_KEY);
+        if (gridEnabled && !listEnabled) {
+            STATE.enabled = true;
         } else {
-            STATE.enabled = gridEnabled;
+            STATE.enabled = false;
         }
-        bindButton();
+        /*
+         * 修正布局设置键，使两个模式互斥。
+         * 只操作布局相关键，不碰其他本地数据。
+         */
+        saveCurrentMode();
+        bindButtons();
         bindStorageEvents();
         applyMode();
         console.info(
-            "[HomeGrid] 网格模块初始化完成，当前状态：",
-            STATE.enabled ? "开启" : "关闭"
+            "[HomeGrid] 初始化完成，当前模式：",
+            STATE.enabled ? "网格模式" : "列表模式"
         );
     }
     /* ======================================================
-       保留原有公开接口
+       十二、公开接口
     ====================================================== */
     window.WritingHomeGrid = Object.freeze({
         enable: enable,
@@ -436,7 +354,7 @@
         refresh: applyMode
     });
     /* ======================================================
-       启动
+       十三、启动
     ====================================================== */
     if (document.readyState === "loading") {
         document.addEventListener(
