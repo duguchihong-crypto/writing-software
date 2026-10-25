@@ -2,31 +2,17 @@
    写作软件 · 新建书籍
    文件：page-js/create-book.js
    功能：
-   1. 输入书名并验证
-   2. 选择、预览、更换、移除封面
+   1. 书名验证
+   2. 选择、更换、移除封面
    3. 手动裁剪封面，固定 2:3 比例
-   4. 支持拖动、滑块缩放和双指缩放
-   5. 输出 400 × 600 JPEG 封面
-   6. 检查存储模块是否正常
-   7. 创建书籍并处理错误
-   8. 防止重复提交
-   9. 取消时确认放弃
-   10. 顶部返回、底部取消返回新建入口页
-   11. 创建成功后返回书架首页
-   12. 兼容同步和异步存储接口
-   13. 兼容 GitHub Pages 项目路径
+   4. 拖动、滑块缩放、双指缩放
+   5. 输出 400 × 600 JPEG
+   6. 创建书籍
+   7. 防止重复提交
+   8. 取消时确认放弃
+   9. 兼容 GitHub Pages 项目路径
    注意：
    书籍数据由 WritingStorage 统一管理。
-   本文件不直接操作 localStorage。
-   裁剪 HTML 需要提供：
-   cover-crop-modal
-   cover-crop-stage
-   cover-crop-image
-   cover-crop-zoom
-   cover-crop-zoom-value
-   cover-crop-reset
-   cover-crop-cancel
-   cover-crop-confirm
 ====================================================== */
 (function () {
     "use strict";
@@ -40,10 +26,9 @@
     var IMAGE_QUALITY = 0.82;
     var MIN_ZOOM = 1;
     var MAX_ZOOM = 3;
-    var ZOOM_STEP = 0.01;
     var REDIRECT_DELAY = 600;
     /* ==================================================
-       二、获取页面元素
+       二、获取 HTML 元素
     ================================================== */
     var elements = {
         form: document.getElementById("create-book-form"),
@@ -105,11 +90,9 @@
     var dragImageTop = 0;
     var pinchStartDistance = 0;
     var pinchStartZoom = 1;
-    var pinchStartCenter = null;
     var pinchSourceCenter = null;
-    var previousBodyOverflow = "";
     /* ==================================================
-       五、检查页面元素
+       五、检查必要元素
     ================================================== */
     function validatePageElements() {
         return Boolean(
@@ -121,7 +104,7 @@
     }
     if (!validatePageElements()) {
         console.error(
-            "[WritingCreateBook] 初始化失败：缺少必要的 HTML 元素。",
+            "[WritingCreateBook] 页面缺少必要元素。",
             {
                 form: Boolean(elements.form),
                 title: Boolean(elements.title),
@@ -141,14 +124,8 @@
             elements.cropCancelButton
         );
     }
-    if (!hasCropElements()) {
-        console.error(
-            "[WritingCreateBook] 裁剪弹窗元素不完整。",
-            "请检查 create-book.html 中的裁剪弹窗 ID。"
-        );
-    }
     /* ==================================================
-       六、提示信息
+       六、消息提示
     ================================================== */
     function showMessage(text, type) {
         if (!elements.message) {
@@ -175,9 +152,7 @@
         );
     }
     function hideMessage() {
-        if (!elements.message) {
-            return;
-        }
+        if (!elements.message) return;
         elements.message.textContent = "";
         elements.message.hidden = true;
         elements.message.classList.remove(
@@ -220,9 +195,7 @@
         return true;
     }
     function updateTitleCounter() {
-        if (!elements.titleCounter) {
-            return;
-        }
+        if (!elements.titleCounter) return;
         elements.titleCounter.textContent =
             elements.title.value.length +
             " / " +
@@ -246,7 +219,7 @@
         setCoverError("");
     }
     /* ==================================================
-       九、更新封面预览
+       九、封面预览
     ================================================== */
     function updateCoverPreview() {
         var hasCover = Boolean(selectedCoverData);
@@ -271,12 +244,10 @@
         }
     }
     /* ==================================================
-       十、提交按钮状态
+       十、创建按钮状态
     ================================================== */
     function updateSubmitButton() {
-        if (!elements.submitButton) {
-            return;
-        }
+        if (!elements.submitButton) return;
         elements.submitButton.disabled =
             isSubmitting || isProcessingImage;
         if (isSubmitting) {
@@ -294,7 +265,7 @@
         }
     }
     /* ==================================================
-       十一、释放裁剪图片资源
+       十一、释放裁剪资源
     ================================================== */
     function releaseCropImage() {
         if (cropObjectUrl) {
@@ -321,39 +292,20 @@
         activePointers.clear();
         pinchStartDistance = 0;
         pinchStartZoom = 1;
-        pinchStartCenter = null;
         pinchSourceCenter = null;
     }
     /* ==================================================
        十二、关闭裁剪弹窗
     ================================================== */
     function closeCropModal() {
-        if (!elements.cropModal) {
-            releaseCropImage();
-            cropIsOpen = false;
-            return;
-        }
         cropIsOpen = false;
-        elements.cropModal.hidden = true;
+        if (elements.cropModal) {
+            elements.cropModal.hidden = true;
+        }
         document.body.classList.remove("cover-crop-open");
         document.removeEventListener(
             "keydown",
             handleCropKeydown,
-            true
-        );
-        document.removeEventListener(
-            "pointermove",
-            handleDocumentPointerMove,
-            true
-        );
-        document.removeEventListener(
-            "pointerup",
-            handleDocumentPointerEnd,
-            true
-        );
-        document.removeEventListener(
-            "pointercancel",
-            handleDocumentPointerEnd,
             true
         );
         releaseCropImage();
@@ -384,7 +336,7 @@
         updateSubmitButton();
     }
     /* ==================================================
-       十四、验证图片是否可读取
+       十四、读取图片
     ================================================== */
     function loadImageFromFile(file) {
         return new Promise(function (resolve, reject) {
@@ -392,18 +344,14 @@
             try {
                 objectUrl = URL.createObjectURL(file);
             } catch (error) {
-                reject(
-                    new Error("无法读取图片，请重新选择。")
-                );
+                reject(new Error("无法读取图片，请重新选择。"));
                 return;
             }
             var image = new Image();
             image.onload = function () {
                 URL.revokeObjectURL(objectUrl);
                 if (!image.naturalWidth || !image.naturalHeight) {
-                    reject(
-                        new Error("图片尺寸无效，请重新选择。")
-                    );
+                    reject(new Error("图片尺寸无效，请重新选择。"));
                     return;
                 }
                 resolve(image);
@@ -411,9 +359,7 @@
             image.onerror = function () {
                 URL.revokeObjectURL(objectUrl);
                 reject(
-                    new Error(
-                        "无法读取这张图片，请更换图片后重试。"
-                    )
+                    new Error("无法读取这张图片，请更换图片后重试。")
                 );
             };
             image.src = objectUrl;
@@ -436,17 +382,11 @@
         var imageHeight = cropNaturalHeight * scale;
         var minLeft = cropViewportWidth - imageWidth;
         var minTop = cropViewportHeight - imageHeight;
-        cropLeft = Math.min(
-            0,
-            Math.max(minLeft, cropLeft)
-        );
-        cropTop = Math.min(
-            0,
-            Math.max(minTop, cropTop)
-        );
+        cropLeft = Math.min(0, Math.max(minLeft, cropLeft));
+        cropTop = Math.min(0, Math.max(minTop, cropTop));
     }
     /* ==================================================
-       十六、更新裁剪图片显示
+       十六、更新图片位置
     ================================================== */
     function updateCropImagePosition() {
         if (
@@ -484,13 +424,6 @@
        十七、初始化裁剪区域
     ================================================== */
     function initializeCropGeometry() {
-        if (
-            !elements.cropStage ||
-            !cropNaturalWidth ||
-            !cropNaturalHeight
-        ) {
-            throw new Error("无法初始化裁剪区域。");
-        }
         var rect = elements.cropStage.getBoundingClientRect();
         cropViewportWidth = rect.width;
         cropViewportHeight = rect.height;
@@ -498,39 +431,30 @@
             cropViewportWidth <= 0 ||
             cropViewportHeight <= 0
         ) {
-            throw new Error("裁剪区域尺寸无效，请重试。");
+            throw new Error(
+                "裁剪区域尺寸无效，请检查 create-book.css。"
+            );
         }
-        /*
-         * 图片最初完整覆盖 2:3 裁剪区域。
-         * 横图会裁掉左右部分，竖图会裁掉上下部分。
-         */
         cropFitScale = Math.max(
             cropViewportWidth / cropNaturalWidth,
             cropViewportHeight / cropNaturalHeight
         );
         cropZoom = MIN_ZOOM;
-        var imageWidth =
-            cropNaturalWidth * cropFitScale * cropZoom;
-        var imageHeight =
-            cropNaturalHeight * cropFitScale * cropZoom;
+        var imageWidth = cropNaturalWidth * cropFitScale;
+        var imageHeight = cropNaturalHeight * cropFitScale;
         cropLeft = (cropViewportWidth - imageWidth) / 2;
         cropTop = (cropViewportHeight - imageHeight) / 2;
-        if (elements.cropZoom) {
-            elements.cropZoom.min = String(MIN_ZOOM);
-            elements.cropZoom.max = String(MAX_ZOOM);
-            elements.cropZoom.step = String(ZOOM_STEP);
-            elements.cropZoom.value = String(cropZoom);
-        }
+        elements.cropZoom.min = String(MIN_ZOOM);
+        elements.cropZoom.max = String(MAX_ZOOM);
+        elements.cropZoom.step = "0.01";
+        elements.cropZoom.value = String(cropZoom);
         updateCropImagePosition();
     }
     /* ==================================================
-       十八、设置缩放
-       以裁剪框中心为缩放中心
+       十八、缩放图片
     ================================================== */
     function setCropZoom(newZoom) {
-        if (!cropNaturalWidth || !cropNaturalHeight) {
-            return;
-        }
+        if (!cropNaturalWidth || !cropNaturalHeight) return;
         newZoom = Math.max(
             MIN_ZOOM,
             Math.min(MAX_ZOOM, Number(newZoom) || MIN_ZOOM)
@@ -551,7 +475,7 @@
         updateCropImagePosition();
     }
     /* ==================================================
-       十九、恢复默认裁剪
+       十九、重置裁剪
     ================================================== */
     function resetCrop() {
         if (
@@ -563,10 +487,8 @@
             return;
         }
         cropZoom = MIN_ZOOM;
-        var imageWidth =
-            cropNaturalWidth * cropFitScale;
-        var imageHeight =
-            cropNaturalHeight * cropFitScale;
+        var imageWidth = cropNaturalWidth * cropFitScale;
+        var imageHeight = cropNaturalHeight * cropFitScale;
         cropLeft = (cropViewportWidth - imageWidth) / 2;
         cropTop = (cropViewportHeight - imageHeight) / 2;
         updateCropImagePosition();
@@ -579,7 +501,7 @@
             if (!hasCropElements()) {
                 reject(
                     new Error(
-                        "裁剪界面尚未配置，请检查 create-book.html。"
+                        "裁剪界面 HTML 元素不完整，请检查 cover-crop-stage 等 ID。"
                     )
                 );
                 return;
@@ -587,17 +509,13 @@
             releaseCropImage();
             cropPreviousFocus = document.activeElement;
             cropIsOpen = true;
-            var objectUrl;
             try {
-                objectUrl = URL.createObjectURL(file);
+                cropObjectUrl = URL.createObjectURL(file);
             } catch (error) {
                 cropIsOpen = false;
-                reject(
-                    new Error("无法打开图片，请重新选择。")
-                );
+                reject(new Error("无法打开图片，请重新选择。"));
                 return;
             }
-            cropObjectUrl = objectUrl;
             elements.cropModal.hidden = false;
             document.body.classList.add("cover-crop-open");
             document.addEventListener(
@@ -606,36 +524,27 @@
                 true
             );
             elements.cropConfirmButton.disabled = true;
+            elements.cropCancelButton.disabled = false;
             if (elements.cropResetButton) {
                 elements.cropResetButton.disabled = true;
             }
             if (elements.cropZoom) {
                 elements.cropZoom.disabled = true;
             }
-            function handleImageLoaded() {
+            elements.cropImage.onload = function () {
                 if (
                     token !== imageSelectionToken ||
                     !cropIsOpen
                 ) {
                     return;
                 }
-                cropNaturalWidth =
-                    elements.cropImage.naturalWidth;
-                cropNaturalHeight =
-                    elements.cropImage.naturalHeight;
-                if (
-                    !cropNaturalWidth ||
-                    !cropNaturalHeight
-                ) {
+                cropNaturalWidth = elements.cropImage.naturalWidth;
+                cropNaturalHeight = elements.cropImage.naturalHeight;
+                if (!cropNaturalWidth || !cropNaturalHeight) {
                     closeCropModal();
-                    reject(
-                        new Error("图片尺寸无效，请重新选择。")
-                    );
+                    reject(new Error("图片尺寸无效，请重新选择。"));
                     return;
                 }
-                /*
-                 * 等待弹窗布局完成，再读取裁剪框尺寸。
-                 */
                 window.requestAnimationFrame(function () {
                     if (
                         token !== imageSelectionToken ||
@@ -649,9 +558,6 @@
                         if (elements.cropResetButton) {
                             elements.cropResetButton.disabled = false;
                         }
-                        if (elements.cropCancelButton) {
-                            elements.cropCancelButton.disabled = false;
-                        }
                         if (elements.cropZoom) {
                             elements.cropZoom.disabled = false;
                         }
@@ -661,34 +567,24 @@
                         if (elements.cropZoomOutButton) {
                             elements.cropZoomOutButton.disabled = false;
                         }
-                        if (
-                            elements.cropConfirmButton &&
-                            typeof elements.cropConfirmButton.focus === "function"
-                        ) {
-                            elements.cropConfirmButton.focus();
-                        }
+                        elements.cropConfirmButton.focus();
                         resolve(true);
                     } catch (error) {
                         closeCropModal();
                         reject(error);
                     }
                 });
-            }
-            elements.cropImage.onload = handleImageLoaded;
-            elements.cropImage.onerror = function () {
-                if (token !== imageSelectionToken) {
-                    return;
-                }
-                closeCropModal();
-                reject(
-                    new Error("图片加载失败，请重新选择。")
-                );
             };
-            elements.cropImage.src = objectUrl;
+            elements.cropImage.onerror = function () {
+                if (token !== imageSelectionToken) return;
+                closeCropModal();
+                reject(new Error("图片加载失败，请重新选择。"));
+            };
+            elements.cropImage.src = cropObjectUrl;
         });
     }
     /* ==================================================
-       二十一、生成裁剪后的封面
+       二十一、生成裁剪封面
     ================================================== */
     function createCroppedCover() {
         if (
@@ -701,16 +597,10 @@
             throw new Error("裁剪区域尚未准备好，请重试。");
         }
         var scale = cropFitScale * cropZoom;
-        /*
-         * 将显示区域换算为原图坐标。
-         */
         var sourceX = -cropLeft / scale;
         var sourceY = -cropTop / scale;
         var sourceWidth = cropViewportWidth / scale;
         var sourceHeight = cropViewportHeight / scale;
-        /*
-         * 防止浮点误差导致源区域越界。
-         */
         sourceX = Math.max(
             0,
             Math.min(cropNaturalWidth, sourceX)
@@ -762,10 +652,7 @@
                 "image/jpeg",
                 IMAGE_QUALITY
             );
-            if (
-                typeof dataUrl !== "string" ||
-                dataUrl.indexOf("data:image/jpeg;base64,") !== 0
-            ) {
+            if (!dataUrl.startsWith("data:image/jpeg;base64,")) {
                 throw new Error("封面生成失败，请重试。");
             }
             return dataUrl;
@@ -786,40 +673,25 @@
         ) {
             return;
         }
-        if (elements.cropConfirmButton) {
-            elements.cropConfirmButton.disabled = true;
-            elements.cropConfirmButton.textContent = "正在生成……";
-        }
+        elements.cropConfirmButton.disabled = true;
+        elements.cropConfirmButton.textContent = "正在生成……";
         try {
-            var croppedData = createCroppedCover();
-            /*
-             * 只有生成成功后才替换当前封面。
-             */
-            selectedCoverData = croppedData;
+            selectedCoverData = createCroppedCover();
             updateCoverPreview();
             clearCoverError();
             hideMessage();
             closeCropModal();
             elements.coverInput.value = "";
         } catch (error) {
-            console.error(
-                "[WritingCreateBook] 裁剪封面失败：",
-                error
-            );
+            console.error("[WritingCreateBook] 裁剪失败：", error);
             showMessage(
-                error && error.message
-                    ? error.message
-                    : "裁剪失败，请重试。",
+                error.message || "裁剪失败，请重试。",
                 "error"
             );
         } finally {
             if (elements.cropConfirmButton) {
                 elements.cropConfirmButton.textContent = "确认裁剪";
-                /*
-                 * 弹窗关闭后不必启用按钮；
-                 * 下次打开时会重新设置状态。
-                 */
-                elements.cropConfirmButton.disabled = !cropIsOpen;
+                elements.cropConfirmButton.disabled = true;
             }
             isProcessingImage = false;
             updateSubmitButton();
@@ -829,65 +701,38 @@
        二十三、取消裁剪
     ================================================== */
     function cancelCrop() {
-        if (!cropIsOpen) {
-            return;
-        }
+        if (!cropIsOpen) return;
         imageSelectionToken++;
         closeCropModal();
         elements.coverInput.value = "";
         isProcessingImage = false;
         updateSubmitButton();
-        /*
-         * 不修改 selectedCoverData。
-         * 取消裁剪不会覆盖之前已经确认的封面。
-         */
     }
     /* ==================================================
-       二十四、裁剪弹窗键盘操作
+       二十四、裁剪键盘操作
     ================================================== */
     function handleCropKeydown(event) {
-        if (!cropIsOpen) {
-            return;
-        }
+        if (!cropIsOpen) return;
         if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();
             cancelCrop();
-            return;
-        }
-        if (
-            event.key === "Enter" &&
-            event.target === elements.cropZoom
-        ) {
-            event.preventDefault();
         }
     }
     /* ==================================================
-       二十五、选择封面
+       二十五、处理图片选择
     ================================================== */
-    async function handleCoverSelection() {
+    async function handleCoverSelection(file) {
         clearCoverError();
         hideMessage();
-        var file =
-            elements.coverInput.files &&
-            elements.coverInput.files[0];
-        if (!file) {
-            return;
-        }
+        if (!file) return;
         var currentToken = ++imageSelectionToken;
-        /*
-         * 先清空 input，允许用户之后再次选择同一文件。
-         * File 对象仍然可以继续使用。
-         */
-        elements.coverInput.value = "";
-        if (!file.type || file.type.indexOf("image/") !== 0) {
+        if (!file.type || !file.type.startsWith("image/")) {
             setCoverError("请选择有效的图片文件。");
             return;
         }
         if (file.size > MAX_IMAGE_SIZE) {
-            setCoverError(
-                "图片不能超过 10 MB，请选择较小的图片。"
-            );
+            setCoverError("图片不能超过 10 MB，请选择较小的图片。");
             return;
         }
         isProcessingImage = true;
@@ -895,32 +740,21 @@
         showMessage("正在读取图片……", "info");
         try {
             var image = await loadImageFromFile(file);
-            if (currentToken !== imageSelectionToken) {
-                return;
-            }
+            if (currentToken !== imageSelectionToken) return;
             if (!image.naturalWidth || !image.naturalHeight) {
                 throw new Error("图片尺寸无效，请重新选择。");
             }
             await openCropModal(file, currentToken);
-            if (currentToken !== imageSelectionToken) {
-                return;
-            }
+            if (currentToken !== imageSelectionToken) return;
             hideMessage();
         } catch (error) {
-            if (currentToken !== imageSelectionToken) {
-                return;
-            }
-            console.error(
-                "[WritingCreateBook] 封面处理失败：",
-                error
-            );
+            if (currentToken !== imageSelectionToken) return;
+            console.error("[WritingCreateBook] 图片处理失败：", error);
             if (cropIsOpen) {
                 closeCropModal();
             }
             setCoverError(
-                error && error.message
-                    ? error.message
-                    : "封面处理失败，请重新选择图片。"
+                error.message || "封面处理失败，请重新选择图片。"
             );
             hideMessage();
             isProcessingImage = false;
@@ -928,31 +762,305 @@
         }
     }
     /* ==================================================
-       二十六、获取书籍存储模块
+       二十六、封面选择器
+       同时支持 label 和直接点击按钮
+    ================================================== */
+    function openNativeFilePicker() {
+        if (isSubmitting || isProcessingImage || isSaved) {
+            return;
+        }
+        if (!elements.coverInput) {
+            setCoverError("找不到封面文件输入框，请检查 HTML。");
+            return;
+        }
+        clearCoverError();
+        hideMessage();
+        try {
+            elements.coverInput.click();
+        } catch (error) {
+            console.error("[WritingCreateBook] 打开文件选择器失败：", error);
+            setCoverError("无法打开图片选择器，请刷新页面后重试。");
+        }
+    }
+    /*
+     * 关键修复：
+     * 不再在 change 事件中提前清空 input。
+     * 先保存 File，再清空 input，避免部分移动浏览器行为异常。
+     */
+    elements.coverInput.addEventListener("change", function () {
+        var file =
+            elements.coverInput.files &&
+            elements.coverInput.files[0];
+        if (!file) return;
+        /*
+         * 先清空输入框，让用户下次能再次选择同一张图片。
+         * 当前 file 变量仍然持有 File 对象。
+         */
+        elements.coverInput.value = "";
+        handleCoverSelection(file);
+    });
+    /*
+     * 如果封面选择按钮是 label，
+     * 保留默认 label 行为，避免阻止原生文件选择器。
+     *
+     * 如果它是 button，则主动打开文件选择器。
+     */
+    if (elements.coverSelectLabel) {
+        var labelTag = elements.coverSelectLabel.tagName.toLowerCase();
+        if (labelTag === "button") {
+            elements.coverSelectLabel.type = "button";
+            elements.coverSelectLabel.addEventListener(
+                "click",
+                function (event) {
+                    event.preventDefault();
+                    openNativeFilePicker();
+                }
+            );
+        }
+    }
+    /* ==================================================
+       二十七、移除封面按钮
+    ================================================== */
+    if (elements.removeCoverButton) {
+        elements.removeCoverButton.type = "button";
+        elements.removeCoverButton.addEventListener(
+            "click",
+            function (event) {
+                event.preventDefault();
+                if (isSubmitting || isProcessingImage) return;
+                clearCoverPreview();
+                hideMessage();
+            }
+        );
+    }
+    /* ==================================================
+       二十八、缩放、重置、取消、确认按钮
+    ================================================== */
+    if (elements.cropZoom) {
+        elements.cropZoom.addEventListener("input", function () {
+            setCropZoom(this.value);
+        });
+    }
+    if (elements.cropZoomInButton) {
+        elements.cropZoomInButton.type = "button";
+        elements.cropZoomInButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            setCropZoom(cropZoom + 0.1);
+        });
+    }
+    if (elements.cropZoomOutButton) {
+        elements.cropZoomOutButton.type = "button";
+        elements.cropZoomOutButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            setCropZoom(cropZoom - 0.1);
+        });
+    }
+    if (elements.cropResetButton) {
+        elements.cropResetButton.type = "button";
+        elements.cropResetButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            resetCrop();
+        });
+    }
+    if (elements.cropCancelButton) {
+        elements.cropCancelButton.type = "button";
+        elements.cropCancelButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            cancelCrop();
+        });
+    }
+    if (elements.cropConfirmButton) {
+        elements.cropConfirmButton.type = "button";
+        elements.cropConfirmButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            confirmCrop();
+        });
+    }
+    if (elements.cropModal) {
+        elements.cropModal.addEventListener("click", function (event) {
+            if (event.target === elements.cropModal) {
+                cancelCrop();
+            }
+        });
+    }
+    /* ==================================================
+       二十九、拖动和双指缩放
+    ================================================== */
+    function getPointerDistance(a, b) {
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    function getPointerCenter(a, b) {
+        return {
+            x: (a.x + b.x) / 2,
+            y: (a.y + b.y) / 2
+        };
+    }
+    function getStagePoint(x, y) {
+        var rect = elements.cropStage.getBoundingClientRect();
+        return {
+            x: x - rect.left,
+            y: y - rect.top
+        };
+    }
+    function beginPinch() {
+        if (activePointers.size < 2) return;
+        var pointers = Array.from(activePointers.values());
+        var a = getStagePoint(pointers[0].x, pointers[0].y);
+        var b = getStagePoint(pointers[1].x, pointers[1].y);
+        pinchStartDistance = getPointerDistance(a, b);
+        pinchStartZoom = cropZoom;
+        var center = getPointerCenter(a, b);
+        var scale = cropFitScale * cropZoom;
+        pinchSourceCenter = {
+            x: (center.x - cropLeft) / scale,
+            y: (center.y - cropTop) / scale
+        };
+    }
+    function updatePinch() {
+        if (
+            activePointers.size < 2 ||
+            !pinchStartDistance ||
+            !pinchSourceCenter
+        ) {
+            return;
+        }
+        var pointers = Array.from(activePointers.values());
+        var a = getStagePoint(pointers[0].x, pointers[0].y);
+        var b = getStagePoint(pointers[1].x, pointers[1].y);
+        var distance = getPointerDistance(a, b);
+        var center = getPointerCenter(a, b);
+        var newZoom = Math.max(
+            MIN_ZOOM,
+            Math.min(
+                MAX_ZOOM,
+                pinchStartZoom * distance / pinchStartDistance
+            )
+        );
+        cropZoom = newZoom;
+        var scale = cropFitScale * cropZoom;
+        cropLeft = center.x - pinchSourceCenter.x * scale;
+        cropTop = center.y - pinchSourceCenter.y * scale;
+        updateCropImagePosition();
+    }
+    function handlePointerMove(event) {
+        if (!cropIsOpen || !activePointers.has(event.pointerId)) {
+            return;
+        }
+        activePointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY
+        });
+        if (activePointers.size >= 2) {
+            event.preventDefault();
+            updatePinch();
+            return;
+        }
+        if (activePointers.size === 1) {
+            event.preventDefault();
+            cropLeft = dragImageLeft + event.clientX - dragStartX;
+            cropTop = dragImageTop + event.clientY - dragStartY;
+            updateCropImagePosition();
+        }
+    }
+    function handlePointerEnd(event) {
+        if (!activePointers.has(event.pointerId)) return;
+        activePointers.delete(event.pointerId);
+        if (activePointers.size === 1) {
+            var remaining = Array.from(activePointers.values())[0];
+            dragStartX = remaining.x;
+            dragStartY = remaining.y;
+            dragImageLeft = cropLeft;
+            dragImageTop = cropTop;
+            pinchStartDistance = 0;
+            pinchSourceCenter = null;
+        } else if (activePointers.size === 0) {
+            pinchStartDistance = 0;
+            pinchSourceCenter = null;
+        } else {
+            beginPinch();
+        }
+    }
+    if (elements.cropStage) {
+        elements.cropStage.style.touchAction = "none";
+        elements.cropStage.addEventListener("pointerdown", function (event) {
+            if (!cropIsOpen) return;
+            if (
+                event.pointerType === "mouse" &&
+                event.button !== 0
+            ) {
+                return;
+            }
+            event.preventDefault();
+            activePointers.set(event.pointerId, {
+                x: event.clientX,
+                y: event.clientY
+            });
+            if (activePointers.size === 1) {
+                dragStartX = event.clientX;
+                dragStartY = event.clientY;
+                dragImageLeft = cropLeft;
+                dragImageTop = cropTop;
+            } else if (activePointers.size === 2) {
+                beginPinch();
+            }
+        });
+        elements.cropStage.addEventListener("dragstart", function (event) {
+            event.preventDefault();
+        });
+    }
+    /*
+     * 在弹窗打开期间才绑定拖动事件，
+     * 关闭弹窗后解除，下一次打开仍然可以正常拖动。
+     */
+    function attachPointerListeners() {
+        document.addEventListener("pointermove", handlePointerMove, {
+            capture: true,
+            passive: false
+        });
+        document.addEventListener("pointerup", handlePointerEnd, true);
+        document.addEventListener("pointercancel", handlePointerEnd, true);
+    }
+    function detachPointerListeners() {
+        document.removeEventListener("pointermove", handlePointerMove, true);
+        document.removeEventListener("pointerup", handlePointerEnd, true);
+        document.removeEventListener("pointercancel", handlePointerEnd, true);
+    }
+    var originalOpenCropModal = openCropModal;
+    openCropModal = function (file, token) {
+        attachPointerListeners();
+        return originalOpenCropModal(file, token).catch(function (error) {
+            detachPointerListeners();
+            throw error;
+        });
+    };
+    var originalCloseCropModal = closeCropModal;
+    closeCropModal = function () {
+        detachPointerListeners();
+        originalCloseCropModal();
+    };
+    /* ==================================================
+       三十、表单提交与存储
     ================================================== */
     function getStorage() {
         var storage = window.WritingStorage;
         if (!storage) {
             throw new Error(
-                "书籍存储模块未加载。请检查是否引入 ../js/storage.js。"
+                "书籍存储模块未加载，请检查 ../js/storage.js。"
             );
         }
         if (typeof storage.createBook !== "function") {
             throw new Error(
-                "书籍存储模块缺少 createBook() 方法。请检查 js/storage.js 的实际接口。"
+                "存储模块缺少 createBook() 方法，请检查 storage.js。"
             );
         }
         return storage;
     }
-    /* ==================================================
-       二十七、错误信息转换
-    ================================================== */
     function getCreateErrorMessage(error) {
-        if (!error) {
-            return "创建失败，请重试。";
-        }
+        if (!error) return "创建失败，请重试。";
         if (error.code === "STORAGE_FULL") {
-            return "浏览器存储空间不足，请移除封面或更换较小的图片后重试。";
+            return "浏览器存储空间不足，请移除封面或更换较小的图片。";
         }
         if (error.code === "STORAGE_UNAVAILABLE") {
             return "当前浏览器无法使用本地存储，请检查浏览器设置。";
@@ -965,14 +1073,9 @@
         }
         return error.message || "创建失败，请重试。";
     }
-    /* ==================================================
-       二十八、检查创建结果
-    ================================================== */
     function validateCreatedBook(book) {
         if (!book || typeof book !== "object") {
-            throw new Error(
-                "存储模块没有返回有效的书籍数据。请检查 createBook()。"
-            );
+            throw new Error("存储模块没有返回有效的书籍数据。");
         }
         var bookId =
             book.id !== undefined && book.id !== null
@@ -984,89 +1087,65 @@
             String(bookId).trim() === ""
         ) {
             throw new Error(
-                "书籍创建结果缺少 ID，无法确认保存成功。请检查 storage.js 的返回值。"
+                "书籍创建结果缺少 ID，请检查 storage.js。"
             );
         }
         return book;
     }
     /* ==================================================
-       二十九、计算页面地址
-       兼容 GitHub Pages 项目路径
+       三十一、页面地址
     ================================================== */
     function getPageUrl(fileName) {
-        var currentUrl = new URL(window.location.href);
-        var currentPath = currentUrl.pathname;
-        var pageSuffix = "/pages/create-book.html";
-        if (currentPath.endsWith(pageSuffix)) {
-            currentUrl.pathname =
-                currentPath.slice(0, -pageSuffix.length) +
+        var url = new URL(window.location.href);
+        var suffix = "/pages/create-book.html";
+        if (url.pathname.endsWith(suffix)) {
+            url.pathname =
+                url.pathname.slice(0, -suffix.length) +
                 "/pages/" +
                 fileName;
         } else {
-            currentUrl.pathname =
-                currentPath.slice(
+            url.pathname =
+                url.pathname.slice(
                     0,
-                    currentPath.lastIndexOf("/") + 1
+                    url.pathname.lastIndexOf("/") + 1
                 ) +
                 fileName;
         }
-        currentUrl.search = "";
-        currentUrl.hash = "";
-        return currentUrl.href;
+        url.search = "";
+        url.hash = "";
+        return url.href;
     }
-    /* ==================================================
-       三十、获取新建入口页地址
-    ================================================== */
     function getCreatePageUrl() {
         return getPageUrl("create.html");
     }
-    /* ==================================================
-       三十一、获取书架首页地址
-    ================================================== */
     function getHomeUrl() {
-        var currentUrl = new URL(window.location.href);
-        var currentPath = currentUrl.pathname;
-        var pageSuffix = "/pages/create-book.html";
-        if (currentPath.endsWith(pageSuffix)) {
-            currentUrl.pathname =
-                currentPath.slice(0, -pageSuffix.length) +
+        var url = new URL(window.location.href);
+        var suffix = "/pages/create-book.html";
+        if (url.pathname.endsWith(suffix)) {
+            url.pathname =
+                url.pathname.slice(0, -suffix.length) +
                 "/index.html";
         } else {
-            var pagesIndex = currentPath.lastIndexOf("/pages/");
+            var pagesIndex = url.pathname.lastIndexOf("/pages/");
             if (pagesIndex !== -1) {
-                currentUrl.pathname =
-                    currentPath.slice(0, pagesIndex) +
+                url.pathname =
+                    url.pathname.slice(0, pagesIndex) +
                     "/index.html";
             } else {
-                currentUrl.pathname =
-                    currentPath.slice(
+                url.pathname =
+                    url.pathname.slice(
                         0,
-                        currentPath.lastIndexOf("/") + 1
+                        url.pathname.lastIndexOf("/") + 1
                     ) +
                     "index.html";
             }
         }
-        currentUrl.search = "";
-        currentUrl.hash = "";
-        return currentUrl.href;
+        url.search = "";
+        url.hash = "";
+        return url.href;
     }
     /* ==================================================
-       三十二、创建成功后返回书架
-    ================================================== */
-    function navigateToHome() {
-        if (redirectTimer !== null) {
-            window.clearTimeout(redirectTimer);
-            redirectTimer = null;
-        }
-        var homeUrl = getHomeUrl();
-        console.info(
-            "[WritingCreateBook] 正在返回书架首页：",
-            homeUrl
-        );
-        window.location.replace(homeUrl);
-    }
-    /* ==================================================
-       三十三、创建书籍
+       三十二、提交书籍
     ================================================== */
     async function handleSubmit(event) {
         event.preventDefault();
@@ -1087,25 +1166,13 @@
         try {
             storage = getStorage();
         } catch (error) {
-            console.error(
-                "[WritingCreateBook] 存储模块检查失败：",
-                error
-            );
-            showMessage(
-                getCreateErrorMessage(error),
-                "error"
-            );
+            showMessage(getCreateErrorMessage(error), "error");
             return;
         }
         isSubmitting = true;
         updateSubmitButton();
         try {
             var title = getTitleValue();
-            /*
-             * Promise.resolve 兼容：
-             * 1. 同步返回书籍对象
-             * 2. 返回 Promise 的异步接口
-             */
             var result = await Promise.resolve(
                 storage.createBook({
                     title: title,
@@ -1121,94 +1188,63 @@
                 "》创建成功！正在返回书架……",
                 "success"
             );
-            console.info(
-                "[WritingCreateBook] 创建成功：",
-                book
-            );
-            console.info(
-                "[WritingCreateBook] 目标首页：",
-                getHomeUrl()
-            );
-            redirectTimer = window.setTimeout(
-                navigateToHome,
-                REDIRECT_DELAY
-            );
+            redirectTimer = window.setTimeout(function () {
+                window.location.replace(getHomeUrl());
+            }, REDIRECT_DELAY);
         } catch (error) {
-            console.error(
-                "[WritingCreateBook] 创建失败：",
-                error
-            );
-            showMessage(
-                getCreateErrorMessage(error),
-                "error"
-            );
+            console.error("[WritingCreateBook] 创建失败：", error);
+            showMessage(getCreateErrorMessage(error), "error");
             isSubmitting = false;
             updateSubmitButton();
         }
     }
     /* ==================================================
-       三十四、检查未保存的输入
+       三十三、取消和返回
     ================================================== */
     function hasUnsavedInput() {
         return Boolean(
             elements.title.value.trim() ||
-            selectedCoverData ||
-            (
-                elements.coverInput.files &&
-                elements.coverInput.files.length > 0
-            )
+            selectedCoverData
         );
     }
-    /* ==================================================
-       三十五、统一处理返回与取消
-    ================================================== */
     function handleCancel(event) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
-        if (isSubmitting || isSaved || isLeavingPage) {
-            return;
-        }
+        if (isSubmitting || isSaved || isLeavingPage) return;
         if (cropIsOpen) {
-            var abandonCrop = window.confirm(
-                "封面正在裁剪，确定取消裁剪并放弃本次创建吗？"
-            );
-            if (!abandonCrop) {
+            if (!window.confirm("封面正在裁剪，确定取消并离开吗？")) {
                 return;
             }
             cancelCrop();
         }
         if (isProcessingImage) {
-            var stopProcessing = window.confirm(
-                "封面仍在处理中，确定放弃本次创建吗？"
-            );
-            if (!stopProcessing) {
+            if (!window.confirm("封面仍在处理中，确定放弃吗？")) {
                 return;
             }
             imageSelectionToken++;
             isProcessingImage = false;
             updateSubmitButton();
         } else if (hasUnsavedInput()) {
-            var confirmed = window.confirm(
-                "当前书籍尚未创建，确定放弃本次填写吗？"
-            );
-            if (!confirmed) {
+            if (!window.confirm("当前书籍尚未创建，确定放弃填写吗？")) {
                 return;
             }
         }
         isLeavingPage = true;
         window.location.assign(getCreatePageUrl());
     }
+    function bindBackButton(button) {
+        if (!button) return;
+        button.addEventListener("click", handleCancel);
+    }
     /* ==================================================
-       三十六、绑定书名事件
+       三十四、绑定事件
     ================================================== */
+    elements.title.maxLength = MAX_TITLE_LENGTH;
     elements.title.addEventListener("input", function () {
         updateTitleCounter();
-        if (
-            elements.titleError &&
-            !elements.titleError.hidden
-        ) {
+        if (elements.titleError && !elements.titleError.hidden) {
             validateTitle();
         }
         hideMessage();
@@ -1218,357 +1254,19 @@
             validateTitle();
         }
     });
-    /* ==================================================
-       三十七、绑定封面选择与移除事件
-    ================================================== */
-    elements.coverInput.addEventListener(
-        "change",
-        handleCoverSelection
-    );
-    if (elements.removeCoverButton) {
-        elements.removeCoverButton.type = "button";
-        elements.removeCoverButton.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                if (isSubmitting || isProcessingImage) {
-                    return;
-                }
-                clearCoverPreview();
-                hideMessage();
-            }
-        );
-    }
-    /* ==================================================
-       三十八、绑定裁剪弹窗按钮
-    ================================================== */
-    if (elements.cropZoom) {
-        elements.cropZoom.addEventListener(
-            "input",
-            function () {
-                setCropZoom(this.value);
-            }
-        );
-    }
-    if (elements.cropZoomInButton) {
-        elements.cropZoomInButton.type = "button";
-        elements.cropZoomInButton.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                setCropZoom(cropZoom + 0.1);
-            }
-        );
-    }
-    if (elements.cropZoomOutButton) {
-        elements.cropZoomOutButton.type = "button";
-        elements.cropZoomOutButton.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                setCropZoom(cropZoom - 0.1);
-            }
-        );
-    }
-    if (elements.cropResetButton) {
-        elements.cropResetButton.type = "button";
-        elements.cropResetButton.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                resetCrop();
-            }
-        );
-    }
-    if (elements.cropCancelButton) {
-        elements.cropCancelButton.type = "button";
-        elements.cropCancelButton.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                cancelCrop();
-            }
-        );
-    }
-    if (elements.cropConfirmButton) {
-        elements.cropConfirmButton.type = "button";
-        elements.cropConfirmButton.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                confirmCrop();
-            }
-        );
-    }
-    /*
-     * 点击弹窗背景可关闭裁剪。
-     * 点击对话框内部不会触发关闭。
-     */
-    if (elements.cropModal) {
-        elements.cropModal.addEventListener(
-            "click",
-            function (event) {
-                if (event.target !== elements.cropModal) {
-                    return;
-                }
-                cancelCrop();
-            }
-        );
-    }
-    /* ==================================================
-       三十九、拖动与双指缩放
-    ================================================== */
-    function getPointerDistance(pointerA, pointerB) {
-        var dx = pointerA.x - pointerB.x;
-        var dy = pointerA.y - pointerB.y;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-    function getPointerCenter(pointerA, pointerB) {
-        return {
-            x: (pointerA.x + pointerB.x) / 2,
-            y: (pointerA.y + pointerB.y) / 2
-        };
-    }
-    /*
-     * 把页面坐标转换成裁剪区域内部坐标。
-     */
-    function getStagePoint(clientX, clientY) {
-        var rect = elements.cropStage.getBoundingClientRect();
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
-    }
-    function beginPinch() {
-        if (activePointers.size < 2) {
-            return;
-        }
-        var pointers = Array.from(activePointers.values());
-        var pointA = getStagePoint(
-            pointers[0].x,
-            pointers[0].y
-        );
-        var pointB = getStagePoint(
-            pointers[1].x,
-            pointers[1].y
-        );
-        pinchStartDistance = getPointerDistance(pointA, pointB);
-        pinchStartZoom = cropZoom;
-        pinchStartCenter = getPointerCenter(pointA, pointB);
-        var scale = cropFitScale * cropZoom;
-        /*
-         * 记录双指中心对应的原图坐标。
-         * 缩放时保持该位置不变，减少画面跳动。
-         */
-        pinchSourceCenter = {
-            x: (pinchStartCenter.x - cropLeft) / scale,
-            y: (pinchStartCenter.y - cropTop) / scale
-        };
-    }
-    function updatePinch() {
-        if (
-            activePointers.size < 2 ||
-            !pinchStartDistance ||
-            !pinchStartCenter ||
-            !pinchSourceCenter
-        ) {
-            return;
-        }
-        var pointers = Array.from(activePointers.values());
-        var pointA = getStagePoint(
-            pointers[0].x,
-            pointers[0].y
-        );
-        var pointB = getStagePoint(
-            pointers[1].x,
-            pointers[1].y
-        );
-        var distance = getPointerDistance(pointA, pointB);
-        var center = getPointerCenter(pointA, pointB);
-        var ratio = distance / pinchStartDistance;
-        var newZoom = Math.max(
-            MIN_ZOOM,
-            Math.min(
-                MAX_ZOOM,
-                pinchStartZoom * ratio
-            )
-        );
-        cropZoom = newZoom;
-        var scale = cropFitScale * cropZoom;
-        cropLeft = center.x - pinchSourceCenter.x * scale;
-        cropTop = center.y - pinchSourceCenter.y * scale;
-        updateCropImagePosition();
-    }
-    function handleDocumentPointerMove(event) {
-        if (
-            !cropIsOpen ||
-            !activePointers.has(event.pointerId)
-        ) {
-            return;
-        }
-        activePointers.set(event.pointerId, {
-            x: event.clientX,
-            y: event.clientY
-        });
-        if (activePointers.size >= 2) {
-            event.preventDefault();
-            updatePinch();
-            return;
-        }
-        if (activePointers.size === 1) {
-            event.preventDefault();
-            cropLeft =
-                dragImageLeft +
-                event.clientX -
-                dragStartX;
-            cropTop =
-                dragImageTop +
-                event.clientY -
-                dragStartY;
-            updateCropImagePosition();
-        }
-    }
-    function handleDocumentPointerEnd(event) {
-        if (!activePointers.has(event.pointerId)) {
-            return;
-        }
-        activePointers.delete(event.pointerId);
-        if (activePointers.size === 1) {
-            var remainingPointer =
-                Array.from(activePointers.values())[0];
-            dragStartX = remainingPointer.x;
-            dragStartY = remainingPointer.y;
-            dragImageLeft = cropLeft;
-            dragImageTop = cropTop;
-            pinchStartDistance = 0;
-            pinchStartCenter = null;
-            pinchSourceCenter = null;
-        } else if (activePointers.size === 0) {
-            pinchStartDistance = 0;
-            pinchStartCenter = null;
-            pinchSourceCenter = null;
-        } else {
-            beginPinch();
-        }
-    }
-    if (elements.cropStage) {
-        elements.cropStage.addEventListener(
-            "pointerdown",
-            function (event) {
-                if (!cropIsOpen) {
-                    return;
-                }
-                if (
-                    event.pointerType === "mouse" &&
-                    event.button !== 0
-                ) {
-                    return;
-                }
-                event.preventDefault();
-                activePointers.set(event.pointerId, {
-                    x: event.clientX,
-                    y: event.clientY
-                });
-                try {
-                    elements.cropStage.setPointerCapture(
-                        event.pointerId
-                    );
-                } catch (error) {
-                    /*
-                     * 某些浏览器不支持指针捕获时，
-                     * 仍通过 document 级事件处理。
-                     */
-                }
-                if (activePointers.size === 1) {
-                    dragStartX = event.clientX;
-                    dragStartY = event.clientY;
-                    dragImageLeft = cropLeft;
-                    dragImageTop = cropTop;
-                } else if (activePointers.size === 2) {
-                    beginPinch();
-                }
-            }
-        );
-        elements.cropStage.addEventListener(
-            "dragstart",
-            function (event) {
-                event.preventDefault();
-            }
-        );
-        document.addEventListener(
-            "pointermove",
-            handleDocumentPointerMove,
-            {
-                capture: true,
-                passive: false
-            }
-        );
-        document.addEventListener(
-            "pointerup",
-            handleDocumentPointerEnd,
-            true
-        );
-        document.addEventListener(
-            "pointercancel",
-            handleDocumentPointerEnd,
-            true
-        );
-    }
-    /* ==================================================
-       四十、绑定表单提交
-    ================================================== */
-    elements.form.addEventListener(
-        "submit",
-        handleSubmit
-    );
-    /* ==================================================
-       四十一、绑定顶部返回和底部取消
-    ================================================== */
-    function bindBackButton(button) {
-        if (!button) {
-            return;
-        }
-        if (button.dataset.createBookBackBound === "true") {
-            return;
-        }
-        button.dataset.createBookBackBound = "true";
-        button.setAttribute(
-            "href",
-            getCreatePageUrl()
-        );
-        button.addEventListener(
-            "click",
-            function (event) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                handleCancel(event);
-            },
-            true
-        );
-    }
-    bindBackButton(elements.cancelTopButton);
+    elements.form.addEventListener("submit", handleSubmit);
     bindBackButton(elements.cancelButton);
+    bindBackButton(elements.cancelTopButton);
+    window.addEventListener("beforeunload", function (event) {
+        if (isSubmitting || isSaved || isLeavingPage) return;
+        if (!hasUnsavedInput()) return;
+        event.preventDefault();
+        event.returnValue = "";
+    });
     /* ==================================================
-       四十二、离开页面前提示
-    ================================================== */
-    window.addEventListener(
-        "beforeunload",
-        function (event) {
-            if (isSubmitting || isSaved || isLeavingPage) {
-                return;
-            }
-            if (!hasUnsavedInput()) {
-                return;
-            }
-            event.preventDefault();
-            event.returnValue = "";
-        }
-    );
-    /* ==================================================
-       四十三、初始化
+       三十五、初始化
     ================================================== */
     function initialize() {
-        elements.title.maxLength = MAX_TITLE_LENGTH;
         updateTitleCounter();
         updateCoverPreview();
         updateSubmitButton();
@@ -1581,45 +1279,35 @@
         if (elements.cropZoom) {
             elements.cropZoom.min = String(MIN_ZOOM);
             elements.cropZoom.max = String(MAX_ZOOM);
-            elements.cropZoom.step = String(ZOOM_STEP);
+            elements.cropZoom.step = "0.01";
             elements.cropZoom.value = String(MIN_ZOOM);
         }
         if (elements.cropZoomValue) {
             elements.cropZoomValue.textContent = "100%";
         }
+        console.info("[WritingCreateBook] 初始化完成。");
         console.info(
-            "[WritingCreateBook] 页面初始化完成。"
+            "[WritingCreateBook] 封面输入框：",
+            Boolean(elements.coverInput)
         );
         console.info(
-            "[WritingCreateBook] 当前页面地址：",
-            window.location.href
+            "[WritingCreateBook] 封面选择按钮：",
+            Boolean(elements.coverSelectLabel)
         );
         console.info(
-            "[WritingCreateBook] WritingStorage 是否存在：",
-            Boolean(window.WritingStorage)
+            "[WritingCreateBook] 裁剪界面完整：",
+            hasCropElements()
         );
         console.info(
-            "[WritingCreateBook] createBook() 是否可用：",
+            "[WritingCreateBook] WritingStorage 可用：",
             Boolean(
                 window.WritingStorage &&
                 typeof window.WritingStorage.createBook === "function"
             )
         );
-        console.info(
-            "[WritingCreateBook] 裁剪弹窗是否完整：",
-            hasCropElements()
-        );
-        console.info(
-            "[WritingCreateBook] 新建入口页地址：",
-            getCreatePageUrl()
-        );
-        console.info(
-            "[WritingCreateBook] 书架首页地址：",
-            getHomeUrl()
-        );
     }
     /* ==================================================
-       四十四、公开接口
+       三十六、公开接口
     ================================================== */
     window.WritingCreateBook = Object.freeze({
         validateTitle: validateTitle,
