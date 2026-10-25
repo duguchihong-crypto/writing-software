@@ -1,0 +1,203 @@
+/* =========================================================
+   写作软件 · 书架列表模式
+   文件：page-css/home-list.css
+
+   功能：
+   1. 每行一本书
+   2. 封面和书名横向排列
+   3. 显示书籍简介及相关信息
+   4. 保留书籍操作菜单
+   5. 不修改书籍数据
+========================================================= */
+
+/* 列表容器 */
+#shelf-list.shelf-list--list {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* 每本书占据一整行 */
+#shelf-list.shelf-list--list > .shelf-card {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+}
+
+/* 书籍打开区域 */
+#shelf-list.shelf-list--list .shelf-card__open {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+}
+
+/* 封面 */
+#shelf-list.shelf-list--list .shelf-card__cover,
+#shelf-list.shelf-list--list .shelf-card__cover--default {
+    position: relative !important;
+    display: flex !important;
+    flex: 0 0 76px !important;
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+    height: 102px !important;
+    min-height: 102px !important;
+    aspect-ratio: 3 / 4 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* 上传的封面图片 */
+#shelf-list.shelf-list--list .shelf-card__cover img,
+#shelf-list.shelf-list--list .shelf-card__cover-image {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+}
+
+/* 默认封面上的装饰 */
+#shelf-list.shelf-list--list .shelf-card__cover-decoration,
+#shelf-list.shelf-list--list .shelf-card__cover-character,
+#shelf-list.shelf-list--list .shelf-card__cover-title {
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+/* 书籍信息区域 */
+#shelf-list.shelf-list--list .shelf-card__body {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    text-align: left !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+}
+
+/* 书名 */
+#shelf-list.shelf-list--list .shelf-card__title {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 0 6px !important;
+    padding: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    text-align: left !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+}
+
+/* 列表模式显示简介及书籍信息 */
+#shelf-list.shelf-list--list .shelf-card__description,
+#shelf-list.shelf-list--list .shelf-card__meta,
+#shelf-list.shelf-list--list .shelf-card__word-count,
+#shelf-list.shelf-list--list .shelf-card__updated-at,
+#shelf-list.shelf-list--list .shelf-card__author,
+#shelf-list.shelf-list--list .shelf-card__footer {
+    display: block !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* 书籍操作按钮 */
+#shelf-list.shelf-list--list .shelf-card__menu-button {
+    position: absolute !important;
+    z-index: 10 !important;
+    top: 6px !important;
+    right: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 30px !important;
+    height: 30px !important;
+}
+
+/* 避免内部内容撑破布局 */
+#shelf-list.shelf-list--list .shelf-card__open > *,
+#shelf-list.shelf-list--list .shelf-card__body > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 分组列表模式：每行一个分组 */
+#home-groups-list.home-groups-list--list {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+/* 分组卡片 */
+#home-groups-list.home-groups-list--list > .home-group-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+}
+
+/* 分组封面 */
+#home-groups-list.home-groups-list--list .home-group-card__cover {
+    flex: 0 0 64px !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    height: 85px !important;
+    aspect-ratio: 3 / 4 !important;
+}
+
+/* 分组名称 */
+#home-groups-list.home-groups-list--list .home-group-card__name {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    text-align: left !important;
+}
