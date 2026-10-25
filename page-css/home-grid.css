@@ -4,15 +4,16 @@
    功能：
    1. 书籍固定三列，每行三本
    2. 书籍封面固定 9:16 比例
-   3. 没有封面图片时显示空白封面框
-   4. 网格模式只显示封面和书名
-   5. 分组固定三列
-   6. 分组透明框固定 9:16 比例
-   7. 书名、分组名显示在框下方
-   8. 保留书籍和分组右上角操作菜单
-   9. 隐藏“我的分组”标题
-  10. 适配手机、平板
-  11. 不修改本地数据
+   3. 上传的封面完整显示，不裁切
+   4. 没有封面图片时显示空白封面框
+   5. 网格模式只显示封面和书名
+   6. 分组固定三列
+   7. 分组透明框固定 9:16 比例
+   8. 书名、分组名显示在框下方
+   9. 保留书籍和分组右上角操作菜单
+  10. 隐藏“我的分组”标题
+  11. 适配手机、平板
+  12. 不修改本地数据
 ========================================================= */
 /* =========================================================
    一、书籍网格容器
@@ -113,7 +114,8 @@ html.home-grid-enabled #shelf-list .shelf-card__cover,
 }
 /* =========================================================
    五、上传的封面图片
-   图片铺满整个封面框
+   图片完整显示在 9:16 封面框内
+   不裁切图片内容
 ========================================================= */
 html.home-grid-enabled #shelf-list .shelf-card__cover img,
 html.home-grid-enabled #shelf-list .shelf-card__cover-image,
@@ -128,8 +130,8 @@ html.home-grid-enabled #shelf-list .shelf-card__cover-image,
     height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    object-fit: cover !important;
-    object-position: center !important;
+    object-fit: contain !important;
+    object-position: center center !important;
     box-sizing: border-box !important;
 }
 /* =========================================================
@@ -191,7 +193,7 @@ html.home-grid-enabled #shelf-list .shelf-card__body,
 }
 /* =========================================================
    九、书名
-   最多显示两行
+   显示在封面下方，最多两行
 ========================================================= */
 html.home-grid-enabled #shelf-list .shelf-card__title,
 #shelf-list.shelf-list--grid .shelf-card__title {
