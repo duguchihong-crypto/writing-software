@@ -12,11 +12,13 @@
         content="创建新书籍，填写书名并选择专属封面。"
     >
     <title>新建书籍 - 写作软件</title>
+
     <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../page-css/create-book.css">
+
     <style>
         :root {
             --create-book-red: #9E2428;
@@ -28,18 +30,20 @@
             --create-book-cyan-active: #0B6B63;
             --create-book-footer-height: 76px;
         }
-        /* 一、页面基础布局 */
+
         html {
             width: 100%;
             min-width: 0;
             min-height: 100%;
         }
+
         body {
             width: 100%;
             min-width: 0;
             min-height: 100%;
             margin: 0;
         }
+
         #app {
             position: relative;
             display: flex;
@@ -49,6 +53,7 @@
             min-height: 100vh;
             min-height: 100dvh;
         }
+
         .create-book-main {
             flex: 1 0 auto;
             min-width: 0;
@@ -59,7 +64,7 @@
                 20px
             );
         }
-        /* 二、顶部返回按钮 */
+
         #cancel-create-book-top {
             display: inline-flex;
             align-items: center;
@@ -78,13 +83,14 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
+
         #cancel-create-book-top:hover {
             background: #FBF0F0 !important;
             color: #7F1D21 !important;
             -webkit-text-fill-color: #7F1D21 !important;
             border-color: #7F1D21 !important;
         }
-        /* 三、取消按钮 */
+
         #cancel-create-book {
             display: inline-flex;
             align-items: center;
@@ -101,16 +107,18 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
+
         #cancel-create-book:hover {
             background: #FBF0F0 !important;
             color: #7F1D21 !important;
             -webkit-text-fill-color: #7F1D21 !important;
             border-color: #FFFFFF !important;
         }
+
         #cancel-create-book:active {
             background: #F4DEDF !important;
         }
-        /* 四、创建按钮与封面选择按钮 */
+
         #create-book-submit,
         .create-book-cover__select-button {
             background: #159E91 !important;
@@ -120,6 +128,7 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
+
         #create-book-submit *,
         #create-book-submit span,
         .create-book-cover__select-button *,
@@ -127,23 +136,27 @@
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
         }
+
         #create-book-submit:hover:not(:disabled),
         .create-book-cover__select-button:hover {
             background: #107F75 !important;
             border-color: #107F75 !important;
         }
+
         #create-book-submit:active:not(:disabled) {
             background: #0B6B63 !important;
             border-color: #0B6B63 !important;
         }
+
         #create-book-submit:disabled {
             opacity: 0.65 !important;
             cursor: not-allowed;
         }
-        /* 五、书名输入框 */
+
         .create-book-field__required {
             color: #9E2428 !important;
         }
+
         .create-book-field__input {
             display: block;
             box-sizing: border-box;
@@ -153,31 +166,34 @@
             -webkit-appearance: none;
             appearance: none;
         }
+
         .create-book-field__input:focus {
             border-color: #159E91 !important;
             outline-color: #159E91 !important;
             box-shadow: 0 0 0 3px
                 rgba(21, 158, 145, 0.12) !important;
         }
-        /* 六、消息区域 */
+
         .create-book-message {
             white-space: pre-wrap;
             overflow-wrap: anywhere;
         }
+
         .create-book-message.is-error {
             color: #9E2428;
         }
+
         .create-book-message.is-success {
             color: #107F75;
         }
-        /* 七、按钮焦点 */
+
         #cancel-create-book-top:focus-visible,
         #cancel-create-book:focus-visible,
         #create-book-submit:focus-visible {
             outline: 2px solid #159E91 !important;
             outline-offset: 3px;
         }
-        /* 八、固定底部导航栏 */
+
         #app > .app-footer {
             position: fixed !important;
             top: auto !important;
@@ -202,6 +218,7 @@
                 var(--color-yellow-dark, #A88638);
             isolation: isolate;
         }
+
         #app > .app-footer .bottom-nav {
             display: flex;
             align-items: center;
@@ -210,15 +227,17 @@
             min-width: 0;
             box-sizing: border-box;
         }
+
         #app > .app-footer .bottom-nav__item {
             flex: 1 1 0;
             min-width: 0;
         }
-        /* 九、手机适配 */
+
         @media (max-width: 520px) {
             :root {
                 --create-book-footer-height: 72px;
             }
+
             .create-book-main {
                 padding-bottom: calc(
                     var(--create-book-footer-height) +
@@ -226,12 +245,13 @@
                     18px
                 );
             }
+
             .create-book-field__input {
                 min-height: 46px;
                 font-size: 16px !important;
             }
         }
-        /* 十、小屏手机 */
+
         @media (max-width: 360px) {
             .create-book-main {
                 padding-bottom: calc(
@@ -241,7 +261,7 @@
                 );
             }
         }
-        /* 十一、减少动态效果 */
+
         @media (prefers-reduced-motion: reduce) {
             #cancel-create-book-top,
             #cancel-create-book,
@@ -252,15 +272,17 @@
         }
     </style>
 </head>
+
 <body>
 <div id="app">
+
     <!-- 顶部栏 -->
     <header class="app-header" id="app-header">
         <div class="app-header__brand">
             <span class="app-header__brand-name">写作软件</span>
         </div>
+
         <div class="app-header__actions">
-            <!-- 使用普通链接，不交给公共导航脚本处理 -->
             <a
                 class="app-header__button app-header__button--settings"
                 id="cancel-create-book-top"
@@ -269,6 +291,7 @@
             >← 返回</a>
         </div>
     </header>
+
     <!-- 页面主体 -->
     <main class="app-main create-book-main">
         <section
@@ -277,10 +300,12 @@
         >
             <div class="create-book-heading">
                 <p class="create-book-heading__eyebrow">NEW BOOK</p>
+
                 <h1
                     class="create-book-heading__title"
                     id="create-book-title"
                 >新建书籍</h1>
+
                 <div
                     class="create-book-heading__divider"
                     aria-hidden="true"
@@ -289,16 +314,19 @@
                     <span></span>
                     <span></span>
                 </div>
+
                 <p class="create-book-heading__description">
                     为你的故事取一个名字，选择一张专属封面。
                 </p>
             </div>
+
             <!-- 新建书籍表单 -->
             <form
                 class="create-book-form"
                 id="create-book-form"
                 novalidate
             >
+
                 <!-- 书籍封面 -->
                 <section
                     class="create-book-section create-book-cover-section"
@@ -309,10 +337,12 @@
                             class="create-book-section__title"
                             id="cover-section-title"
                         >书籍封面</h2>
+
                         <span class="create-book-section__optional">
                             选填
                         </span>
                     </div>
+
                     <div class="create-book-cover">
                         <div
                             class="create-book-cover__preview"
@@ -347,13 +377,16 @@
                                         stroke-linecap="round"
                                     />
                                 </svg>
+
                                 <span class="create-book-cover__placeholder-title">
                                     尚未选择封面
                                 </span>
+
                                 <span class="create-book-cover__placeholder-description">
                                     让每一个故事拥有自己的面貌
                                 </span>
                             </div>
+
                             <img
                                 class="create-book-cover__image"
                                 id="cover-preview-image"
@@ -361,6 +394,7 @@
                                 hidden
                             >
                         </div>
+
                         <div class="create-book-cover__actions">
                             <label
                                 class="create-book-cover__select-button"
@@ -369,6 +403,7 @@
                                 <span aria-hidden="true">＋</span>
                                 <span id="cover-select-label">选择封面</span>
                             </label>
+
                             <button
                                 class="create-book-cover__remove-button"
                                 id="remove-cover-button"
@@ -376,12 +411,15 @@
                                 hidden
                             >移除封面</button>
                         </div>
+
                         <p
                             class="create-book-cover__help"
                             id="cover-help"
                         >
-                            支持常见图片格式，建议使用清晰的竖版封面。
+                            支持常见图片格式，封面统一为 2:3 比例。
+                            选择图片后，可拖动或缩放调整裁剪位置。
                         </p>
+
                         <input
                             class="create-book-cover__input"
                             id="book-cover-input"
@@ -390,6 +428,7 @@
                             accept="image/*"
                             aria-describedby="cover-help cover-error"
                         >
+
                         <p
                             class="create-book-cover__error"
                             id="cover-error"
@@ -398,6 +437,7 @@
                         ></p>
                     </div>
                 </section>
+
                 <!-- 基本信息 -->
                 <section
                     class="create-book-section create-book-info-section"
@@ -409,6 +449,7 @@
                             id="info-section-title"
                         >基本信息</h2>
                     </div>
+
                     <div class="create-book-field">
                         <label
                             class="create-book-field__label"
@@ -420,6 +461,7 @@
                                 aria-hidden="true"
                             >*</span>
                         </label>
+
                         <input
                             class="create-book-field__input"
                             id="book-title"
@@ -431,6 +473,7 @@
                             required
                             aria-describedby="book-title-help book-title-error"
                         >
+
                         <div class="create-book-field__footer">
                             <p
                                 class="create-book-field__help"
@@ -438,11 +481,13 @@
                             >
                                 一个好名字，是故事的开始。
                             </p>
+
                             <span
                                 class="create-book-field__counter"
                                 id="book-title-counter"
                             >0 / 100</span>
                         </div>
+
                         <p
                             class="create-book-field__error"
                             id="book-title-error"
@@ -451,6 +496,7 @@
                         ></p>
                     </div>
                 </section>
+
                 <!-- 操作消息 -->
                 <div
                     class="create-book-message"
@@ -459,15 +505,16 @@
                     aria-live="polite"
                     hidden
                 ></div>
+
                 <!-- 操作按钮 -->
                 <div class="create-book-actions">
-                    <!-- 普通链接：返回 pages/create.html -->
                     <a
                         class="create-book-actions__button create-book-actions__button--cancel"
                         id="cancel-create-book"
                         href="./create.html"
                         aria-label="取消并返回新建页面"
                     >取消</a>
+
                     <button
                         class="create-book-actions__button create-book-actions__button--submit"
                         id="create-book-submit"
@@ -477,16 +524,135 @@
                         创建书籍
                     </button>
                 </div>
+
                 <p class="create-book-footnote">
                     创建后，你可以继续为这部作品添加章节、人物与世界观。
                 </p>
             </form>
         </section>
     </main>
+
+    <!-- 封面裁剪弹窗 -->
+    <div
+        class="cover-crop-modal"
+        id="cover-crop-modal"
+        hidden
+    >
+        <button
+            class="cover-crop-modal__backdrop"
+            type="button"
+            data-crop-dismiss
+            aria-label="关闭裁剪窗口"
+            tabindex="-1"
+        ></button>
+
+        <section
+            class="cover-crop-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cover-crop-title"
+            aria-describedby="cover-crop-instructions"
+        >
+            <header class="cover-crop-dialog__header">
+                <div>
+                    <h2
+                        class="cover-crop-dialog__title"
+                        id="cover-crop-title"
+                    >调整封面</h2>
+
+                    <p class="cover-crop-dialog__subtitle">
+                        统一比例 · 2:3
+                    </p>
+                </div>
+
+                <button
+                    class="cover-crop-dialog__close"
+                    type="button"
+                    data-crop-dismiss
+                    aria-label="关闭裁剪窗口"
+                >×</button>
+            </header>
+
+            <p
+                class="cover-crop-dialog__instructions"
+                id="cover-crop-instructions"
+            >
+                拖动图片调整位置。使用下方滑块缩放，手机也可以双指缩放。
+                裁剪框外的部分不会保留。
+            </p>
+
+            <!-- 固定 2:3 裁剪框 -->
+            <div
+                class="cover-crop-viewport"
+                id="cover-crop-viewport"
+            >
+                <img
+                    class="cover-crop-viewport__image"
+                    id="cover-crop-image"
+                    alt="正在调整的封面"
+                    draggable="false"
+                >
+            </div>
+
+            <div class="cover-crop-zoom">
+                <div class="cover-crop-zoom__header">
+                    <label
+                        class="cover-crop-zoom__label"
+                        for="cover-crop-zoom"
+                    >缩放图片</label>
+
+                    <output
+                        class="cover-crop-zoom__value"
+                        id="cover-crop-zoom-value"
+                        for="cover-crop-zoom"
+                    >100%</output>
+                </div>
+
+                <input
+                    class="cover-crop-zoom__range"
+                    id="cover-crop-zoom"
+                    type="range"
+                    min="1"
+                    max="3"
+                    step="0.01"
+                    value="1"
+                    aria-label="封面缩放比例"
+                >
+
+                <div class="cover-crop-zoom__limits">
+                    <span>适应裁剪框</span>
+                    <span>放大 3 倍</span>
+                </div>
+            </div>
+
+            <div class="cover-crop-dialog__actions">
+                <button
+                    class="cover-crop-button cover-crop-button--reset"
+                    id="cover-crop-reset"
+                    type="button"
+                >重置</button>
+
+                <div class="cover-crop-dialog__actions-right">
+                    <button
+                        class="cover-crop-button cover-crop-button--cancel"
+                        id="cover-crop-cancel"
+                        type="button"
+                    >取消</button>
+
+                    <button
+                        class="cover-crop-button cover-crop-button--confirm"
+                        id="cover-crop-confirm"
+                        type="button"
+                    >确认裁剪</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
     <!-- 固定底部导航栏 -->
     <footer class="app-footer" id="app-footer">
         <nav class="bottom-nav" aria-label="主导航">
-            <!-- 书架 -->
+
             <a
                 class="bottom-nav__item"
                 href="../index.html"
@@ -517,7 +683,7 @@
                 </span>
                 <span class="bottom-nav__label">书架</span>
             </a>
-            <!-- 工具 -->
+
             <a
                 class="bottom-nav__item"
                 href="./tools.html"
@@ -553,13 +719,16 @@
                 </span>
                 <span class="bottom-nav__label">工具</span>
             </a>
+
         </nav>
     </footer>
 </div>
-<!-- 保留原有 JS 文件，避免影响书籍创建、存储和公共组件 -->
+
+<!-- 保留原有公共脚本 -->
 <script src="../js/storage.js" defer></script>
 <script src="../js/navigation.js" defer></script>
 <script src="../js/components.js" defer></script>
 <script src="../page-js/create-book.js" defer></script>
+
 </body>
 </html>
