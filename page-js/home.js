@@ -11,9 +11,13 @@
    7. 兼容本地存储变化及跨页面同步
    8. 兼容同步和异步存储读取
    9. 加强异常处理与调试日志
+   10. 无封面书籍显示空白国风封面
+   11. 书名统一显示在封面下方
+   12. 分组显示空白透明框和分组名称
    注意：
    - 书籍数据由 WritingStorage 统一管理。
    - 不直接修改书籍数据库。
+   - 不修改、不清除本地存储数据。
    - 保留原有页面元素、CSS 类名和功能。
 ====================================================== */
 (function () {
@@ -195,7 +199,7 @@
         }
         /*
          * 兼容旧版本封面数据。
-         * 此处只读取旧数据，不修改存储内容。
+         * 这里只读取旧数据，不修改存储内容。
          */
         try {
             const legacyData = localStorage.getItem(
@@ -228,35 +232,34 @@
     }
     /* ==================================================
        六、默认书籍封面
+       修改说明：
+       1. 保留原有 CSS 类名。
+       2. 保留国风默认封面样式。
+       3. 不再生成“卷”字。
+       4. 不再生成书名首字。
+       5. 不再把完整书名写进封面。
+       6. 封面内部完全为空。
     ================================================== */
-    function createDefaultCover(title) {
-        const firstCharacter = Array.from(title)[0] || "书";
+    function createDefaultCover() {
         return `
             <div
                 class="shelf-card__cover shelf-card__cover--default"
                 aria-label="默认封面"
-            >
-                <span
-                    class="shelf-card__cover-decoration"
-                    aria-hidden="true"
-                >卷</span>
-                <span class="shelf-card__cover-character">
-                    ${escapeHTML(firstCharacter)}
-                </span>
-                <span class="shelf-card__cover-title">
-                    ${escapeHTML(title)}
-                </span>
-            </div>
+                role="img"
+            ></div>
         `;
     }
     /* ==================================================
        七、书籍封面
+       有封面：显示图片。
+       无封面：显示空白国风封面。
+       书名统一由 createBookCard() 放在封面下方。
     ================================================== */
     function createCoverHTML(book) {
         const title = getBookTitle(book);
         const cover = getBookCover(book);
         if (!cover) {
-            return createDefaultCover(title);
+            return createDefaultCover();
         }
         return `
             <div class="shelf-card__cover">
@@ -745,6 +748,16 @@
     });
     /* ==================================================
        十六、创建书籍卡片
+       书籍卡片结构：
+       article.shelf-card
+       ├── button.shelf-card__open
+       │   ├── div.shelf-card__cover
+       │   └── div.shelf-card__body
+       │       ├── h3.shelf-card__title
+       │       ├── p.shelf-card__description
+       │       └── div.shelf-card__meta
+       └── button.shelf-card__menu-button
+       书名始终位于封面节点之外。
     ================================================== */
     function createBookCard(book) {
         const card = document.createElement("article");
@@ -788,6 +801,7 @@
         card.appendChild(
             createMenuButton("book", book.id, title)
         );
+        /* 上传的封面加载失败时，切换为空白国风封面。 */
         const coverImage = card.querySelector(
             ".shelf-card__cover-image"
         );
@@ -798,7 +812,7 @@
                 );
                 if (coverContainer) {
                     coverContainer.outerHTML =
-                        createDefaultCover(title);
+                        createDefaultCover();
                 }
             });
         }
@@ -1043,11 +1057,13 @@
     }
     /* ==================================================
        二十三、创建分组卡片
-       修改内容：
-       1. 使用透明封面框代替原来的复选框
-       2. 分组名称放在透明框下方
-       3. 保留右上角的三个点操作菜单
-       4. 保留原有分组名称、ID 和操作功能
+       分组卡片结构：
+       article.home-group-card
+       ├── div.home-group-card__cover
+       ├── h3.home-group-card__name
+       └── button.home-group-card__menu-button
+       透明框为空。
+       分组名称放在透明框之外。
     ================================================== */
     function createGroupCard(group) {
         const card = document.createElement("article");
