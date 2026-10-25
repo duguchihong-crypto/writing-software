@@ -1,32 +1,32 @@
 /* ======================================================
-写作软件 · 新建书籍
-文件：page-js/create-book.js
-功能：
-1. 输入书名并验证
-2. 选择、预览、更换、移除封面
-3. 手动裁剪封面，固定 2:3 比例
-4. 支持拖动、滑块缩放和双指缩放
-5. 输出 400 × 600 JPEG 封面
-6. 检查存储模块是否正常
-7. 创建书籍并处理错误
-8. 防止重复提交
-9. 取消时确认放弃
-10. 顶部返回、底部取消返回新建页面
-11. 创建成功后返回书架首页
-12. 兼容同步和异步存储接口
-13. 兼容 GitHub Pages 项目路径
-注意：
-书籍数据由 WritingStorage 统一管理。
-本文件不直接操作 localStorage。
-裁剪 HTML 需要提供：
-cover-crop-modal
-cover-crop-stage
-cover-crop-image
-cover-crop-zoom
-cover-crop-zoom-value
-cover-crop-reset
-cover-crop-cancel
-cover-crop-confirm
+   写作软件 · 新建书籍
+   文件：page-js/create-book.js
+   功能：
+   1. 输入书名并验证
+   2. 选择、预览、更换、移除封面
+   3. 手动裁剪封面，固定 2:3 比例
+   4. 支持拖动、滑块缩放和双指缩放
+   5. 输出 400 × 600 JPEG 封面
+   6. 检查存储模块是否正常
+   7. 创建书籍并处理错误
+   8. 防止重复提交
+   9. 取消时确认放弃
+   10. 顶部返回、底部取消返回新建入口页
+   11. 创建成功后返回书架首页
+   12. 兼容同步和异步存储接口
+   13. 兼容 GitHub Pages 项目路径
+   注意：
+   书籍数据由 WritingStorage 统一管理。
+   本文件不直接操作 localStorage。
+   裁剪 HTML 需要提供：
+   cover-crop-modal
+   cover-crop-stage
+   cover-crop-image
+   cover-crop-zoom
+   cover-crop-zoom-value
+   cover-crop-reset
+   cover-crop-cancel
+   cover-crop-confirm
 ====================================================== */
 (function () {
     "use strict";
@@ -60,12 +60,13 @@ cover-crop-confirm
         submitButton: document.getElementById("create-book-submit"),
         cancelButton: document.getElementById("cancel-create-book"),
         cancelTopButton: document.getElementById("cancel-create-book-top"),
-        /* 封面裁剪元素 */
         cropModal: document.getElementById("cover-crop-modal"),
         cropStage: document.getElementById("cover-crop-stage"),
         cropImage: document.getElementById("cover-crop-image"),
         cropZoom: document.getElementById("cover-crop-zoom"),
         cropZoomValue: document.getElementById("cover-crop-zoom-value"),
+        cropZoomInButton: document.getElementById("cover-crop-zoom-in"),
+        cropZoomOutButton: document.getElementById("cover-crop-zoom-out"),
         cropResetButton: document.getElementById("cover-crop-reset"),
         cropCancelButton: document.getElementById("cover-crop-cancel"),
         cropConfirmButton: document.getElementById("cover-crop-confirm")
@@ -104,6 +105,8 @@ cover-crop-confirm
     var dragImageTop = 0;
     var pinchStartDistance = 0;
     var pinchStartZoom = 1;
+    var pinchStartCenter = null;
+    var pinchSourceCenter = null;
     var previousBodyOverflow = "";
     /* ==================================================
        五、检查页面元素
@@ -302,6 +305,10 @@ cover-crop-confirm
             elements.cropImage.onload = null;
             elements.cropImage.onerror = null;
             elements.cropImage.removeAttribute("src");
+            elements.cropImage.style.width = "";
+            elements.cropImage.style.height = "";
+            elements.cropImage.style.left = "";
+            elements.cropImage.style.top = "";
         }
         cropNaturalWidth = 0;
         cropNaturalHeight = 0;
@@ -314,6 +321,8 @@ cover-crop-confirm
         activePointers.clear();
         pinchStartDistance = 0;
         pinchStartZoom = 1;
+        pinchStartCenter = null;
+        pinchSourceCenter = null;
     }
     /* ==================================================
        十二、关闭裁剪弹窗
@@ -330,6 +339,21 @@ cover-crop-confirm
         document.removeEventListener(
             "keydown",
             handleCropKeydown,
+            true
+        );
+        document.removeEventListener(
+            "pointermove",
+            handleDocumentPointerMove,
+            true
+        );
+        document.removeEventListener(
+            "pointerup",
+            handleDocumentPointerEnd,
+            true
+        );
+        document.removeEventListener(
+            "pointercancel",
+            handleDocumentPointerEnd,
             true
         );
         releaseCropImage();
@@ -360,7 +384,7 @@ cover-crop-confirm
         updateSubmitButton();
     }
     /* ==================================================
-       十四、读取图片
+       十四、验证图片是否可读取
     ================================================== */
     function loadImageFromFile(file) {
         return new Promise(function (resolve, reject) {
@@ -376,10 +400,7 @@ cover-crop-confirm
             var image = new Image();
             image.onload = function () {
                 URL.revokeObjectURL(objectUrl);
-                if (
-                    !image.naturalWidth ||
-                    !image.naturalHeight
-                ) {
+                if (!image.naturalWidth || !image.naturalHeight) {
                     reject(
                         new Error("图片尺寸无效，请重新选择。")
                     );
@@ -439,21 +460,24 @@ cover-crop-confirm
         var imageWidth = cropNaturalWidth * scale;
         var imageHeight = cropNaturalHeight * scale;
         clampCropPosition();
-        elements.cropImage.style.width =
-            imageWidth + "px";
-        elements.cropImage.style.height =
-            imageHeight + "px";
-        elements.cropImage.style.left =
-            cropLeft + "px";
-        elements.cropImage.style.top =
-            cropTop + "px";
+        elements.cropImage.style.width = imageWidth + "px";
+        elements.cropImage.style.height = imageHeight + "px";
+        elements.cropImage.style.left = cropLeft + "px";
+        elements.cropImage.style.top = cropTop + "px";
         if (elements.cropZoom) {
-            elements.cropZoom.value =
-                String(cropZoom);
+            elements.cropZoom.value = String(cropZoom);
         }
         if (elements.cropZoomValue) {
             elements.cropZoomValue.textContent =
                 Math.round(cropZoom * 100) + "%";
+        }
+        if (elements.cropZoomInButton) {
+            elements.cropZoomInButton.disabled =
+                cropZoom >= MAX_ZOOM;
+        }
+        if (elements.cropZoomOutButton) {
+            elements.cropZoomOutButton.disabled =
+                cropZoom <= MIN_ZOOM;
         }
     }
     /* ==================================================
@@ -476,6 +500,10 @@ cover-crop-confirm
         ) {
             throw new Error("裁剪区域尺寸无效，请重试。");
         }
+        /*
+         * 图片最初完整覆盖 2:3 裁剪区域。
+         * 横图会裁掉左右部分，竖图会裁掉上下部分。
+         */
         cropFitScale = Math.max(
             cropViewportWidth / cropNaturalWidth,
             cropViewportHeight / cropNaturalHeight
@@ -497,7 +525,7 @@ cover-crop-confirm
     }
     /* ==================================================
        十八、设置缩放
-       默认以裁剪框中心为缩放中心
+       以裁剪框中心为缩放中心
     ================================================== */
     function setCropZoom(newZoom) {
         if (!cropNaturalWidth || !cropNaturalHeight) {
@@ -581,7 +609,10 @@ cover-crop-confirm
             if (elements.cropResetButton) {
                 elements.cropResetButton.disabled = true;
             }
-            elements.cropImage.onload = function () {
+            if (elements.cropZoom) {
+                elements.cropZoom.disabled = true;
+            }
+            function handleImageLoaded() {
                 if (
                     token !== imageSelectionToken ||
                     !cropIsOpen
@@ -596,30 +627,54 @@ cover-crop-confirm
                     !cropNaturalWidth ||
                     !cropNaturalHeight
                 ) {
+                    closeCropModal();
                     reject(
                         new Error("图片尺寸无效，请重新选择。")
                     );
-                    closeCropModal();
                     return;
                 }
-                try {
-                    initializeCropGeometry();
-                    elements.cropConfirmButton.disabled = false;
-                    if (elements.cropResetButton) {
-                        elements.cropResetButton.disabled = false;
+                /*
+                 * 等待弹窗布局完成，再读取裁剪框尺寸。
+                 */
+                window.requestAnimationFrame(function () {
+                    if (
+                        token !== imageSelectionToken ||
+                        !cropIsOpen
+                    ) {
+                        return;
                     }
-                    if (elements.cropCancelButton) {
-                        elements.cropCancelButton.disabled = false;
+                    try {
+                        initializeCropGeometry();
+                        elements.cropConfirmButton.disabled = false;
+                        if (elements.cropResetButton) {
+                            elements.cropResetButton.disabled = false;
+                        }
+                        if (elements.cropCancelButton) {
+                            elements.cropCancelButton.disabled = false;
+                        }
+                        if (elements.cropZoom) {
+                            elements.cropZoom.disabled = false;
+                        }
+                        if (elements.cropZoomInButton) {
+                            elements.cropZoomInButton.disabled = false;
+                        }
+                        if (elements.cropZoomOutButton) {
+                            elements.cropZoomOutButton.disabled = false;
+                        }
+                        if (
+                            elements.cropConfirmButton &&
+                            typeof elements.cropConfirmButton.focus === "function"
+                        ) {
+                            elements.cropConfirmButton.focus();
+                        }
+                        resolve(true);
+                    } catch (error) {
+                        closeCropModal();
+                        reject(error);
                     }
-                    if (elements.cropZoom) {
-                        elements.cropZoom.disabled = false;
-                    }
-                    resolve(true);
-                } catch (error) {
-                    closeCropModal();
-                    reject(error);
-                }
-            };
+                });
+            }
+            elements.cropImage.onload = handleImageLoaded;
             elements.cropImage.onerror = function () {
                 if (token !== imageSelectionToken) {
                     return;
@@ -647,7 +702,7 @@ cover-crop-confirm
         }
         var scale = cropFitScale * cropZoom;
         /*
-         * 将裁剪框中的显示坐标转换为原图坐标。
+         * 将显示区域换算为原图坐标。
          */
         var sourceX = -cropLeft / scale;
         var sourceY = -cropTop / scale;
@@ -738,8 +793,7 @@ cover-crop-confirm
         try {
             var croppedData = createCroppedCover();
             /*
-             * 只有确认裁剪成功后才替换当前封面。
-             * 如果生成失败，旧封面不会被覆盖。
+             * 只有生成成功后才替换当前封面。
              */
             selectedCoverData = croppedData;
             updateCoverPreview();
@@ -761,7 +815,11 @@ cover-crop-confirm
         } finally {
             if (elements.cropConfirmButton) {
                 elements.cropConfirmButton.textContent = "确认裁剪";
-                elements.cropConfirmButton.disabled = false;
+                /*
+                 * 弹窗关闭后不必启用按钮；
+                 * 下次打开时会重新设置状态。
+                 */
+                elements.cropConfirmButton.disabled = !cropIsOpen;
             }
             isProcessingImage = false;
             updateSubmitButton();
@@ -781,7 +839,7 @@ cover-crop-confirm
         updateSubmitButton();
         /*
          * 不修改 selectedCoverData。
-         * 因此取消裁剪不会覆盖原有封面。
+         * 取消裁剪不会覆盖之前已经确认的封面。
          */
     }
     /* ==================================================
@@ -797,9 +855,6 @@ cover-crop-confirm
             cancelCrop();
             return;
         }
-        /*
-         * 防止弹窗打开时误触底层表单。
-         */
         if (
             event.key === "Enter" &&
             event.target === elements.cropZoom
@@ -820,13 +875,16 @@ cover-crop-confirm
             return;
         }
         var currentToken = ++imageSelectionToken;
+        /*
+         * 先清空 input，允许用户之后再次选择同一文件。
+         * File 对象仍然可以继续使用。
+         */
+        elements.coverInput.value = "";
         if (!file.type || file.type.indexOf("image/") !== 0) {
-            elements.coverInput.value = "";
             setCoverError("请选择有效的图片文件。");
             return;
         }
         if (file.size > MAX_IMAGE_SIZE) {
-            elements.coverInput.value = "";
             setCoverError(
                 "图片不能超过 10 MB，请选择较小的图片。"
             );
@@ -836,23 +894,13 @@ cover-crop-confirm
         updateSubmitButton();
         showMessage("正在读取图片……", "info");
         try {
-            /*
-             * 先确认浏览器能够正常读取图片。
-             */
             var image = await loadImageFromFile(file);
             if (currentToken !== imageSelectionToken) {
                 return;
             }
-            if (
-                !image.naturalWidth ||
-                !image.naturalHeight
-            ) {
+            if (!image.naturalWidth || !image.naturalHeight) {
                 throw new Error("图片尺寸无效，请重新选择。");
             }
-            /*
-             * 不直接压缩整张原图。
-             * 打开裁剪界面，由用户决定最终保留的区域。
-             */
             await openCropModal(file, currentToken);
             if (currentToken !== imageSelectionToken) {
                 return;
@@ -869,7 +917,6 @@ cover-crop-confirm
             if (cropIsOpen) {
                 closeCropModal();
             }
-            elements.coverInput.value = "";
             setCoverError(
                 error && error.message
                     ? error.message
@@ -927,10 +974,14 @@ cover-crop-confirm
                 "存储模块没有返回有效的书籍数据。请检查 createBook()。"
             );
         }
+        var bookId =
+            book.id !== undefined && book.id !== null
+                ? book.id
+                : book.bookId;
         if (
-            book.id === undefined ||
-            book.id === null ||
-            String(book.id).trim() === ""
+            bookId === undefined ||
+            bookId === null ||
+            String(bookId).trim() === ""
         ) {
             throw new Error(
                 "书籍创建结果缺少 ID，无法确认保存成功。请检查 storage.js 的返回值。"
@@ -1051,8 +1102,9 @@ cover-crop-confirm
         try {
             var title = getTitleValue();
             /*
-             * 统一通过 WritingStorage 创建书籍。
-             * 兼容同步返回值和 Promise 返回值。
+             * Promise.resolve 兼容：
+             * 1. 同步返回书籍对象
+             * 2. 返回 Promise 的异步接口
              */
             var result = await Promise.resolve(
                 storage.createBook({
@@ -1146,10 +1198,6 @@ cover-crop-confirm
             }
         }
         isLeavingPage = true;
-        /*
-         * 顶部返回和底部取消仍返回新建入口页。
-         * 只有创建成功后才返回书架首页。
-         */
         window.location.assign(getCreatePageUrl());
     }
     /* ==================================================
@@ -1202,6 +1250,26 @@ cover-crop-confirm
             }
         );
     }
+    if (elements.cropZoomInButton) {
+        elements.cropZoomInButton.type = "button";
+        elements.cropZoomInButton.addEventListener(
+            "click",
+            function (event) {
+                event.preventDefault();
+                setCropZoom(cropZoom + 0.1);
+            }
+        );
+    }
+    if (elements.cropZoomOutButton) {
+        elements.cropZoomOutButton.type = "button";
+        elements.cropZoomOutButton.addEventListener(
+            "click",
+            function (event) {
+                event.preventDefault();
+                setCropZoom(cropZoom - 0.1);
+            }
+        );
+    }
     if (elements.cropResetButton) {
         elements.cropResetButton.type = "button";
         elements.cropResetButton.addEventListener(
@@ -1232,8 +1300,23 @@ cover-crop-confirm
             }
         );
     }
+    /*
+     * 点击弹窗背景可关闭裁剪。
+     * 点击对话框内部不会触发关闭。
+     */
+    if (elements.cropModal) {
+        elements.cropModal.addEventListener(
+            "click",
+            function (event) {
+                if (event.target !== elements.cropModal) {
+                    return;
+                }
+                cancelCrop();
+            }
+        );
+    }
     /* ==================================================
-       三十九、绑定裁剪区域拖动与双指缩放
+       三十九、拖动与双指缩放
     ================================================== */
     function getPointerDistance(pointerA, pointerB) {
         var dx = pointerA.x - pointerB.x;
@@ -1245,6 +1328,128 @@ cover-crop-confirm
             x: (pointerA.x + pointerB.x) / 2,
             y: (pointerA.y + pointerB.y) / 2
         };
+    }
+    /*
+     * 把页面坐标转换成裁剪区域内部坐标。
+     */
+    function getStagePoint(clientX, clientY) {
+        var rect = elements.cropStage.getBoundingClientRect();
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+    function beginPinch() {
+        if (activePointers.size < 2) {
+            return;
+        }
+        var pointers = Array.from(activePointers.values());
+        var pointA = getStagePoint(
+            pointers[0].x,
+            pointers[0].y
+        );
+        var pointB = getStagePoint(
+            pointers[1].x,
+            pointers[1].y
+        );
+        pinchStartDistance = getPointerDistance(pointA, pointB);
+        pinchStartZoom = cropZoom;
+        pinchStartCenter = getPointerCenter(pointA, pointB);
+        var scale = cropFitScale * cropZoom;
+        /*
+         * 记录双指中心对应的原图坐标。
+         * 缩放时保持该位置不变，减少画面跳动。
+         */
+        pinchSourceCenter = {
+            x: (pinchStartCenter.x - cropLeft) / scale,
+            y: (pinchStartCenter.y - cropTop) / scale
+        };
+    }
+    function updatePinch() {
+        if (
+            activePointers.size < 2 ||
+            !pinchStartDistance ||
+            !pinchStartCenter ||
+            !pinchSourceCenter
+        ) {
+            return;
+        }
+        var pointers = Array.from(activePointers.values());
+        var pointA = getStagePoint(
+            pointers[0].x,
+            pointers[0].y
+        );
+        var pointB = getStagePoint(
+            pointers[1].x,
+            pointers[1].y
+        );
+        var distance = getPointerDistance(pointA, pointB);
+        var center = getPointerCenter(pointA, pointB);
+        var ratio = distance / pinchStartDistance;
+        var newZoom = Math.max(
+            MIN_ZOOM,
+            Math.min(
+                MAX_ZOOM,
+                pinchStartZoom * ratio
+            )
+        );
+        cropZoom = newZoom;
+        var scale = cropFitScale * cropZoom;
+        cropLeft = center.x - pinchSourceCenter.x * scale;
+        cropTop = center.y - pinchSourceCenter.y * scale;
+        updateCropImagePosition();
+    }
+    function handleDocumentPointerMove(event) {
+        if (
+            !cropIsOpen ||
+            !activePointers.has(event.pointerId)
+        ) {
+            return;
+        }
+        activePointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY
+        });
+        if (activePointers.size >= 2) {
+            event.preventDefault();
+            updatePinch();
+            return;
+        }
+        if (activePointers.size === 1) {
+            event.preventDefault();
+            cropLeft =
+                dragImageLeft +
+                event.clientX -
+                dragStartX;
+            cropTop =
+                dragImageTop +
+                event.clientY -
+                dragStartY;
+            updateCropImagePosition();
+        }
+    }
+    function handleDocumentPointerEnd(event) {
+        if (!activePointers.has(event.pointerId)) {
+            return;
+        }
+        activePointers.delete(event.pointerId);
+        if (activePointers.size === 1) {
+            var remainingPointer =
+                Array.from(activePointers.values())[0];
+            dragStartX = remainingPointer.x;
+            dragStartY = remainingPointer.y;
+            dragImageLeft = cropLeft;
+            dragImageTop = cropTop;
+            pinchStartDistance = 0;
+            pinchStartCenter = null;
+            pinchSourceCenter = null;
+        } else if (activePointers.size === 0) {
+            pinchStartDistance = 0;
+            pinchStartCenter = null;
+            pinchSourceCenter = null;
+        } else {
+            beginPinch();
+        }
     }
     if (elements.cropStage) {
         elements.cropStage.addEventListener(
@@ -1269,7 +1474,10 @@ cover-crop-confirm
                         event.pointerId
                     );
                 } catch (error) {
-                    /* 部分浏览器可能不支持捕获，继续使用事件处理。 */
+                    /*
+                     * 某些浏览器不支持指针捕获时，
+                     * 仍通过 document 级事件处理。
+                     */
                 }
                 if (activePointers.size === 1) {
                     dragStartX = event.clientX;
@@ -1277,104 +1485,33 @@ cover-crop-confirm
                     dragImageLeft = cropLeft;
                     dragImageTop = cropTop;
                 } else if (activePointers.size === 2) {
-                    var pointers = Array.from(
-                        activePointers.values()
-                    );
-                    pinchStartDistance = getPointerDistance(
-                        pointers[0],
-                        pointers[1]
-                    );
-                    pinchStartZoom = cropZoom;
+                    beginPinch();
                 }
             }
-        );
-        elements.cropStage.addEventListener(
-            "pointermove",
-            function (event) {
-                if (
-                    !cropIsOpen ||
-                    !activePointers.has(event.pointerId)
-                ) {
-                    return;
-                }
-                event.preventDefault();
-                activePointers.set(event.pointerId, {
-                    x: event.clientX,
-                    y: event.clientY
-                });
-                if (activePointers.size >= 2) {
-                    var pointers = Array.from(
-                        activePointers.values()
-                    );
-                    var distance = getPointerDistance(
-                        pointers[0],
-                        pointers[1]
-                    );
-                    if (pinchStartDistance > 0) {
-                        var zoomRatio =
-                            distance / pinchStartDistance;
-                        setCropZoom(
-                            pinchStartZoom * zoomRatio
-                        );
-                    }
-                    return;
-                }
-                if (activePointers.size === 1) {
-                    cropLeft =
-                        dragImageLeft +
-                        event.clientX -
-                        dragStartX;
-                    cropTop =
-                        dragImageTop +
-                        event.clientY -
-                        dragStartY;
-                    updateCropImagePosition();
-                }
-            }
-        );
-        function endCropPointer(event) {
-            if (!activePointers.has(event.pointerId)) {
-                return;
-            }
-            activePointers.delete(event.pointerId);
-            if (activePointers.size === 1) {
-                var remainingPointer =
-                    Array.from(activePointers.values())[0];
-                dragStartX = remainingPointer.x;
-                dragStartY = remainingPointer.y;
-                dragImageLeft = cropLeft;
-                dragImageTop = cropTop;
-                pinchStartDistance = 0;
-            } else if (activePointers.size === 0) {
-                pinchStartDistance = 0;
-            } else if (activePointers.size >= 2) {
-                var pointers = Array.from(
-                    activePointers.values()
-                );
-                pinchStartDistance = getPointerDistance(
-                    pointers[0],
-                    pointers[1]
-                );
-                pinchStartZoom = cropZoom;
-            }
-        }
-        elements.cropStage.addEventListener(
-            "pointerup",
-            endCropPointer
-        );
-        elements.cropStage.addEventListener(
-            "pointercancel",
-            endCropPointer
-        );
-        elements.cropStage.addEventListener(
-            "lostpointercapture",
-            endCropPointer
         );
         elements.cropStage.addEventListener(
             "dragstart",
             function (event) {
                 event.preventDefault();
             }
+        );
+        document.addEventListener(
+            "pointermove",
+            handleDocumentPointerMove,
+            {
+                capture: true,
+                passive: false
+            }
+        );
+        document.addEventListener(
+            "pointerup",
+            handleDocumentPointerEnd,
+            true
+        );
+        document.addEventListener(
+            "pointercancel",
+            handleDocumentPointerEnd,
+            true
         );
     }
     /* ==================================================
@@ -1395,7 +1532,10 @@ cover-crop-confirm
             return;
         }
         button.dataset.createBookBackBound = "true";
-        button.setAttribute("href", getCreatePageUrl());
+        button.setAttribute(
+            "href",
+            getCreatePageUrl()
+        );
         button.addEventListener(
             "click",
             function (event) {
@@ -1411,16 +1551,19 @@ cover-crop-confirm
     /* ==================================================
        四十二、离开页面前提示
     ================================================== */
-    window.addEventListener("beforeunload", function (event) {
-        if (isSubmitting || isSaved || isLeavingPage) {
-            return;
+    window.addEventListener(
+        "beforeunload",
+        function (event) {
+            if (isSubmitting || isSaved || isLeavingPage) {
+                return;
+            }
+            if (!hasUnsavedInput()) {
+                return;
+            }
+            event.preventDefault();
+            event.returnValue = "";
         }
-        if (!hasUnsavedInput()) {
-            return;
-        }
-        event.preventDefault();
-        event.returnValue = "";
-    });
+    );
     /* ==================================================
        四十三、初始化
     ================================================== */
@@ -1440,6 +1583,9 @@ cover-crop-confirm
             elements.cropZoom.max = String(MAX_ZOOM);
             elements.cropZoom.step = String(ZOOM_STEP);
             elements.cropZoom.value = String(MIN_ZOOM);
+        }
+        if (elements.cropZoomValue) {
+            elements.cropZoomValue.textContent = "100%";
         }
         console.info(
             "[WritingCreateBook] 页面初始化完成。"
