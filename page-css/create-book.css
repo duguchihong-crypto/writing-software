@@ -4,13 +4,15 @@
 功能：
 1. 页面整体布局
 2. 页面标题与装饰
-3. 书籍封面预览
-4. 图片选择与移除按钮
+3. 统一 2:3 比例的书籍封面预览
+4. 图片选择、更换与移除按钮
 5. 书名输入框
 6. 错误提示与操作按钮
-7. 手机端适配
-8. 固定底部导航栏
-9. 青色主题统一
+7. 手动裁剪封面弹窗
+8. 图片拖动、缩放及裁剪操作界面
+9. 手机、平板和电脑适配
+10. 固定底部导航栏
+11. 青色主题统一
 ====================================================== */
 /* ======================================================
 一、页面整体布局
@@ -36,8 +38,9 @@
             transparent 65%
         ),
         var(--theme-background);
-    /* 为固定底部导航栏预留空间 */
-    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(
+        100px + env(safe-area-inset-bottom, 0px)
+    );
 }
 .create-book-page {
     display: flex;
@@ -197,6 +200,7 @@
 }
 /* ======================================================
 五、封面区域
+统一使用 2:3 比例
 ====================================================== */
 .create-book-cover {
     display: flex;
@@ -211,9 +215,13 @@
     justify-content: center;
     width: 190px;
     max-width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 2 / 3;
     overflow: hidden;
-    background: linear-gradient(145deg, #F9F5EB, #EEE4D2);
+    background: linear-gradient(
+        145deg,
+        #F9F5EB,
+        #EEE4D2
+    );
     border: 1px solid var(--color-white-deep);
     border-radius: 5px;
     box-shadow: 0 5px 16px rgba(33, 31, 28, 0.10);
@@ -299,6 +307,7 @@
     border: 1px solid var(--color-cyan);
     border-radius: 5px;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
     transition:
         background-color 160ms ease,
         border-color 160ms ease,
@@ -402,11 +411,11 @@
 }
 .create-book-field__input {
     display: block;
-    box-sizing: border-box;
     width: 100%;
     min-width: 0;
     min-height: 48px;
     padding: 12px 14px;
+    box-sizing: border-box;
     color: var(--theme-text);
     font-family: inherit;
     font-size: 16px;
@@ -418,7 +427,6 @@
     transition:
         border-color 160ms ease,
         box-shadow 160ms ease;
-    /* 避免 iOS 输入框字号过小导致自动放大 */
     -webkit-appearance: none;
     appearance: none;
 }
@@ -431,7 +439,8 @@
 }
 .create-book-field__input:focus {
     border-color: var(--color-cyan);
-    box-shadow: 0 0 0 3px rgba(40, 124, 115, 0.12);
+    box-shadow: 0 0 0 3px
+        rgba(40, 124, 115, 0.12);
 }
 .create-book-field__footer {
     display: flex;
@@ -468,7 +477,8 @@
 }
 .create-book-field__input[aria-invalid="true"] {
     border-color: var(--color-red);
-    box-shadow: 0 0 0 2px rgba(158, 36, 40, 0.08);
+    box-shadow: 0 0 0 2px
+        rgba(158, 36, 40, 0.08);
 }
 /* ======================================================
 八、表单消息
@@ -482,6 +492,8 @@
     background: rgba(40, 124, 115, 0.08);
     border: 1px solid rgba(40, 124, 115, 0.22);
     border-radius: 5px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 .create-book-message[hidden] {
     display: none !important;
@@ -498,7 +510,6 @@
 }
 /* ======================================================
 九、底部操作按钮
-取消和创建书籍统一使用青色
 ====================================================== */
 .create-book-actions {
     display: flex;
@@ -531,20 +542,18 @@
         box-shadow 160ms ease,
         opacity 160ms ease;
 }
-/* 取消按钮：青色 */
 .create-book-actions__button--cancel {
     color: #FFFFFF !important;
     background: #159E91 !important;
     border-color: #159E91 !important;
 }
-/* 创建书籍按钮：青色 */
 .create-book-actions__button--submit {
     color: #FFFFFF !important;
     background: #159E91 !important;
     border-color: #159E91 !important;
-    box-shadow: 0 3px 8px rgba(21, 158, 145, 0.18);
+    box-shadow: 0 3px 8px
+        rgba(21, 158, 145, 0.18);
 }
-/* 悬停状态 */
 @media (hover: hover) {
     .create-book-actions__button--cancel:hover,
     .create-book-actions__button--submit:hover:not(:disabled) {
@@ -553,19 +562,16 @@
         border-color: #107F75 !important;
     }
 }
-/* 按下状态 */
 .create-book-actions__button--cancel:active,
 .create-book-actions__button--submit:active:not(:disabled) {
     background: #0B6B63 !important;
     border-color: #0B6B63 !important;
 }
-/* 键盘焦点 */
 .create-book-actions__button:focus-visible,
 .create-book-cover__remove-button:focus-visible {
     outline: 3px solid rgba(40, 124, 115, 0.28);
     outline-offset: 3px;
 }
-/* 禁用状态 */
 .create-book-actions__button:disabled,
 .create-book-cover__remove-button:disabled {
     opacity: 0.55;
@@ -583,15 +589,295 @@
     text-align: center;
 }
 /* ======================================================
-十一、固定底部导航栏
-====================================================== */
-/*
+十一、封面裁剪弹窗
 说明：
-1. 导航栏固定在视口底部。
-2. 不根据键盘高度修改 bottom。
-3. 页面内容为导航栏预留空间。
-4. 适配 iPhone 底部安全区域。
-*/
+HTML 中需要添加：
+#cover-crop-modal
+#cover-crop-stage
+#cover-crop-image
+#cover-crop-zoom
+#cover-crop-reset
+#cover-crop-cancel
+#cover-crop-confirm
+====================================================== */
+.cover-crop-modal[hidden] {
+    display: none !important;
+}
+.cover-crop-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+        max(16px, env(safe-area-inset-top, 0px))
+        max(16px, env(safe-area-inset-right, 0px))
+        max(16px, env(safe-area-inset-bottom, 0px))
+        max(16px, env(safe-area-inset-left, 0px));
+    box-sizing: border-box;
+    background: rgba(15, 20, 20, 0.76);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    overscroll-behavior: contain;
+}
+.cover-crop-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 520px);
+    max-height: 100%;
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.30);
+}
+.cover-crop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #E8E8E8;
+}
+.cover-crop-title {
+    margin: 0;
+    color: #222222;
+    font-family: "Songti SC", "STSong", "SimSun", serif;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+.cover-crop-subtitle {
+    margin: 5px 0 0;
+    color: #777777;
+    font-size: 12px;
+    line-height: 1.7;
+}
+.cover-crop-ratio {
+    flex-shrink: 0;
+    padding: 5px 9px;
+    color: #107F75;
+    font-size: 11px;
+    font-weight: 700;
+    background: #E8F7F5;
+    border: 1px solid #C4E9E4;
+    border-radius: 4px;
+}
+/* 裁剪区域外围 */
+.cover-crop-workspace {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 16px;
+    background: #F5F5F5;
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+/* 固定 2:3 裁剪框 */
+.cover-crop-stage {
+    position: relative;
+    width: min(100%, 320px);
+    aspect-ratio: 2 / 3;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #202020;
+    border: 2px solid #159E91;
+    border-radius: 3px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.18);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+.cover-crop-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    pointer-events: none;
+}
+/* 待裁剪图片 */
+.cover-crop-image {
+    position: absolute;
+    display: block;
+    max-width: none;
+    max-height: none;
+    width: auto;
+    height: auto;
+    object-fit: fill;
+    transform-origin: center center;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+/* 三分线 */
+.cover-crop-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background-image:
+        linear-gradient(
+            to right,
+            transparent calc(33.333% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(33.333% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(33.333% + 0.5px),
+            transparent calc(33.333% + 0.5px)
+        ),
+        linear-gradient(
+            to right,
+            transparent calc(66.666% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(66.666% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(66.666% + 0.5px),
+            transparent calc(66.666% + 0.5px)
+        ),
+        linear-gradient(
+            to bottom,
+            transparent calc(33.333% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(33.333% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(33.333% + 0.5px),
+            transparent calc(33.333% + 0.5px)
+        ),
+        linear-gradient(
+            to bottom,
+            transparent calc(66.666% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(66.666% - 0.5px),
+            rgba(255, 255, 255, 0.35) calc(66.666% + 0.5px),
+            transparent calc(66.666% + 0.5px)
+        );
+}
+/* 操作提示 */
+.cover-crop-tip {
+    margin: 0;
+    color: #666666;
+    font-size: 12px;
+    line-height: 1.8;
+    text-align: center;
+}
+/* 缩放控制 */
+.cover-crop-zoom-control {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 320px);
+    gap: 9px;
+}
+.cover-crop-zoom-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #333333;
+    font-size: 12px;
+}
+.cover-crop-zoom-value {
+    color: #107F75;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.cover-crop-zoom-row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 28px;
+    align-items: center;
+    gap: 10px;
+}
+.cover-crop-zoom-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 32px;
+    padding: 0;
+    color: #107F75;
+    font-size: 21px;
+    line-height: 1;
+    background: #FFFFFF;
+    border: 1px solid #D7E9E6;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.cover-crop-zoom-button:active {
+    background: #E8F7F5;
+}
+.cover-crop-zoom {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 28px;
+    margin: 0;
+    accent-color: #159E91;
+    cursor: pointer;
+}
+/* 弹窗按钮 */
+.cover-crop-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1px solid #E8E8E8;
+    background: #FFFFFF;
+}
+.cover-crop-actions__group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.cover-crop-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 17px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.cover-crop-button--reset {
+    color: #555555;
+    background: #FFFFFF;
+    border-color: #DDDDDD;
+}
+.cover-crop-button--cancel {
+    color: #9E2428;
+    background: #FFFFFF;
+    border-color: #E6C6C7;
+}
+.cover-crop-button--confirm {
+    color: #FFFFFF;
+    background: #159E91;
+    border-color: #159E91;
+}
+.cover-crop-button--confirm:hover {
+    background: #107F75;
+    border-color: #107F75;
+}
+.cover-crop-button:focus-visible,
+.cover-crop-zoom-button:focus-visible {
+    outline: 3px solid rgba(21, 158, 145, 0.25);
+    outline-offset: 2px;
+}
+.cover-crop-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+/* 弹窗打开时禁止页面滚动 */
+body.cover-crop-open {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+/* ======================================================
+十二、固定底部导航栏
+====================================================== */
 #app > .app-footer {
     position: fixed;
     right: 0;
@@ -608,7 +894,7 @@
     width: 100%;
 }
 /* ======================================================
-十二、平板适配
+十三、平板适配
 ====================================================== */
 @media (max-width: 768px) {
     .create-book-page {
@@ -623,9 +909,15 @@
     .create-book-section {
         padding: 22px;
     }
+    .cover-crop-dialog {
+        width: min(100%, 480px);
+    }
+    .cover-crop-stage {
+        width: min(100%, 300px);
+    }
 }
 /* ======================================================
-十三、手机适配
+十四、手机适配
 ====================================================== */
 @media (max-width: 520px) {
     .create-book-page {
@@ -668,7 +960,9 @@
     }
     .create-book-actions {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
         gap: 10px;
         margin-top: 22px;
     }
@@ -680,18 +974,67 @@
     .create-book-footnote {
         font-size: 10px;
     }
-    /* 手机端继续固定在底部，不随键盘高度主动上移 */
     #app > .app-footer {
         right: 0;
         bottom: 0;
         left: 0;
     }
     #app > .create-book-main {
-        padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: calc(
+            96px + env(safe-area-inset-bottom, 0px)
+        );
+    }
+    /* 手机端裁剪弹窗 */
+    .cover-crop-modal {
+        align-items: center;
+        padding:
+            max(10px, env(safe-area-inset-top, 0px))
+            max(10px, env(safe-area-inset-right, 0px))
+            max(10px, env(safe-area-inset-bottom, 0px))
+            max(10px, env(safe-area-inset-left, 0px));
+    }
+    .cover-crop-dialog {
+        width: 100%;
+        max-width: 440px;
+        max-height: 100%;
+        border-radius: 10px;
+    }
+    .cover-crop-header {
+        padding: 13px 15px;
+    }
+    .cover-crop-title {
+        font-size: 17px;
+    }
+    .cover-crop-subtitle {
+        font-size: 11px;
+    }
+    .cover-crop-workspace {
+        gap: 10px;
+        padding: 12px 12px;
+        min-height: 0;
+    }
+    .cover-crop-stage {
+        width: min(100%, 250px);
+        max-height: 48dvh;
+    }
+    .cover-crop-zoom-control {
+        width: min(100%, 280px);
+    }
+    .cover-crop-actions {
+        gap: 8px;
+        padding: 12px;
+    }
+    .cover-crop-actions__group {
+        gap: 7px;
+    }
+    .cover-crop-button {
+        min-height: 40px;
+        padding: 9px 12px;
+        font-size: 12px;
     }
 }
 /* ======================================================
-十四、小屏手机
+十五、小屏手机
 ====================================================== */
 @media (max-width: 360px) {
     .create-book-page {
@@ -708,9 +1051,29 @@
         flex-wrap: wrap;
         gap: 4px 10px;
     }
+    .cover-crop-header {
+        padding: 11px;
+    }
+    .cover-crop-workspace {
+        padding: 10px 8px;
+    }
+    .cover-crop-stage {
+        width: min(100%, 220px);
+        max-height: 44dvh;
+    }
+    .cover-crop-actions {
+        padding: 10px 8px;
+    }
+    .cover-crop-actions__group {
+        gap: 5px;
+    }
+    .cover-crop-button {
+        padding-right: 9px;
+        padding-left: 9px;
+    }
 }
 /* ======================================================
-十五、减少动态效果
+十六、减少动态效果
 ====================================================== */
 @media (prefers-reduced-motion: reduce) {
     .create-book-cover__select-button,
