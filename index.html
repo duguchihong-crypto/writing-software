@@ -24,19 +24,13 @@
          首页样式
     ============================== -->
     <link rel="stylesheet" href="./page-css/home.css">
-    <!-- 设置弹窗样式 -->
     <link rel="stylesheet" href="./page-css/home-settings.css">
-    <!-- 书籍排序样式 -->
     <link rel="stylesheet" href="./page-css/home-sort.css">
-    <!-- 分组排序样式 -->
     <link rel="stylesheet" href="./page-css/home-group-sort.css">
-    <!-- 网格模式样式 -->
     <link rel="stylesheet" href="./page-css/home-grid.css">
-    <!-- 列表模式样式 -->
     <link rel="stylesheet" href="./page-css/home-list.css">
     <!-- ==============================
          分组卡片专用样式
-         独立于书籍卡片，避免影响书籍布局
     ============================== -->
     <link rel="stylesheet" href="./page-css/home-group-cards.css">
     <!-- ==============================
@@ -76,7 +70,6 @@
     <script src="./page-js/home-list.js" defer></script>
     <!-- ==============================
          首页渲染
-         保留在相关依赖之后
     ============================== -->
     <script src="./page-js/home.js" defer></script>
 </head>
@@ -101,7 +94,7 @@
             <!-- 新建作品 -->
             <a
                 class="app-header__button app-header__button--create"
-                href="./pages/create.html"
+                href="./pages/create-book.html"
                 aria-label="新建作品"
             >
                 <span
@@ -171,8 +164,6 @@
             </section>
             <!-- ==============================
                  分组区域
-                 不显示「我的分组」标题
-                 保留原有容器与列表 ID
             ============================== -->
             <section
                 class="home-groups"
@@ -190,7 +181,6 @@
             </section>
             <!-- ==============================
                  书籍区域
-                 保留原有书籍列表
             ============================== -->
             <section
                 class="shelf-content"
@@ -274,7 +264,6 @@
     </footer>
     <!-- ==============================
          设置弹窗
-         保留原有结构和操作标识
     ============================== -->
     <div
         class="home-settings"
