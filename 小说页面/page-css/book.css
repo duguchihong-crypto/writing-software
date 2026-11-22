@@ -1,0 +1,249 @@
+/* =========================
+   小说页面整体布局
+========================= */
+
+.book-page {
+    min-height: 100vh;
+    background: var(--bg-color, #f7f7f7);
+    color: var(--text-color, #333);
+    font-family: inherit;
+}
+
+/* =========================
+   顶部固定栏
+========================= */
+
+.book-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    background: var(--surface-color, #fff);
+    border-bottom: 1px solid var(--border-color, #eee);
+    z-index: 100;
+}
+
+.book-header button {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.book-header__back,
+.book-header__add {
+    width: 42px;
+    height: 42px;
+}
+
+.book-header__title {
+    flex: 1;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* =========================
+   新建菜单
+========================= */
+
+.book-create-menu {
+    position: fixed;
+    top: 62px;
+    right: 12px;
+    width: 125px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 200;
+}
+
+.book-create-menu[hidden] {
+    display: none;
+}
+
+.book-create-menu button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.book-create-menu button:active {
+    background: #f2f2f2;
+}
+
+/* =========================
+   中间内容区域
+========================= */
+
+.book-main {
+    box-sizing: border-box;
+    min-height: 100vh;
+    padding: 72px 16px 76px;
+}
+
+.book-panel {
+    width: 100%;
+}
+
+.book-panel[hidden] {
+    display: none;
+}
+
+.book-panel__heading {
+    margin-bottom: 18px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* =========================
+   全书目录
+========================= */
+
+.book-outline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.book-empty {
+    padding: 50px 15px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+/* =========================
+   书籍信息
+========================= */
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.book-info__cover {
+    width: 120px;
+    height: 180px;
+    background: #eee;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+}
+
+.book-info__item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+/* =========================
+   正文编辑区域
+========================= */
+
+#chapter-editor-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+#chapter-editor-panel[hidden] {
+    display: none;
+}
+
+#back-to-outline {
+    align-self: flex-start;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+}
+
+#chapter-title {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    background: transparent;
+    font-size: 20px;
+    outline: none;
+}
+
+#chapter-content {
+    width: 100%;
+    min-height: 55vh;
+    box-sizing: border-box;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.9;
+    resize: vertical;
+    outline: none;
+}
+
+#save-status {
+    color: #999;
+    font-size: 12px;
+    text-align: right;
+}
+
+/* =========================
+   底部固定导航栏
+========================= */
+
+.book-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 58px;
+    display: flex;
+    background: var(--surface-color, #fff);
+    border-top: 1px solid var(--border-color, #eee);
+    z-index: 100;
+}
+
+.book-footer__tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.book-footer__tab.active {
+    color: var(--primary-color, #333);
+    font-weight: 600;
+}
+
+/* =========================
+   手机安全区域
+========================= */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .book-footer {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
