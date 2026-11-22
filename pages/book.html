@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>小说编辑</title>
+
+    <!-- 公共样式：软件整体外观 -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/footer.css">
+
+    <!-- 小说页面专属样式 -->
+    <link rel="stylesheet" href="../page-css/book.css">
+</head>
+
+<body>
+
+    <div class="book-page">
+
+        <!-- 顶部固定导航栏 -->
+        <header class="book-header">
+
+            <!-- 返回书架 -->
+            <button
+                type="button"
+                class="book-header__back"
+                id="back-to-shelf"
+                aria-label="返回书架">
+                ＜
+            </button>
+
+            <!-- 小说名称 -->
+            <div class="book-header__title"
+                 id="book-title">
+                正在加载……
+            </div>
+
+            <!-- 新建按钮 -->
+            <button
+                type="button"
+                class="book-header__add"
+                id="open-create-menu"
+                aria-label="新建">
+                ＋
+            </button>
+
+        </header>
+
+
+        <!-- 新建菜单 -->
+        <div class="book-create-menu"
+             id="create-menu"
+             hidden>
+
+            <button type="button"
+                    data-create="volume">
+                新建卷
+            </button>
+
+            <button type="button"
+                    data-create="part">
+                新建篇
+            </button>
+
+            <button type="button"
+                    data-create="chapter">
+                新建章
+            </button>
+
+            <button type="button"
+                    data-create="preface">
+                新建序
+            </button>
+
+        </div>
+
+
+        <!-- 中间内容区域 -->
+        <main class="book-main">
+
+            <!-- 全书页面 -->
+            <section id="all-books-panel"
+                     class="book-panel">
+
+                <div class="book-panel__heading">
+                    全书目录
+                </div>
+
+                <div id="book-outline"
+                     class="book-outline">
+
+                    <div class="book-empty">
+                        还没有创建任何内容。
+                        点击右上角的＋开始创建。
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- 书籍信息页面 -->
+            <section id="book-info-panel"
+                     class="book-panel"
+                     hidden>
+
+                <div class="book-panel__heading">
+                    书籍信息
+                </div>
+
+                <div class="book-info">
+
+                    <div class="book-info__cover"
+                         id="book-cover">
+                    </div>
+
+                    <div class="book-info__item">
+                        <span>书名</span>
+                        <span id="book-info-title">-</span>
+                    </div>
+
+                    <div class="book-info__item">
+                        <span>简介</span>
+                        <span id="book-description">暂无简介</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- 章节正文编辑区域 -->
+            <section id="chapter-editor-panel"
+                     class="book-panel"
+                     hidden>
+
+                <button type="button"
+                        id="back-to-outline">
+                    ← 返回目录
+                </button>
+
+                <input
+                    type="text"
+                    id="chapter-title"
+                    placeholder="章节名称">
+
+                <textarea
+                    id="chapter-content"
+                    placeholder="开始写作……">
+                </textarea>
+
+                <div id="save-status">
+                    自动保存
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- 底部固定导航栏 -->
+        <footer class="book-footer">
+
+            <button
+                type="button"
+                class="book-footer__tab active"
+                id="tab-all-books">
+
+                全书
+
+            </button>
+
+            <button
+                type="button"
+                class="book-footer__tab"
+                id="tab-book-info">
+
+                书籍
+
+            </button>
+
+        </footer>
+
+    </div>
+
+
+    <!-- 公共功能 -->
+    <script src="../js/storage.js"></script>
+    <script src="../js/navigation.js"></script>
+
+    <!-- 小说页面功能 -->
+    <script src="../page-js/book.js"></script>
+
+</body>
+</html>
