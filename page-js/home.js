@@ -272,32 +272,42 @@
             </div>
         `;
     }
-    /* ==================================================
-       八、打开书籍
-    ================================================== */
-    function openBook(bookId) {
-        if (
-            bookId === undefined ||
-            bookId === null ||
-            String(bookId).trim() === ""
-        ) {
-            showMessage("无法打开书籍：书籍编号无效。");
-            return;
-        }
-        if (
-            window.WritingNavigation &&
-            typeof window.WritingNavigation.goEditor === "function"
-        ) {
-            window.WritingNavigation.goEditor(bookId);
-            return;
-        }
-        const url = new URL(
-            "./pages/editor.html",
-            window.location.href
-        );
-        url.searchParams.set("id", String(bookId));
-        window.location.href = url.href;
+/* ==================================================
+   八、打开书籍
+   进入独立小说页面，并传递书籍 ID。
+================================================== */
+
+function openBook(bookId) {
+
+    if (
+        bookId === undefined ||
+        bookId === null ||
+        String(bookId).trim() === ""
+    ) {
+        showMessage("无法打开书籍：书籍编号无效。");
+        return;
     }
+
+    // 优先使用统一导航模块
+    if (
+        window.WritingNavigation &&
+        typeof window.WritingNavigation.goEditor === "function"
+    ) {
+        window.WritingNavigation.goEditor(bookId);
+        return;
+    }
+
+    // 导航模块不可用时，直接进入小说页面
+    const url = new URL(
+        "./novel-page/book.html",
+        window.location.href
+    );
+
+    // 传递当前书籍的独立编号
+    url.searchParams.set("id", String(bookId));
+
+    window.location.href = url.href;
+}
     /* ==================================================
        九、全局浮动操作菜单
     ================================================== */
