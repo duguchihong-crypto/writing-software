@@ -12,7 +12,7 @@
         content="一款采用传统五色国风设计的写作软件，用于创作小说、整理大纲、管理人物与构建世界。"
     >
     <meta name="color-scheme" content="light">
-    <title>写作软件 · 书架</title>
+<title>写作软件 · 书架</title>
 <!-- ==============================
      公共样式
 ============================== -->
@@ -30,11 +30,11 @@
 <link rel="stylesheet" href="./page-css/home-grid.css">
 <link rel="stylesheet" href="./page-css/home-list.css">
 <!-- ==============================
-     分组卡片专用样式
+     分组卡片样式
 ============================== -->
 <link rel="stylesheet" href="./page-css/home-group-cards.css">
 <!-- ==============================
-     公共 JavaScript
+     公共功能
 ============================== -->
 <script src="./js/storage.js" defer></script>
 <script src="./js/groups-storage.js" defer></script>
@@ -49,7 +49,7 @@
 ============================== -->
 <script src="./page-js/home-group-delete.js" defer></script>
 <!-- ==============================
-     设置模块
+     书架设置
 ============================== -->
 <script src="./page-js/home-settings.js" defer></script>
 <!-- ==============================
@@ -61,15 +61,15 @@
 ============================== -->
 <script src="./page-js/home-group-sort.js" defer></script>
 <!-- ==============================
-     网格模式
+     网格显示
 ============================== -->
 <script src="./page-js/home-grid.js" defer></script>
 <!-- ==============================
-     列表模式
+     列表显示
 ============================== -->
 <script src="./page-js/home-list.js" defer></script>
 <!-- ==============================
-     首页渲染
+     首页显示与管理
 ============================== -->
 <script src="./page-js/home.js" defer></script>
 </head>
@@ -176,7 +176,7 @@
                 id="home-groups-list"
                 aria-label="分组列表"
             >
-                <!-- 分组卡片由 home.js 生成 -->
+                <!-- 分组卡片由首页程序生成 -->
             </div>
         </section>
         <!-- ==============================
@@ -193,7 +193,7 @@
                 id="shelf-list"
                 aria-label="书籍列表"
             >
-                <!-- 书籍卡片由 home.js 生成 -->
+                <!-- 书籍卡片由首页程序生成 -->
             </div>
         </section>
     </section>
@@ -263,7 +263,7 @@
     </nav>
 </footer>
 <!-- ==============================
-     设置弹窗
+     书架设置弹窗
 ============================== -->
 <div
     class="home-settings"
