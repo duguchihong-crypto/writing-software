@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#9E2428">
-    <meta name="color-scheme" content="light">
 
-    <title>新建</title>
+    <title>小说</title>
 
     <!-- 公共样式 -->
     <link rel="stylesheet" href="../css/theme.css">
@@ -14,254 +12,156 @@
     <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="../css/footer.css">
 
-    <!-- 新建页面样式 -->
-    <link rel="stylesheet" href="../page-css/create.css">
-
-    <!-- 返回按钮样式 -->
-    <style>
-        .create-back-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 9px 16px;
-            color: #9E2428;
-            background: #ffffff;
-            border: 1px solid #e5dada;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        .create-back-button:hover {
-            background: #fff8f6;
-        }
-
-        .create-back-button:active {
-            transform: scale(0.97);
-        }
-    </style>
+    <!-- 小说页面样式 -->
+    <link rel="stylesheet" href="./book.css">
 </head>
 
 <body>
 
-<div class="app" id="app">
+    <div class="book-page">
 
-    <!-- ==============================
-         顶部导航栏
-    ============================== -->
-    <header class="app-header" id="app-header">
+        <!-- 顶部固定栏 -->
+        <header class="book-header">
 
-        <a
-            href="../index.html"
-            class="create-back-button"
-            aria-label="返回书架"
-        >
-            ← 返回书架
-        </a>
+            <button id="back-to-shelf" class="header-back">
+                ＜
+            </button>
 
-    </header>
+            <h1 id="book-title" class="header-title">
+                小说
+            </h1>
 
+            <button id="open-create-menu" class="header-add">
+                ＋
+            </button>
 
-    <!-- ==============================
-         页面主体
-    ============================== -->
-    <main class="app-main create-main" id="app-main">
-
-        <div class="create-page">
-
-            <!-- 页面标题 -->
-            <div class="create-page__heading">
-
-                <p class="create-page__eyebrow">
-                    CREATE
-                </p>
-
-                <h1 class="create-page__title">
-                    新建
-                </h1>
-
-                <div class="create-page__divider">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-
-                <p class="create-page__subtitle">
-                    选择你想创建的内容
-                </p>
-
-            </div>
+        </header>
 
 
-            <!-- ==============================
-                 新建选项
-            ============================== -->
-            <div class="create-options">
+        <!-- 新建菜单 -->
+        <div id="create-menu" class="create-menu hidden">
 
-                <!-- 新建书籍 -->
-                <a
-                    href="../pages/create-book.html"
-                    class="create-option create-option--book"
-                >
+            <button data-create="volume">
+                卷
+            </button>
 
-                    <div class="create-option__icon">
-                        <span>📖</span>
-                    </div>
+            <button data-create="part">
+                篇
+            </button>
 
-                    <div class="create-option__content">
+            <button data-create="chapter">
+                章
+            </button>
 
-                        <h2 class="create-option__title">
-                            新建书籍
-                        </h2>
-
-                        <p class="create-option__description">
-                            创建一本新的小说，开始你的写作。
-                        </p>
-
-                        <span class="create-option__detail">
-                            CREATE BOOK
-                        </span>
-
-                    </div>
-
-                    <span class="create-option__arrow">
-                        →
-                    </span>
-
-                </a>
-
-
-                <!-- 新建分组 -->
-                <a
-                    href="../pages/create-group.html"
-                    class="create-option create-option--group"
-                >
-
-                    <div class="create-option__icon">
-                        <span>📁</span>
-                    </div>
-
-                    <div class="create-option__content">
-
-                        <h2 class="create-option__title">
-                            新建分组
-                        </h2>
-
-                        <p class="create-option__description">
-                            创建一个分组，整理和管理你的书籍。
-                        </p>
-
-                        <span class="create-option__detail">
-                            CREATE GROUP
-                        </span>
-
-                    </div>
-
-                    <span class="create-option__arrow">
-                        →
-                    </span>
-
-                </a>
-
-            </div>
+            <button data-create="preface">
+                序
+            </button>
 
         </div>
 
-    </main>
+
+        <!-- 主体内容 -->
+        <main class="book-main">
 
 
-    <!-- ==============================
-         底部导航
-    ============================== -->
-    <footer class="app-footer" id="app-footer">
+            <!-- 全书目录 -->
+            <section id="all-books-panel" class="book-panel">
 
-        <nav class="bottom-nav" aria-label="主导航">
+                <div class="outline-header">
+                    <h2>全书目录</h2>
+                </div>
 
-            <!-- 书架 -->
-            <a
-                class="bottom-nav__item"
-                href="../index.html"
-                data-nav="home"
-                aria-label="书架"
-            >
+                <div id="book-outline" class="book-outline">
 
-                <svg
-                    class="bottom-nav__icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
+                    <!-- 目录由 book.js 自动生成 -->
+
+                </div>
+
+            </section>
+
+
+            <!-- 书籍信息 -->
+            <section id="book-info-panel"
+                     class="book-panel hidden">
+
+                <h2>书籍信息</h2>
+
+                <div class="book-info-cover">
+                    <img id="book-cover" src="" alt="小说封面">
+                </div>
+
+                <div class="book-info-item">
+                    <label>书名</label>
+                    <input
+                        id="book-name"
+                        type="text"
+                        placeholder="请输入书名"
+                    >
+                </div>
+
+                <div class="book-info-item">
+                    <label>简介</label>
+                    <textarea
+                        id="book-description"
+                        placeholder="请输入小说简介"
+                    ></textarea>
+                </div>
+
+            </section>
+
+
+            <!-- 章节正文编辑 -->
+            <section id="chapter-editor-panel"
+                     class="book-panel hidden">
+
+                <button id="back-to-outline" class="back-outline">
+                    ＜ 返回目录
+                </button>
+
+                <input
+                    id="chapter-title"
+                    class="chapter-title"
+                    type="text"
+                    placeholder="章节标题"
                 >
-                    <path
-                        d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22Z"
-                    ></path>
 
-                    <path d="M4 5.5V22"></path>
-                    <path d="M8 7h8"></path>
-                    <path d="M8 11h8"></path>
+                <textarea
+                    id="chapter-content"
+                    class="chapter-content"
+                    placeholder="开始写作……"
+                ></textarea>
 
-                </svg>
+                <div id="save-status" class="save-status">
+                    自动保存
+                </div>
 
-                <span class="bottom-nav__label">
-                    书架
-                </span>
+            </section>
 
-            </a>
-
-
-            <!-- 工具 -->
-            <a
-                class="bottom-nav__item"
-                href="../pages/tools.html"
-                data-nav="tools"
-                aria-label="工具"
-            >
-
-                <svg
-                    class="bottom-nav__icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                >
-                    <circle
-                        cx="12"
-                        cy="12"
-                        r="8.5"
-                    ></circle>
-
-                    <path
-                        d="M14.5 9.5 13 13l-3.5 1.5L11 11Z"
-                    ></path>
-
-                </svg>
-
-                <span class="bottom-nav__label">
-                    工具
-                </span>
-
-            </a>
-
-        </nav>
-
-    </footer>
-
-</div>
+        </main>
 
 
-<!-- ==============================
-     公共功能
-============================== -->
-<script src="../js/navigation.js" defer></script>
+        <!-- 底部固定栏 -->
+        <footer class="book-footer">
+
+            <button id="tab-all-books" class="footer-tab active">
+                全书
+            </button>
+
+            <button id="tab-book-info" class="footer-tab">
+                书籍
+            </button>
+
+        </footer>
+
+    </div>
+
+
+    <!-- 公共功能 -->
+    <script src="../js/storage.js"></script>
+    <script src="../js/navigation.js"></script>
+
+    <!-- 小说页面功能 -->
+    <script src="./book.js"></script>
 
 </body>
 </html>
