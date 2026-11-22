@@ -45,16 +45,17 @@
         saveStatus: document.getElementById("save-status")
     };
     /* =================================
-       检查必要页面元素
+       检查必要元素
     ================================= */
     for (const key of Object.keys(elements)) {
         if (!elements[key]) {
             console.error("小说页面缺少必要元素：", key);
+            alert("小说页面加载不完整，请检查 book.html。");
             return;
         }
     }
     /* =================================
-       小说数据
+       独立数据存储
     ================================= */
     const DATA_KEY = "writing-book-structure:" + bookId;
     const INFO_KEY = "writing-book-info:" + bookId;
@@ -75,6 +76,20 @@
             volumes: []
         };
     }
+    /* =================================
+       数据整理
+    ================================= */
+    function normalizeChapter(chapter, type) {
+        if (!chapter || typeof chapter !== "object") {
+            return null;
+        }
+        return {
+            id: chapter.id || createId(),
+            type: type,
+            title: String(chapter.title || ""),
+            content: String(chapter.content || "")
+        };
+    }
     function loadData() {
         try {
             const saved = localStorage.getItem(DATA_KEY);
@@ -88,23 +103,62 @@
             ) {
                 return createEmptyData();
             }
-            if (!("preface" in result)) {
-                result.preface = null;
+            const data = createEmptyData();
+            if (result.preface) {
+                data.preface = normalizeChapter(
+                    result.preface,
+                    "preface"
+                );
             }
-            result.volumes.forEach(function (volume) {
-                if (!Array.isArray(volume.parts)) {
-                    volume.parts = [];
-                }
-                if (!Array.isArray(volume.chapters)) {
-                    volume.chapters = [];
-                }
-                volume.parts.forEach(function (part) {
-                    if (!Array.isArray(part.chapters)) {
-                        part.chapters = [];
+            data.volumes = result.volumes
+                .filter(function (volume) {
+                    return volume && typeof volume === "object";
+                })
+                .map(function (volume) {
+                    const normalizedVolume = {
+                        id: volume.id || createId(),
+                        type: "volume",
+                        title: String(volume.title || "未命名卷"),
+                        parts: [],
+                        chapters: []
+                    };
+                    if (Array.isArray(volume.parts)) {
+                        normalizedVolume.parts = volume.parts
+                            .filter(function (part) {
+                                return part && typeof part === "object";
+                            })
+                            .map(function (part) {
+                                return {
+                                    id: part.id || createId(),
+                                    type: "part",
+                                    title: String(part.title || "未命名篇"),
+                                    chapters: Array.isArray(part.chapters)
+                                        ? part.chapters
+                                            .map(function (chapter) {
+                                                return normalizeChapter(
+                                                    chapter,
+                                                    "chapter"
+                                                );
+                                            })
+                                            .filter(Boolean)
+                                        : []
+                                };
+                            });
                     }
+                    if (Array.isArray(volume.chapters)) {
+                        normalizedVolume.chapters =
+                            volume.chapters
+                                .map(function (chapter) {
+                                    return normalizeChapter(
+                                        chapter,
+                                        "chapter"
+                                    );
+                                })
+                                .filter(Boolean);
+                    }
+                    return normalizedVolume;
                 });
-            });
-            return result;
+            return data;
         } catch (error) {
             console.error("读取小说目录失败：", error);
             return createEmptyData();
@@ -114,18 +168,22 @@
     /* =================================
        保存小说目录
     ================================= */
+    function setSaveStatus(message) {
+        if (elements.saveStatus) {
+            elements.saveStatus.textContent = message;
+        }
+    }
     function saveData() {
         try {
             localStorage.setItem(
                 DATA_KEY,
                 JSON.stringify(data)
             );
-            elements.saveStatus.textContent = "已保存";
+            setSaveStatus("已保存");
             return true;
         } catch (error) {
             console.error("保存小说失败：", error);
-            elements.saveStatus.textContent = "保存失败";
-            alert("保存失败，请检查手机存储空间。");
+            setSaveStatus("保存失败");
             return false;
         }
     }
@@ -170,6 +228,7 @@
             elements.cover.style.display = "none";
         }
     }
+    let infoSaveTimer = null;
     function saveBookInfo() {
         bookInfo.title =
             elements.bookName.value.trim() || "未命名小说";
@@ -181,20 +240,54 @@
                 JSON.stringify(bookInfo)
             );
             elements.title.textContent = bookInfo.title;
+            // 同步更新书架中的书籍信息
+            if (typeof storage.updateBook === "function") {
+                storage.updateBook(bookId, {
+                    title: bookInfo.title,
+                    description: bookInfo.description,
+                    cover: bookInfo.cover
+                });
+            }
+            return true;
         } catch (error) {
             console.error("保存书籍信息失败：", error);
-            alert("书籍信息保存失败。");
+            return false;
         }
     }
-    elements.bookName.addEventListener("change", saveBookInfo);
-    elements.description.addEventListener("change", saveBookInfo);
+    function scheduleInfoSave() {
+        clearTimeout(infoSaveTimer);
+        infoSaveTimer = setTimeout(function () {
+            saveBookInfo();
+        }, 500);
+    }
+    elements.bookName.addEventListener(
+        "input",
+        scheduleInfoSave
+    );
+    elements.description.addEventListener(
+        "input",
+        scheduleInfoSave
+    );
     /* =================================
        页面切换
     ================================= */
+    function setPanelVisible(element, visible) {
+        element.hidden = !visible;
+        element.classList.toggle("hidden", !visible);
+    }
     function showPanel(panel) {
-        elements.allPanel.hidden = panel !== "all";
-        elements.infoPanel.hidden = panel !== "info";
-        elements.editorPanel.hidden = panel !== "editor";
+        setPanelVisible(
+            elements.allPanel,
+            panel === "all"
+        );
+        setPanelVisible(
+            elements.infoPanel,
+            panel === "info"
+        );
+        setPanelVisible(
+            elements.editorPanel,
+            panel === "editor"
+        );
         elements.allTab.classList.toggle(
             "active",
             panel === "all"
@@ -205,11 +298,8 @@
         );
         elements.menu.hidden = true;
         elements.menu.classList.add("hidden");
-        if (panel === "all") {
-            elements.add.style.display = "";
-        } else {
-            elements.add.style.display = "none";
-        }
+        elements.add.style.display =
+            panel === "all" ? "" : "none";
     }
     elements.allTab.addEventListener("click", function () {
         closeEditor();
@@ -224,16 +314,26 @@
     ================================= */
     elements.back.addEventListener("click", function () {
         closeEditor();
+        clearTimeout(infoSaveTimer);
         saveBookInfo();
         window.location.href = "../index.html";
     });
     /* =================================
        新建菜单
     ================================= */
+    function closeMenu() {
+        elements.menu.hidden = true;
+        elements.menu.classList.add("hidden");
+    }
     function toggleMenu() {
-        const isHidden = elements.menu.hidden;
+        const isHidden =
+            elements.menu.hidden ||
+            elements.menu.classList.contains("hidden");
         elements.menu.hidden = !isHidden;
-        elements.menu.classList.toggle("hidden", !isHidden);
+        elements.menu.classList.toggle(
+            "hidden",
+            !isHidden
+        );
     }
     elements.add.addEventListener("click", function (event) {
         event.stopPropagation();
@@ -244,16 +344,14 @@
             !elements.menu.contains(event.target) &&
             !elements.add.contains(event.target)
         ) {
-            elements.menu.hidden = true;
-            elements.menu.classList.add("hidden");
+            closeMenu();
         }
     });
     elements.menu.addEventListener("click", function (event) {
         const button = event.target.closest("[data-create]");
         if (!button) return;
         const type = button.dataset.create;
-        elements.menu.hidden = true;
-        elements.menu.classList.add("hidden");
+        closeMenu();
         if (type === "volume") createVolume();
         if (type === "part") createPart();
         if (type === "chapter") createChapter();
@@ -289,7 +387,7 @@
             })
             .join("\n");
         const answer = prompt(
-            "请选择篇所属的卷，输入编号：\n" + choices
+            "请选择篇所属的卷，输入编号：\n\n" + choices
         );
         if (answer === null) return;
         const index = Number(answer) - 1;
@@ -338,7 +436,7 @@
             })
             .join("\n");
         const answer = prompt(
-            "请选择章节所属位置，输入编号：\n" + choices
+            "请选择章节所属位置，输入编号：\n\n" + choices
         );
         if (answer === null) return;
         const index = Number(answer) - 1;
@@ -387,89 +485,58 @@
     ================================= */
     function renderOutline() {
         elements.outline.replaceChildren();
-        /*
-         * 序永远显示在目录最上方
-         */
+        // 序始终排在最上方
         if (data.preface) {
             renderChapter(
                 data.preface,
-                elements.outline,
-                "序"
+                elements.outline
             );
         }
-        /*
-         * 显示卷
-         */
+        // 显示卷
         data.volumes.forEach(function (volume) {
             const volumeBox = createBox(
-                "卷",
+                "outline-volume",
                 volume.title
             );
             elements.outline.appendChild(volumeBox);
-            /*
-             * 显示篇
-             */
+            // 显示篇
             volume.parts.forEach(function (part) {
                 const partBox = createBox(
-                    "篇",
+                    "outline-part",
                     part.title
                 );
                 volumeBox.appendChild(partBox);
+                // 显示篇内章节
                 part.chapters.forEach(function (chapter) {
-                    renderChapter(
-                        chapter,
-                        partBox,
-                        "章"
-                    );
+                    renderChapter(chapter, partBox);
                 });
             });
-            /*
-             * 显示直接属于卷的章节
-             */
+            // 显示直接属于卷的章节
             volume.chapters.forEach(function (chapter) {
-                renderChapter(
-                    chapter,
-                    volumeBox,
-                    "章"
-                );
+                renderChapter(chapter, volumeBox);
             });
         });
     }
     /* =================================
        创建目录容器
     ================================= */
-    function createBox(type, title) {
+    function createBox(className, title) {
         const box = document.createElement("div");
-        box.className = "outline-box";
-        box.style.padding = "12px";
-        box.style.marginBottom = "10px";
-        box.style.border = "1px solid #e5e5e5";
-        box.style.borderRadius = "8px";
+        box.className = className;
         const heading = document.createElement("div");
-        heading.textContent = type + " · " + title;
-        heading.style.fontWeight = "600";
-        heading.style.marginBottom = "10px";
+        heading.className = "outline-heading";
+        heading.textContent = title;
         box.appendChild(heading);
         return box;
     }
     /* =================================
        显示章节
     ================================= */
-    function renderChapter(chapter, parent, type) {
+    function renderChapter(chapter, parent) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "outline-chapter";
-        button.textContent =
-            type + " · " + chapter.title;
-        button.style.display = "block";
-        button.style.width = "100%";
-        button.style.padding = "12px";
-        button.style.marginBottom = "6px";
-        button.style.textAlign = "left";
-        button.style.border = "none";
-        button.style.borderRadius = "6px";
-        button.style.background = "#f5f5f5";
-        button.style.color = "inherit";
+        button.textContent = chapter.title || "未命名章节";
         button.addEventListener("click", function () {
             openChapter(chapter);
         });
@@ -481,16 +548,19 @@
     let currentChapter = null;
     let saveTimer = null;
     function openChapter(chapter) {
+        if (currentChapter) {
+            closeEditor();
+        }
         currentChapter = chapter;
         elements.chapterTitle.value =
             chapter.title || "";
         elements.chapterContent.value =
             chapter.content || "";
-        elements.saveStatus.textContent = "自动保存";
+        setSaveStatus("自动保存");
         showPanel("editor");
     }
     /* =================================
-       编辑正文
+       保存正文
     ================================= */
     function saveCurrentChapter() {
         if (!currentChapter) return true;
@@ -504,9 +574,12 @@
         }
         return success;
     }
+    /* =================================
+       正文自动保存
+    ================================= */
     function scheduleSave() {
         if (!currentChapter) return;
-        elements.saveStatus.textContent = "正在保存……";
+        setSaveStatus("正在保存……");
         clearTimeout(saveTimer);
         saveTimer = setTimeout(function () {
             saveCurrentChapter();
@@ -532,6 +605,17 @@
     elements.backOutline.addEventListener("click", function () {
         closeEditor();
         showPanel("all");
+    });
+    /* =================================
+       页面离开前保存
+    ================================= */
+    window.addEventListener("pagehide", function () {
+        clearTimeout(saveTimer);
+        clearTimeout(infoSaveTimer);
+        if (currentChapter) {
+            saveCurrentChapter();
+        }
+        saveBookInfo();
     });
     /* =================================
        页面初始化
