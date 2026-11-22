@@ -4,97 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新建</title>
-    <!-- 公共样式 -->
-    <link rel="stylesheet" href="../css/theme.css">
-    <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/footer.css">
-    <!-- 新建页面样式 -->
-    <link rel="stylesheet" href="../page-css/create.css">
+<!-- 公共样式 -->
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/header.css">
+<link rel="stylesheet" href="../css/footer.css">
+<!-- 新建页面样式 -->
+<link rel="stylesheet" href="../page-css/create.css">
+<!-- 返回按钮样式 -->
+<style>
+    .create-back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 16px;
+        color: #c83b3b;
+        background: #ffffff;
+        border: 1px solid #e5dada;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .create-back-button:active {
+        transform: scale(0.97);
+    }
+</style>
 </head>
 <body>
 <div id="app">
-    <!-- 顶部导航 -->
-    <header class="app-header">
-        <a href="../index.html">
-            返回书架
-        </a>
-    </header>
-    <!-- 页面主体 -->
-    <main class="app-main create-main">
-        <div class="create-page">
-            <!-- 页面标题 -->
-            <div class="create-page__heading">
-                <p class="create-page__eyebrow">
-                    CREATE
-                </p>
-                <h1 class="create-page__title">
-                    新建
-                </h1>
-                <div class="create-page__divider">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <p class="create-page__subtitle">
-                    选择你想创建的内容
-                </p>
+<!-- 顶部导航 -->
+<header class="app-header">
+    <a href="../index.html" class="create-back-button">
+        ← 返回书架
+    </a>
+</header>
+<!-- 页面主体 -->
+<main class="app-main create-main">
+    <div class="create-page">
+        <!-- 页面标题 -->
+        <div class="create-page__heading">
+            <p class="create-page__eyebrow">CREATE</p>
+            <h1 class="create-page__title">新建</h1>
+            <div class="create-page__divider">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-            <!-- 新建选项 -->
-            <div class="create-options">
-                <!-- 新建书籍 -->
-                <a
-                    href="./create-book.html"
-                    class="create-option create-option--book"
-                >
-                    <div class="create-option__icon">
-                        <span>📖</span>
-                    </div>
-                    <div class="create-option__content">
-                        <h2 class="create-option__title">
-                            新建书籍
-                        </h2>
-                        <p class="create-option__description">
-                            创建一本新的小说，开始你的写作。
-                        </p>
-                        <span class="create-option__detail">
-                            CREATE BOOK
-                        </span>
-                    </div>
-                    <span class="create-option__arrow">
-                        →
-                    </span>
-                </a>
-                <!-- 新建分组 -->
-                <a
-                    href="./create-group.html"
-                    class="create-option create-option--group"
-                >
-                    <div class="create-option__icon">
-                        <span>📁</span>
-                    </div>
-                    <div class="create-option__content">
-                        <h2 class="create-option__title">
-                            新建分组
-                        </h2>
-                        <p class="create-option__description">
-                            创建一个分组，整理和管理你的书籍。
-                        </p>
-                        <span class="create-option__detail">
-                            CREATE GROUP
-                        </span>
-                    </div>
-                    <span class="create-option__arrow">
-                        →
-                    </span>
-                </a>
-            </div>
+            <p class="create-page__subtitle">
+                选择你想创建的内容
+            </p>
         </div>
-    </main>
-    <!-- 底部导航 -->
-    <footer class="app-footer">
-        <a href="../index.html">书架</a>
-    </footer>
+        <!-- 新建选项 -->
+        <div class="create-options">
+            <!-- 新建书籍 -->
+            <a
+                href="./create-book.html"
+                class="create-option create-option--book"
+            >
+                <div class="create-option__icon">
+                    <span>📖</span>
+                </div>
+                <div class="create-option__content">
+                    <h2 class="create-option__title">
+                        新建书籍
+                    </h2>
+                    <p class="create-option__description">
+                        创建一本新的小说，开始你的写作。
+                    </p>
+                    <span class="create-option__detail">
+                        CREATE BOOK
+                    </span>
+                </div>
+                <span class="create-option__arrow">→</span>
+            </a>
+            <!-- 新建分组 -->
+            <a
+                href="./create-group.html"
+                class="create-option create-option--group"
+            >
+                <div class="create-option__icon">
+                    <span>📁</span>
+                </div>
+                <div class="create-option__content">
+                    <h2 class="create-option__title">
+                        新建分组
+                    </h2>
+                    <p class="create-option__description">
+                        创建一个分组，整理和管理你的书籍。
+                    </p>
+                    <span class="create-option__detail">
+                        CREATE GROUP
+                    </span>
+                </div>
+                <span class="create-option__arrow">→</span>
+            </a>
+        </div>
+    </div>
+</main>
+<!-- 底部导航 -->
+<footer class="app-footer">
+    <nav class="bottom-nav">
+        <!-- 书架 -->
+        <a
+            href="../index.html"
+            class="bottom-nav__item"
+            data-nav="home"
+        >
+            <span class="bottom-nav__icon">📚</span>
+            <span class="bottom-nav__label">书架</span>
+        </a>
+        <!-- 工具 -->
+        <a
+            href="./tools.html"
+            class="bottom-nav__item"
+            data-nav="tools"
+        >
+            <span class="bottom-nav__icon">🛠️</span>
+            <span class="bottom-nav__label">工具</span>
+        </a>
+    </nav>
+</footer>
 </div>
 <!-- 公共功能 -->
 <script src="../js/navigation.js" defer></script>
