@@ -4,23 +4,30 @@
 * {
     box-sizing: border-box;
 }
+
 html,
 body {
     margin: 0;
     padding: 0;
     width: 100%;
-    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
 }
+
 body {
     background: var(--bg-color, #f7f7f7);
     color: var(--text-color, #333);
     font-family: inherit;
 }
+
 .book-page {
-    min-height: 100vh;
-    min-height: 100dvh;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     background: var(--bg-color, #f7f7f7);
+    overflow: hidden;
 }
+
 /* =========================
    顶部固定栏
 ========================= */
@@ -38,6 +45,7 @@ body {
     border-bottom: 1px solid var(--border-color, #eee);
     z-index: 100;
 }
+
 .book-header button {
     width: 42px;
     height: 42px;
@@ -51,10 +59,12 @@ body {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
+
 .header-back,
 .header-add {
     flex-shrink: 0;
 }
+
 .header-title {
     flex: 1;
     min-width: 0;
@@ -67,6 +77,7 @@ body {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 /* =========================
    新建菜单
 ========================= */
@@ -84,6 +95,7 @@ body {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     z-index: 200;
 }
+
 .create-menu button {
     display: block;
     width: 100%;
@@ -97,31 +109,48 @@ body {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
+
 .create-menu button:active {
     background: #f2f2f2;
 }
-/* 通用隐藏状态 */
+
+/* =========================
+   通用隐藏状态
+========================= */
 .hidden {
     display: none !important;
 }
+
 /* =========================
    中间内容区域
+   独立滚动
 ========================= */
 .book-main {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+
     width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 72px 16px 90px;
+    min-height: 0;
+    padding: 16px;
+
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
 }
+
 .book-panel {
     width: 100%;
 }
+
 /* 默认不显示目录标题 */
 .outline-header {
     display: none;
 }
+
 /* =========================
    全书目录
 ========================= */
@@ -131,10 +160,12 @@ body {
     gap: 12px;
     width: 100%;
 }
+
 /* 目录为空时保持空白 */
 .book-empty {
     display: none;
 }
+
 /* =========================
    书籍信息
 ========================= */
@@ -143,14 +174,17 @@ body {
     flex-direction: column;
     gap: 18px;
 }
+
 #book-info-panel.hidden {
     display: none !important;
 }
+
 #book-info-panel h2 {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
 }
+
 .book-info-cover {
     width: 120px;
     height: 180px;
@@ -158,12 +192,14 @@ body {
     background: #eee;
     border-radius: 6px;
 }
+
 #book-cover {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .book-info-item {
     display: flex;
     flex-direction: column;
@@ -171,10 +207,12 @@ body {
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color, #eee);
 }
+
 .book-info-item label {
     font-size: 14px;
     color: #888;
 }
+
 .book-info-item input,
 .book-info-item textarea {
     width: 100%;
@@ -187,11 +225,13 @@ body {
     font-size: 15px;
     outline: none;
 }
+
 .book-info-item textarea {
     min-height: 120px;
     line-height: 1.7;
     resize: vertical;
 }
+
 /* =========================
    正文编辑区域
 ========================= */
@@ -201,9 +241,11 @@ body {
     gap: 14px;
     min-height: 65vh;
 }
+
 #chapter-editor-panel.hidden {
     display: none !important;
 }
+
 #back-to-outline {
     align-self: flex-start;
     padding: 8px 12px;
@@ -213,6 +255,7 @@ body {
     font-size: 14px;
     cursor: pointer;
 }
+
 #chapter-title {
     width: 100%;
     padding: 12px 0;
@@ -224,6 +267,7 @@ body {
     font-family: inherit;
     outline: none;
 }
+
 #chapter-content {
     width: 100%;
     min-height: 55vh;
@@ -237,11 +281,13 @@ body {
     resize: vertical;
     outline: none;
 }
+
 #save-status {
     color: #999;
     font-size: 12px;
     text-align: right;
 }
+
 /* =========================
    底部固定导航栏
 ========================= */
@@ -250,14 +296,18 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 58px;
+
+    height: calc(58px + env(safe-area-inset-bottom, 0px));
+
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+
     background: var(--surface-color, #fff);
     border-top: 1px solid var(--border-color, #eee);
     z-index: 100;
 }
+
 .footer-tab {
     flex: 1;
     height: 58px;
@@ -268,10 +318,12 @@ body {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
+
 .footer-tab.active {
     color: var(--primary-color, #333);
     font-weight: 600;
 }
+
 /* =========================
    小屏幕适配
 ========================= */
@@ -279,9 +331,11 @@ body {
     .book-header {
         padding: 0 8px;
     }
+
     .header-title {
         font-size: 16px;
     }
+
     .book-main {
         padding-left: 12px;
         padding-right: 12px;
