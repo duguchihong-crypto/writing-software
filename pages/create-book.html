@@ -4,40 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffffff">
-    <title>新建书籍 - 写作软件</title>
-    <!-- 公共样式 -->
-    <link rel="stylesheet" href="../css/theme.css">
-    <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/footer.css">
-    <!-- 页面样式 -->
-    <link rel="stylesheet" href="../page-css/create-book.css">
+<title>新建书籍 - 写作软件</title>
+<!-- 公共样式 -->
+<link rel="stylesheet" href="../CSS/theme.css">
+<link rel="stylesheet" href="../CSS/base.css">
+<link rel="stylesheet" href="../CSS/header.css">
+<link rel="stylesheet" href="../CSS/footer.css">
+<!-- 页面样式 -->
+<link rel="stylesheet" href="../page-css/create-book.css">
 </head>
 <body>
-<div class="app create-book-page">
-    <!-- 顶部导航 -->
-    <header class="app-header">
-        <button
-            type="button"
-            class="header-back-button"
-            id="cancel-create-book-top"
-            aria-label="返回"
+<div id="app" class="app create-book-page">
+<!-- 顶部导航 -->
+<header class="app-header">
+    <button
+        type="button"
+        class="header-back-button"
+        id="cancel-create-book-top"
+        aria-label="返回"
+    >
+        ←
+    </button>
+    <h1>新建书籍</h1>
+    <div class="header-placeholder"></div>
+</header>
+<!-- 页面主体 -->
+<main class="create-book-main">
+    <div class="create-book-page__content">
+        <section class="create-book-intro">
+            <h2>创建一本新书</h2>
+            <p>
+                为你的新作品填写基本信息。
+            </p>
+        </section>
+        <!-- 新建书籍表单 -->
+        <form
+            id="create-book-form"
+            class="create-book-form"
+            novalidate
         >
-            ←
-        </button>
-        <h1>新建书籍</h1>
-        <div class="header-placeholder"></div>
-    </header>
-    <!-- 主体 -->
-    <main class="create-book-main">
-        <form id="create-book-form" novalidate>
-            <!-- 页面标题 -->
-            <section class="create-book-intro">
-                <h2>创建一本新书</h2>
-                <p>为你的新作品填写基本信息。</p>
-            </section>
             <!-- 书名 -->
-            <section class="create-book-section">
+            <section class="create-book-section create-book-info-section">
                 <label for="book-title">
                     书籍名称
                     <span class="required-mark">*</span>
@@ -54,10 +61,12 @@
                 <div class="create-book-field-footer">
                     <p
                         id="book-title-error"
-                        class="create-book-error"
+                        class="create-book-field__error"
                         hidden
                     ></p>
-                    <span id="book-title-counter">0 / 100</span>
+                    <span id="book-title-counter">
+                        0 / 100
+                    </span>
                 </div>
             </section>
             <!-- 封面 -->
@@ -66,29 +75,29 @@
                 <p class="create-book-description">
                     可以上传自己的图片，也可以暂时不设置封面。
                 </p>
-                <div class="cover-editor">
+                <div class="create-book-cover">
                     <!-- 封面预览 -->
-                    <div class="cover-preview">
+                    <div class="create-book-cover__preview">
                         <div
                             id="cover-placeholder"
-                            class="cover-placeholder"
+                            class="create-book-cover__placeholder"
                         >
                             <span>＋</span>
                             <span>暂无封面</span>
                         </div>
                         <img
                             id="cover-preview-image"
-                            class="cover-preview-image"
+                            class="create-book-cover__image"
                             alt="书籍封面预览"
                             hidden
                         >
                     </div>
                     <!-- 封面操作 -->
-                    <div class="cover-editor-actions">
+                    <div class="create-book-cover__actions">
                         <label
                             for="book-cover-input"
                             id="cover-select-label"
-                            class="cover-select-button"
+                            class="create-book-cover__select-button"
                         >
                             选择封面
                         </label>
@@ -102,7 +111,7 @@
                         <button
                             type="button"
                             id="remove-cover-button"
-                            class="cover-remove-button"
+                            class="create-book-cover__remove-button"
                             hidden
                         >
                             移除封面
@@ -114,11 +123,11 @@
                 </p>
                 <p
                     id="cover-error"
-                    class="create-book-error"
+                    class="create-book-field__error"
                     hidden
                 ></p>
             </section>
-            <!-- 提示信息 -->
+            <!-- 操作提示 -->
             <div
                 id="create-book-message"
                 class="create-book-message"
@@ -143,165 +152,176 @@
                 </button>
             </section>
         </form>
-    </main>
+    </div>
+</main>
 </div>
-<!-- ================================================== -->
-<!-- 封面手动裁剪弹窗 -->
-<!-- ================================================== -->
+<!-- ========================================= -->
+<!-- 封面裁剪弹窗 -->
+<!-- ========================================= -->
 <div
     class="cover-crop-modal"
     id="cover-crop-modal"
     hidden
 >
-    <!-- 背景遮罩 -->
-    <div
-        class="cover-crop-modal__backdrop"
-        id="cover-crop-backdrop"
-        aria-hidden="true"
-    ></div>
-    <!-- 裁剪面板 -->
-    <section
-        class="cover-crop-dialog"
-        id="cover-crop-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cover-crop-title"
-        aria-describedby="cover-crop-instructions"
-        tabindex="-1"
+<!-- 背景遮罩 -->
+<div
+    class="cover-crop-modal__backdrop"
+    id="cover-crop-backdrop"
+    aria-hidden="true"
+></div>
+<!-- 裁剪面板 -->
+<section
+    class="cover-crop-dialog"
+    id="cover-crop-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cover-crop-title"
+    aria-describedby="cover-crop-instructions"
+    tabindex="-1"
+>
+    <!-- 标题 -->
+    <header class="cover-crop-dialog__header">
+        <div>
+            <p class="cover-crop-dialog__eyebrow">
+                BOOK COVER
+            </p>
+            <h2
+                class="cover-crop-dialog__title"
+                id="cover-crop-title"
+            >
+                裁剪封面
+            </h2>
+        </div>
+        <button
+            class="cover-crop-dialog__close"
+            id="cover-crop-close"
+            type="button"
+            aria-label="关闭裁剪窗口"
+        >
+            ×
+        </button>
+    </header>
+    <!-- 操作说明 -->
+    <p
+        class="cover-crop-dialog__instructions"
+        id="cover-crop-instructions"
     >
-        <!-- 标题 -->
-        <header class="cover-crop-dialog__header">
-            <div>
-                <p class="cover-crop-dialog__eyebrow">
-                    BOOK COVER
-                </p>
-                <h2
-                    class="cover-crop-dialog__title"
-                    id="cover-crop-title"
-                >裁剪封面</h2>
-            </div>
-            <button
-                class="cover-crop-dialog__close"
-                id="cover-crop-close"
-                type="button"
-                aria-label="关闭裁剪窗口"
-            >×</button>
-        </header>
-        <!-- 操作说明 -->
-        <p
-            class="cover-crop-dialog__instructions"
-            id="cover-crop-instructions"
+        拖动图片调整显示位置，使用下方滑块缩放图片。
+        裁剪框固定为 2:3 比例，确认后生成统一尺寸的封面。
+    </p>
+    <!-- 裁剪区域 -->
+    <div
+        class="cover-crop-stage"
+        id="cover-crop-stage"
+        aria-label="封面裁剪区域"
+    >
+        <img
+            class="cover-crop-image"
+            id="cover-crop-image"
+            alt="正在裁剪的封面图片"
+            draggable="false"
         >
-            拖动图片调整显示位置，使用下方滑块缩放图片。
-            裁剪框固定为 2:3 比例，确认后生成统一尺寸的封面。
-        </p>
-        <!-- 裁剪区域 -->
         <div
-            class="cover-crop-stage"
-            id="cover-crop-stage"
-            aria-label="封面裁剪区域"
+            class="cover-crop-grid"
+            aria-hidden="true"
+        ></div>
+    </div>
+    <!-- 比例说明 -->
+    <div class="cover-crop-ratio">
+        <span class="cover-crop-ratio__label">
+            封面比例
+        </span>
+        <span class="cover-crop-ratio__value">
+            2 : 3
+        </span>
+        <span class="cover-crop-ratio__size">
+            400 × 600
+        </span>
+    </div>
+    <!-- 图片缩放 -->
+    <div class="cover-crop-zoom">
+        <label
+            class="cover-crop-zoom__label"
+            for="cover-crop-zoom"
         >
-            <img
-                class="cover-crop-image"
-                id="cover-crop-image"
-                alt="正在裁剪的封面图片"
-                draggable="false"
-            >
-            <div
-                class="cover-crop-grid"
-                aria-hidden="true"
-            ></div>
-        </div>
-        <!-- 比例说明 -->
-        <div class="cover-crop-ratio">
-            <span class="cover-crop-ratio__label">
-                封面比例
-            </span>
-            <span class="cover-crop-ratio__value">
-                2 : 3
-            </span>
-            <span class="cover-crop-ratio__size">
-                400 × 600
-            </span>
-        </div>
-        <!-- 缩放控制 -->
-        <div class="cover-crop-zoom">
-            <label
-                class="cover-crop-zoom__label"
-                for="cover-crop-zoom"
-            >
-                图片缩放
-            </label>
-            <div class="cover-crop-zoom__controls">
-                <button
-                    class="cover-crop-zoom__icon"
-                    id="cover-crop-zoom-out"
-                    type="button"
-                    aria-label="缩小图片"
-                >−</button>
-                <input
-                    class="cover-crop-zoom__slider"
-                    id="cover-crop-zoom"
-                    type="range"
-                    min="1"
-                    max="3"
-                    step="0.01"
-                    value="1"
-                    aria-label="调整封面图片缩放比例"
-                >
-                <button
-                    class="cover-crop-zoom__icon"
-                    id="cover-crop-zoom-in"
-                    type="button"
-                    aria-label="放大图片"
-                >＋</button>
-            </div>
-            <output
-                class="cover-crop-zoom__value"
-                id="cover-crop-zoom-value"
-                for="cover-crop-zoom"
-            >100%</output>
-        </div>
-        <!-- 裁剪操作 -->
-        <div class="cover-crop-dialog__actions">
+            图片缩放
+        </label>
+        <div class="cover-crop-zoom__controls">
             <button
-                class="cover-crop-button cover-crop-button--reset"
-                id="cover-crop-reset"
+                class="cover-crop-zoom__icon"
+                id="cover-crop-zoom-out"
+                type="button"
+                aria-label="缩小图片"
+            >
+                −
+            </button>
+            <input
+                class="cover-crop-zoom__slider"
+                id="cover-crop-zoom"
+                type="range"
+                min="1"
+                max="3"
+                step="0.01"
+                value="1"
+                aria-label="调整封面图片缩放比例"
+            >
+            <button
+                class="cover-crop-zoom__icon"
+                id="cover-crop-zoom-in"
+                type="button"
+                aria-label="放大图片"
+            >
+                ＋
+            </button>
+        </div>
+        <output
+            class="cover-crop-zoom__value"
+            id="cover-crop-zoom-value"
+            for="cover-crop-zoom"
+        >
+            100%
+        </output>
+    </div>
+    <!-- 裁剪按钮 -->
+    <div class="cover-crop-dialog__actions">
+        <button
+            class="cover-crop-button cover-crop-button--reset"
+            id="cover-crop-reset"
+            type="button"
+        >
+            重置
+        </button>
+        <div class="cover-crop-dialog__actions-right">
+            <button
+                class="cover-crop-button cover-crop-button--cancel"
+                id="cover-crop-cancel"
                 type="button"
             >
-                重置
+                取消
             </button>
-            <div class="cover-crop-dialog__actions-right">
-                <button
-                    class="cover-crop-button cover-crop-button--cancel"
-                    id="cover-crop-cancel"
-                    type="button"
-                >
-                    取消
-                </button>
-                <button
-                    class="cover-crop-button cover-crop-button--confirm"
-                    id="cover-crop-confirm"
-                    type="button"
-                >
-                    确认裁剪
-                </button>
-            </div>
+            <button
+                class="cover-crop-button cover-crop-button--confirm"
+                id="cover-crop-confirm"
+                type="button"
+            >
+                确认裁剪
+            </button>
         </div>
-        <!-- 裁剪错误 -->
-        <p
-            class="cover-crop-dialog__error"
-            id="cover-crop-error"
-            role="alert"
-            hidden
-        ></p>
-    </section>
+    </div>
+    <!-- 错误提示 -->
+    <p
+        class="cover-crop-dialog__error"
+        id="cover-crop-error"
+        role="alert"
+        hidden
+    ></p>
+</section>
 </div>
-<!-- ================================================== -->
+<!-- ========================================= -->
 <!-- JavaScript -->
-<!-- ================================================== -->
-<script src="../js/storage.js"></script>
-<script src="../js/navigation.js"></script>
+<!-- ========================================= -->
+<script src="../jS/storage.js"></script>
+<script src="../jS/navigation.js"></script>
 <script src="../page-js/create-book.js"></script>
 </body>
 </html>
