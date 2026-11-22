@@ -1,6 +1,7 @@
 /* =========================
-   小说页面整体布局
+   小说页面整体
 ========================= */
+
 * {
     box-sizing: border-box;
 }
@@ -15,8 +16,8 @@ body {
 }
 
 body {
-    background: var(--bg-color, #f7f7f7);
-    color: var(--text-color, #333);
+    background: var(--theme-background, #F8F4E9);
+    color: var(--color-black, #211F1C);
     font-family: inherit;
 }
 
@@ -24,38 +25,51 @@ body {
     width: 100%;
     height: 100vh;
     height: 100dvh;
-    background: var(--bg-color, #f7f7f7);
     overflow: hidden;
+    background: var(--theme-background, #F8F4E9);
 }
+
 
 /* =========================
    顶部固定栏
 ========================= */
+
 .book-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+
     height: 56px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     padding: 0 14px;
-    background: var(--surface-color, #fff);
-    border-bottom: 1px solid var(--border-color, #eee);
+
+    background: var(--color-red, #9E2428);
+    border-bottom: 2px solid var(--color-yellow, #D6B15E);
+
+    color: #fff;
+
     z-index: 100;
 }
 
 .book-header button {
     width: 42px;
     height: 42px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border: none;
     background: transparent;
+
+    color: #fff;
     font-size: 24px;
-    color: inherit;
+
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
@@ -68,76 +82,101 @@ body {
 .header-title {
     flex: 1;
     min-width: 0;
+
     margin: 0;
     padding: 0 8px;
+
     text-align: center;
-    font-size: 17px;
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 18px;
     font-weight: 600;
+
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
+
 /* =========================
    新建菜单
 ========================= */
+
 .create-menu {
     position: fixed;
     top: 62px;
     right: 12px;
+
     width: 125px;
     padding: 6px;
+
     display: flex;
     flex-direction: column;
-    background: var(--surface-color, #fff);
-    border: 1px solid var(--border-color, #eee);
-    border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+    background: var(--color-white, #F8F4E9);
+
+    border: 1px solid var(--color-yellow, #D6B15E);
+    border-radius: 8px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+
     z-index: 200;
 }
 
 .create-menu button {
-    display: block;
     width: 100%;
     padding: 12px;
+
     border: none;
     border-radius: 6px;
+
     background: transparent;
-    color: inherit;
+
+    color: var(--color-black, #211F1C);
+
     text-align: left;
+    font-family: inherit;
     font-size: 15px;
+
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
 
 .create-menu button:active {
-    background: #f2f2f2;
+    background: rgba(214, 177, 94, 0.2);
 }
 
+
 /* =========================
-   通用隐藏状态
+   隐藏状态
 ========================= */
+
 .hidden {
     display: none !important;
 }
 
+
 /* =========================
-   中间内容区域
-   独立滚动
+   中间滚动区域
 ========================= */
+
 .book-main {
     position: fixed;
+
     top: 56px;
     left: 0;
     right: 0;
+
     bottom: calc(58px + env(safe-area-inset-bottom, 0px));
 
     width: 100%;
     min-height: 0;
+
     padding: 16px;
 
     overflow-x: hidden;
     overflow-y: auto;
+
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
 }
@@ -146,139 +185,295 @@ body {
     width: 100%;
 }
 
-/* 默认不显示目录标题 */
-.outline-header {
-    display: none;
-}
 
 /* =========================
-   全书目录
+   目录
 ========================= */
+
 .book-outline {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+
+    gap: 14px;
     width: 100%;
 }
 
-/* 目录为空时保持空白 */
-.book-empty {
-    display: none;
+.outline-volume {
+    width: 100%;
 }
+
+.outline-heading {
+    color: var(--color-red, #9E2428);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 19px;
+    font-weight: 600;
+
+    line-height: 1.8;
+}
+
+.outline-part {
+    margin-left: 22px;
+}
+
+.outline-part .outline-heading {
+    color: var(--color-black, #211F1C);
+    font-size: 17px;
+}
+
+.outline-chapter {
+    display: block;
+
+    width: 100%;
+    margin-left: 44px;
+
+    padding: 9px 0;
+
+    border: none;
+    background: transparent;
+
+    color: var(--color-black, #211F1C);
+
+    text-align: left;
+    font-family: inherit;
+    font-size: 15px;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.outline-chapter:active {
+    color: var(--color-red, #9E2428);
+}
+
+
+/* =========================
+   全书
+========================= */
+
+.full-book-content {
+    width: 100%;
+}
+
+.full-preface,
+.full-volume {
+    margin-bottom: 32px;
+}
+
+.full-volume-title {
+    margin: 28px 0 20px;
+
+    color: var(--color-red, #9E2428);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 23px;
+    font-weight: 700;
+
+    text-align: center;
+}
+
+.full-part-title {
+    margin: 24px 0 16px;
+
+    color: var(--color-black, #211F1C);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.full-chapter {
+    margin: 26px 0 34px;
+}
+
+.full-chapter-title {
+    margin: 0 0 18px;
+
+    color: var(--color-black, #211F1C);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 19px;
+    font-weight: 600;
+
+    text-align: center;
+}
+
+.full-chapter-text {
+    color: var(--color-black, #211F1C);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 16px;
+
+    line-height: 2;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.full-empty-text {
+    color: #999;
+    text-align: center;
+    font-size: 14px;
+}
+
+.full-edit-button {
+    display: block;
+
+    margin: 12px auto 0;
+    padding: 5px 12px;
+
+    border: 1px solid var(--color-yellow, #D6B15E);
+    border-radius: 5px;
+
+    background: transparent;
+    color: var(--color-red, #9E2428);
+
+    font-size: 13px;
+}
+
 
 /* =========================
    书籍信息
 ========================= */
+
 #book-info-panel {
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 
-#book-info-panel.hidden {
-    display: none !important;
-}
-
 #book-info-panel h2 {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
+
+    color: var(--color-red, #9E2428);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 21px;
 }
 
 .book-info-cover {
     width: 120px;
     height: 180px;
+
     overflow: hidden;
+
     background: #eee;
-    border-radius: 6px;
+    border: 1px solid var(--color-yellow, #D6B15E);
+    border-radius: 5px;
 }
 
 #book-cover {
     display: block;
+
     width: 100%;
     height: 100%;
+
     object-fit: cover;
 }
 
 .book-info-item {
     display: flex;
     flex-direction: column;
+
     gap: 8px;
     padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color, #eee);
+
+    border-bottom: 1px solid rgba(158, 36, 40, 0.2);
 }
 
 .book-info-item label {
+    color: var(--color-red, #9E2428);
     font-size: 14px;
-    color: #888;
 }
 
 .book-info-item input,
 .book-info-item textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border-color, #eee);
+    padding: 11px;
+
+    border: 1px solid rgba(158, 36, 40, 0.2);
     border-radius: 6px;
-    background: var(--surface-color, #fff);
-    color: inherit;
+
+    background: var(--color-white, #F8F4E9);
+    color: var(--color-black, #211F1C);
+
     font-family: inherit;
     font-size: 15px;
+
     outline: none;
+}
+
+.book-info-item input:focus,
+.book-info-item textarea:focus {
+    border-color: var(--color-yellow, #D6B15E);
 }
 
 .book-info-item textarea {
     min-height: 120px;
-    line-height: 1.7;
+    line-height: 1.8;
     resize: vertical;
 }
 
+
 /* =========================
-   正文编辑区域
+   正文编辑
 ========================= */
+
 #chapter-editor-panel {
     display: flex;
     flex-direction: column;
+
     gap: 14px;
     min-height: 65vh;
 }
 
-#chapter-editor-panel.hidden {
-    display: none !important;
-}
-
 #back-to-outline {
     align-self: flex-start;
+
     padding: 8px 12px;
+
     border: none;
     background: transparent;
-    color: inherit;
+
+    color: var(--color-red, #9E2428);
     font-size: 14px;
+
     cursor: pointer;
 }
 
 #chapter-title {
     width: 100%;
     padding: 12px 0;
+
     border: none;
-    border-bottom: 1px solid var(--border-color, #ddd);
+    border-bottom: 1px solid var(--color-yellow, #D6B15E);
+
     background: transparent;
-    color: inherit;
-    font-size: 20px;
-    font-family: inherit;
+    color: var(--color-black, #211F1C);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 21px;
+
     outline: none;
 }
 
 #chapter-content {
     width: 100%;
     min-height: 55vh;
+
     padding: 12px 0;
+
     border: none;
     background: transparent;
-    color: inherit;
-    font-family: inherit;
+
+    color: var(--color-black, #211F1C);
+
+    font-family: "Songti SC", "SimSun", serif;
     font-size: 16px;
-    line-height: 1.9;
+
+    line-height: 2;
     resize: vertical;
+
     outline: none;
 }
 
@@ -288,11 +483,14 @@ body {
     text-align: right;
 }
 
+
 /* =========================
-   底部固定导航栏
+   底部导航
 ========================= */
+
 .book-footer {
     position: fixed;
+
     bottom: 0;
     left: 0;
     right: 0;
@@ -301,33 +499,49 @@ body {
 
     display: flex;
     align-items: flex-start;
+
     padding-bottom: env(safe-area-inset-bottom, 0px);
 
-    background: var(--surface-color, #fff);
-    border-top: 1px solid var(--border-color, #eee);
+    background: var(--color-black, #211F1C);
+
+    border-top: 1px solid var(--color-yellow, #D6B15E);
+
     z-index: 100;
 }
 
 .footer-tab {
     flex: 1;
     height: 58px;
+
     border: none;
+    border-top: 2px solid transparent;
+
     background: transparent;
-    color: #888;
+
+    color: #C8BFAE;
+
+    font-family: inherit;
     font-size: 15px;
+
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
 
 .footer-tab.active {
-    color: var(--primary-color, #333);
+    color: var(--color-yellow, #D6B15E);
+
+    border-top-color: var(--color-yellow, #D6B15E);
+
     font-weight: 600;
 }
 
+
 /* =========================
-   小屏幕适配
+   手机适配
 ========================= */
+
 @media (max-width: 380px) {
+
     .book-header {
         padding: 0 8px;
     }
@@ -340,4 +554,9 @@ body {
         padding-left: 12px;
         padding-right: 12px;
     }
+
+    .outline-chapter {
+        margin-left: 32px;
+    }
+
 }
