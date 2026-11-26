@@ -3,7 +3,7 @@
    文件：page-js/home-grid.js
 
    功能：
-   1. 网格模式每行显示三本书
+   1. 网格模式每行显示三项
    2. 网格模式与列表模式互斥
    3. 保存用户布局选择
    4. 支持动态生成的书籍和分组
@@ -14,6 +14,7 @@
    9. 不清除其他本地数据
   10. 与列表模块同步布局状态
   11. 监听设置模块派发的布局事件
+  12. 统一控制书籍和分组所在的书架
 ====================================================== */
 (function () {
     "use strict";
@@ -47,7 +48,7 @@
 
     const SELECTOR = {
         shelf: "#shelf-list",
-        groups: "#home-groups-list",
+
         closeButton:
             '[data-settings-close]:not(.home-settings__backdrop)'
     };
@@ -73,6 +74,7 @@
                 "[HomeGrid] 读取布局设置失败：",
                 error
             );
+
             return false;
         }
     }
@@ -106,10 +108,6 @@
 
     function getShelf() {
         return document.querySelector(SELECTOR.shelf);
-    }
-
-    function getGroups() {
-        return document.querySelector(SELECTOR.groups);
     }
 
     /* ======================================================
@@ -158,12 +156,16 @@
 
     /* ======================================================
        六、应用布局类名
+
+       现在书籍和分组共用 #shelf-list。
+
+       不再单独操作：
+       #home-groups-list
     ====================================================== */
 
     function applyClassesOnly() {
         const root = getRoot();
         const shelf = getShelf();
-        const groups = getGroups();
 
         /* 首页根元素 */
 
@@ -177,7 +179,7 @@
             !STATE.enabled
         );
 
-        /* 书籍容器 */
+        /* 统一书架 */
 
         if (shelf) {
             shelf.classList.toggle(
@@ -187,20 +189,6 @@
 
             shelf.classList.toggle(
                 "shelf-list--list",
-                !STATE.enabled
-            );
-        }
-
-        /* 分组容器 */
-
-        if (groups) {
-            groups.classList.toggle(
-                "home-groups-list--grid",
-                STATE.enabled
-            );
-
-            groups.classList.toggle(
-                "home-groups-list--list",
                 !STATE.enabled
             );
         }
