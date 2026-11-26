@@ -339,6 +339,7 @@
 
     <!-- ==============================
          底部导航
+         与首页统一使用相同 SVG 图标
     ============================== -->
     <footer class="app-footer" id="app-footer">
 
@@ -346,9 +347,10 @@
 
             <!-- 书架 -->
             <a
-                class="bottom-nav__item"
+                class="bottom-nav__item bottom-nav__item--active"
                 href="../index.html"
                 data-nav="home"
+                aria-current="page"
                 aria-label="书架"
             >
 
@@ -356,15 +358,16 @@
                     class="bottom-nav__icon"
                     viewBox="0 0 24 24"
                     fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                     aria-hidden="true"
                 >
-                    <path
-                        d="M3 10.5L12 3L21 10.5V20H14V14H10V20H3V10.5Z"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                        stroke-linejoin="round"
-                    />
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22Z"></path>
+                    <path d="M4 5.5V22"></path>
+                    <path d="M8 7h8"></path>
+                    <path d="M8 11h8"></path>
                 </svg>
 
                 <span class="bottom-nav__label">
@@ -385,24 +388,14 @@
                     class="bottom-nav__icon"
                     viewBox="0 0 24 24"
                     fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                     aria-hidden="true"
                 >
-                    <path
-                        d="M12 3L14.2 8.8L20 11L14.2 13.2L12 19L9.8 13.2L4 11L9.8 8.8L12 3Z"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                        stroke-linejoin="round"
-                    />
-
-                    <path
-                        d="M19 16L20 18.5L22.5 19.5L20 20.5L19 23L18 20.5L15.5 19.5L18 18.5L19 16Z"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.2"
-                        stroke-linejoin="round"
-                    />
-
+                    <circle cx="12" cy="12" r="8.5"></circle>
+                    <path d="M14.5 9.5 13 13l-3.5 1.5L11 11Z"></path>
                 </svg>
 
                 <span class="bottom-nav__label">
