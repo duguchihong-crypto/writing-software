@@ -1,6 +1,6 @@
 /* ======================================================
    首页分组删除模块
-   文件：page-js/home-group-delete.js
+   文件：home-js/group-delete.js
 
    独立职责：
    1. 创建分组删除按钮
@@ -16,6 +16,10 @@
 
 (function () {
     "use strict";
+
+    /* =================================
+       创建分组删除按钮
+    ================================= */
 
     function createDeleteButton(group) {
         const button = document.createElement("button");
@@ -34,6 +38,10 @@
             "删除分组：" + name
         );
 
+        /* =================================
+           删除按钮点击事件
+        ================================= */
+
         button.addEventListener("click", function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -48,6 +56,10 @@
                 return;
             }
 
+            /* =================================
+               检查分组存储接口
+            ================================= */
+
             const storage = window.WritingGroupsStorage;
 
             if (
@@ -58,6 +70,10 @@
                 return;
             }
 
+            /* =================================
+               执行删除
+            ================================= */
+
             try {
                 const deleted = storage.deleteGroup(group.id);
 
@@ -67,6 +83,10 @@
                     );
                     return;
                 }
+
+                /* =================================
+                   刷新首页分组列表
+                ================================= */
 
                 if (
                     window.WritingHome &&
@@ -89,6 +109,10 @@
 
         return button;
     }
+
+    /* =================================
+       暴露公开接口
+    ================================= */
 
     window.WritingGroupDelete = Object.freeze({
         createButton: createDeleteButton
