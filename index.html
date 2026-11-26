@@ -19,75 +19,45 @@
 
     <title>写作软件 · 书架</title>
 
-    <!-- ==============================
-         公共样式
-    ============================== -->
+    <!-- 公共样式 -->
     <link rel="stylesheet" href="./css/theme.css">
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/header.css">
     <link rel="stylesheet" href="./css/footer.css">
 
-    <!-- ==============================
-         首页样式
-    ============================== -->
+    <!-- 首页样式 -->
     <link rel="stylesheet" href="./page-css/home.css">
     <link rel="stylesheet" href="./page-css/home-settings.css">
     <link rel="stylesheet" href="./page-css/home-sort.css">
-    <link rel="stylesheet" href="./page-css/home-group-sort.css">
     <link rel="stylesheet" href="./page-css/home-grid.css">
     <link rel="stylesheet" href="./page-css/home-list.css">
-
-    <!-- ==============================
-         分组卡片样式
-    ============================== -->
     <link rel="stylesheet" href="./page-css/home-group-cards.css">
 
-    <!-- ==============================
-         公共功能
-    ============================== -->
+    <!-- 公共功能 -->
     <script src="./js/storage.js" defer></script>
     <script src="./js/groups-storage.js" defer></script>
     <script src="./js/navigation.js" defer></script>
     <script src="./js/components.js" defer></script>
 
-    <!-- ==============================
-         书籍管理
-    ============================== -->
+    <!-- 书籍管理 -->
     <script src="./page-js/home-book-delete.js" defer></script>
 
-    <!-- ==============================
-         分组管理
-    ============================== -->
+    <!-- 分组管理 -->
     <script src="./page-js/home-group-delete.js" defer></script>
 
-    <!-- ==============================
-         书架设置
-    ============================== -->
+    <!-- 书架设置 -->
     <script src="./page-js/home-settings.js" defer></script>
 
-    <!-- ==============================
-         书籍排序
-    ============================== -->
+    <!-- 统一排序 -->
     <script src="./page-js/home-sort.js" defer></script>
 
-    <!-- ==============================
-         分组排序
-    ============================== -->
-    <script src="./page-js/home-group-sort.js" defer></script>
-
-    <!-- ==============================
-         网格显示
-    ============================== -->
+    <!-- 网格显示 -->
     <script src="./page-js/home-grid.js" defer></script>
 
-    <!-- ==============================
-         列表显示
-    ============================== -->
+    <!-- 列表显示 -->
     <script src="./page-js/home-list.js" defer></script>
 
-    <!-- ==============================
-         首页显示与管理
-    ============================== -->
+    <!-- 首页显示与管理 -->
     <script src="./page-js/home.js" defer></script>
 
 </head>
@@ -96,9 +66,7 @@
 
 <div class="app" id="app">
 
-    <!-- ==============================
-         顶部导航栏
-    ============================== -->
+    <!-- 顶部导航栏 -->
     <header class="app-header" id="app-header">
 
         <div class="app-header__brand">
@@ -117,7 +85,6 @@
 
         <div class="app-header__actions">
 
-            <!-- 新建：进入新建选择页面 -->
             <a
                 class="app-header__button app-header__button--create"
                 href="./creation/create.html"
@@ -133,7 +100,6 @@
                 </span>
             </a>
 
-            <!-- 设置 -->
             <button
                 class="app-header__button app-header__button--settings"
                 id="home-settings-trigger"
@@ -152,9 +118,7 @@
 
     </header>
 
-    <!-- ==============================
-         页面主体
-    ============================== -->
+    <!-- 页面主体 -->
     <main class="app-main" id="app-main">
 
         <section
@@ -163,9 +127,7 @@
             aria-label="书架"
         >
 
-            <!-- ==============================
-                 空书架提示
-            ============================== -->
+            <!-- 空书架提示 -->
             <section
                 class="empty-state"
                 id="empty-state"
@@ -203,42 +165,20 @@
 
             </section>
 
-            <!-- ==============================
-                 分组区域
-            ============================== -->
-            <section
-                class="home-groups"
-                id="home-groups"
-                aria-label="分组"
-                hidden
-            >
-
-                <div
-                    class="home-groups__list"
-                    id="home-groups-list"
-                    aria-label="分组列表"
-                >
-                    <!-- 分组卡片由首页程序生成 -->
-                </div>
-
-            </section>
-
-            <!-- ==============================
-                 书籍区域
-            ============================== -->
+            <!-- 统一书架：分组和书籍共用 -->
             <section
                 class="shelf-content"
                 id="shelf-content"
-                aria-label="书籍"
+                aria-label="书架"
                 hidden
             >
 
                 <div
                     class="shelf-list"
                     id="shelf-list"
-                    aria-label="书籍列表"
+                    aria-label="书籍与分组列表"
                 >
-                    <!-- 书籍卡片由首页程序生成 -->
+                    <!-- 分组卡片和书籍卡片统一由 home.js 生成 -->
                 </div>
 
             </section>
@@ -247,14 +187,11 @@
 
     </main>
 
-    <!-- ==============================
-         底部导航
-    ============================== -->
+    <!-- 底部导航 -->
     <footer class="app-footer" id="app-footer">
 
         <nav class="bottom-nav" aria-label="主导航">
 
-            <!-- 书架 -->
             <a
                 class="bottom-nav__item bottom-nav__item--active"
                 href="./index.html"
@@ -287,7 +224,6 @@
 
             </a>
 
-            <!-- 工具 -->
             <a
                 class="bottom-nav__item"
                 href="./pages/tools.html"
@@ -325,23 +261,19 @@
 
     </footer>
 
-    <!-- ==============================
-         书架设置弹窗
-    ============================== -->
+    <!-- 书架设置弹窗 -->
     <div
         class="home-settings"
         id="home-settings"
         hidden
     >
 
-        <!-- 背景遮罩 -->
         <div
             class="home-settings__backdrop"
             data-settings-close
             aria-hidden="true"
         ></div>
 
-        <!-- 设置面板 -->
         <section
             class="home-settings__panel"
             id="home-settings-dialog"
@@ -374,7 +306,7 @@
             <!-- 设置选项 -->
             <div class="home-settings__options">
 
-                <!-- 书籍排序 -->
+                <!-- 统一排序 -->
                 <button
                     class="home-settings__option"
                     type="button"
@@ -387,25 +319,7 @@
 
                     <span class="home-settings__option-content">
                         <span class="home-settings__option-title">
-                            书籍排序
-                        </span>
-                    </span>
-                </button>
-
-                <!-- 分组排序 -->
-                <button
-                    class="home-settings__option"
-                    type="button"
-                    data-settings-action="group-sort"
-                >
-                    <span
-                        class="home-settings__option-icon"
-                        aria-hidden="true"
-                    >⇅</span>
-
-                    <span class="home-settings__option-content">
-                        <span class="home-settings__option-title">
-                            分组排序
+                            排序
                         </span>
                     </span>
                 </button>
