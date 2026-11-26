@@ -1,6 +1,6 @@
 /* ======================================================
    首页书籍删除模块
-   文件：page-js/home-book-delete.js
+   文件：home-js/book-delete.js
 
    独立职责：
    1. 创建书籍删除按钮
@@ -16,6 +16,10 @@
 
 (function () {
     "use strict";
+
+    /* =================================
+       创建书籍删除按钮
+    ================================= */
 
     function createDeleteButton(book) {
         const button = document.createElement("button");
@@ -34,6 +38,10 @@
             "删除《" + title + "》"
         );
 
+        /* =================================
+           删除按钮点击事件
+        ================================= */
+
         button.addEventListener("click", function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -49,6 +57,10 @@
                 return;
             }
 
+            /* =================================
+               检查书籍存储接口
+            ================================= */
+
             const storage = window.WritingStorage;
 
             if (
@@ -59,6 +71,10 @@
                 return;
             }
 
+            /* =================================
+               执行删除
+            ================================= */
+
             try {
                 const deleted = storage.deleteBook(book.id);
 
@@ -68,6 +84,10 @@
                     );
                     return;
                 }
+
+                /* =================================
+                   刷新首页书架
+                ================================= */
 
                 if (
                     window.WritingHome &&
@@ -90,6 +110,10 @@
 
         return button;
     }
+
+    /* =================================
+       暴露公开接口
+    ================================= */
 
     window.WritingBookDelete = Object.freeze({
         createButton: createDeleteButton
