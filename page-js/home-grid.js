@@ -12,7 +12,8 @@
    7. 避免重复初始化
    8. 不修改书籍、分组数据
    9. 不清除其他本地数据
-  10. 不负责设置按钮点击事件
+  10. 与列表模块同步布局状态
+  11. 监听设置模块派发的布局事件
 ====================================================== */
 (function () {
     "use strict";
@@ -38,9 +39,17 @@
     const LIST_STORAGE_KEY =
         "writing-software-home-list-enabled";
 
+    const LAYOUT_EVENT =
+        "writing-home-layout-change";
+
+    const SETTINGS_EVENT =
+        "writing-home-settings-action";
+
     const SELECTOR = {
         shelf: "#shelf-list",
-        groups: "#home-groups-list"
+        groups: "#home-groups-list",
+        closeButton:
+            '[data-settings-close]:not(.home-settings__backdrop)'
     };
 
     const STATE = {
@@ -48,7 +57,8 @@
         initialized: false,
         observer: null,
         observedRoot: null,
-        pendingRefresh: false
+        pendingRefresh: false,
+        handlingStorage: false
     };
 
     /* ======================================================
@@ -103,7 +113,7 @@
     }
 
     /* ======================================================
-       五、应用布局
+       五、同步设置按钮状态
     ====================================================== */
 
     function updateButtons() {
@@ -145,6 +155,10 @@
             }
         });
     }
+
+    /* ======================================================
+       六、应用布局类名
+    ====================================================== */
 
     function applyClassesOnly() {
         const root = getRoot();
@@ -200,7 +214,43 @@
     }
 
     /* ======================================================
-       六、切换模式
+       七、布局事件同步
+    ====================================================== */
+
+    function dispatchLayoutChange(mode) {
+        document.dispatchEvent(
+            new CustomEvent(LAYOUT_EVENT, {
+                detail: {
+                    mode: mode
+                }
+            })
+        );
+    }
+
+    function bindLayoutEvents() {
+        document.addEventListener(
+            LAYOUT_EVENT,
+            function (event) {
+                const mode =
+                    event.detail &&
+                    event.detail.mode;
+
+                if (
+                    mode !== "grid" &&
+                    mode !== "list"
+                ) {
+                    return;
+                }
+
+                STATE.enabled = mode === "grid";
+
+                applyMode();
+            }
+        );
+    }
+
+    /* ======================================================
+       八、切换模式
     ====================================================== */
 
     function enable() {
@@ -208,6 +258,8 @@
 
         saveCurrentMode();
         applyMode();
+
+        dispatchLayoutChange("grid");
 
         console.info(
             "[HomeGrid] 已启用网格模式。"
@@ -222,8 +274,10 @@
         saveCurrentMode();
         applyMode();
 
+        dispatchLayoutChange("list");
+
         console.info(
-            "[HomeGrid] 已关闭网格模式。"
+            "[HomeGrid] 已切换到列表模式。"
         );
 
         return false;
@@ -236,7 +290,48 @@
     }
 
     /* ======================================================
-       七、动态页面监听
+       九、关闭设置窗口
+    ====================================================== */
+
+    function closeSettings() {
+        const button = document.querySelector(
+            SELECTOR.closeButton
+        );
+
+        if (button) {
+            button.click();
+        }
+    }
+
+    /* ======================================================
+       十、监听设置模块事件
+
+       home-settings.js 派发：
+       writing-home-settings-action
+
+       本模块只处理 grid。
+    ====================================================== */
+
+    function bindSettingsEvents() {
+        document.addEventListener(
+            SETTINGS_EVENT,
+            function (event) {
+                const action =
+                    event.detail &&
+                    event.detail.action;
+
+                if (action !== "grid") {
+                    return;
+                }
+
+                enable();
+                closeSettings();
+            }
+        );
+    }
+
+    /* ======================================================
+       十一、动态页面监听
     ====================================================== */
 
     function scheduleRefresh() {
@@ -308,13 +403,17 @@
     }
 
     /* ======================================================
-       八、跨标签页同步
+       十二、跨标签页同步
     ====================================================== */
 
     function bindStorageEvents() {
         window.addEventListener(
             "storage",
             function (event) {
+                if (STATE.handlingStorage) {
+                    return;
+                }
+
                 if (
                     event.key !== STORAGE_KEY &&
                     event.key !== LIST_STORAGE_KEY
@@ -322,21 +421,38 @@
                     return;
                 }
 
-                const gridEnabled =
-                    readStorage(STORAGE_KEY);
+                STATE.handlingStorage = true;
 
-                const listEnabled =
-                    readStorage(LIST_STORAGE_KEY);
+                try {
+                    const gridEnabled =
+                        readStorage(STORAGE_KEY);
 
-                /*
-                 * 两个模式同时开启时，
-                 * 优先列表模式。
-                 */
+                    const listEnabled =
+                        readStorage(LIST_STORAGE_KEY);
 
-                STATE.enabled =
-                    gridEnabled && !listEnabled;
+                    /*
+                     * 两个模式同时开启时，
+                     * 优先列表模式。
+                     */
 
-                applyMode();
+                    if (listEnabled) {
+                        STATE.enabled = false;
+                    } else if (gridEnabled) {
+                        STATE.enabled = true;
+                    } else {
+                        STATE.enabled = false;
+                    }
+
+                    saveCurrentMode();
+                    applyMode();
+
+                    dispatchLayoutChange(
+                        STATE.enabled ? "grid" : "list"
+                    );
+
+                } finally {
+                    STATE.handlingStorage = false;
+                }
 
                 console.info(
                     "[HomeGrid] 已同步其他标签页的布局设置。"
@@ -346,7 +462,7 @@
     }
 
     /* ======================================================
-       九、初始化
+       十三、初始化
     ====================================================== */
 
     function initialize() {
@@ -362,16 +478,24 @@
         const listEnabled =
             readStorage(LIST_STORAGE_KEY);
 
-        STATE.enabled =
-            gridEnabled && !listEnabled;
-
         /*
-         * 修正两个布局设置键，
-         * 保证网格与列表互斥。
+         * 优先列表模式。
+         * 如果只有网格模式开启，则恢复网格。
+         * 两个设置都关闭时，默认列表模式。
          */
+
+        if (listEnabled) {
+            STATE.enabled = false;
+        } else if (gridEnabled) {
+            STATE.enabled = true;
+        } else {
+            STATE.enabled = false;
+        }
 
         saveCurrentMode();
 
+        bindSettingsEvents();
+        bindLayoutEvents();
         bindStorageEvents();
 
         applyMode();
@@ -385,7 +509,7 @@
     }
 
     /* ======================================================
-       十、公开接口
+       十四、公开接口
        保留原有接口名称
     ====================================================== */
 
@@ -402,7 +526,7 @@
     });
 
     /* ======================================================
-       十一、启动
+       十五、启动
     ====================================================== */
 
     if (document.readyState === "loading") {
