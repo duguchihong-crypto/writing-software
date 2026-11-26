@@ -1,6 +1,7 @@
 /* =========================================================
    写作软件 · 书架网格模式
    文件：page-css/home-grid.css
+
    1. 书籍固定三列
    2. 书籍卡片宽度统一
    3. 所有封面固定 3:4
@@ -8,17 +9,29 @@
    5. 无封面时显示固定默认图案，铺满整个封面框
    6. 只显示封面和书名
    7. 分组固定三列
-   8. 分组透明框固定 3:4
-   9. 书名和分组名显示在框下方
-  10. 保留右上角操作菜单
-  11. 隐藏“我的分组”标题
-  12. 清除黄色装饰线
-  13. 适配手机、平板和电脑
-  14. 不修改本地数据
+   8. 分组卡片及内部框使用青色背景
+   9. 分组框固定 3:4
+  10. 书名和分组名显示在框下方
+  11. 保留右上角操作菜单
+  12. 隐藏“我的分组”标题
+  13. 清除黄色装饰线
+  14. 适配手机、平板和电脑
+  15. 不修改本地数据
 ========================================================= */
+
 /* =========================================================
-   一、书籍网格容器
+   一、统一颜色
 ========================================================= */
+
+:root {
+    --home-grid-group-bg: #d9eeee;
+    --home-grid-group-border: #b7d5d5;
+}
+
+/* =========================================================
+   二、书籍网格容器
+========================================================= */
+
 html.home-grid-enabled #shelf-list,
 #shelf-list.shelf-list--grid {
     display: grid !important;
@@ -37,9 +50,11 @@ html.home-grid-enabled #shelf-list,
     padding: 0 !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   二、书籍卡片
+   三、书籍卡片
 ========================================================= */
+
 html.home-grid-enabled #shelf-list > .shelf-card,
 #shelf-list.shelf-list--grid > .shelf-card {
     position: relative !important;
@@ -66,9 +81,11 @@ html.home-grid-enabled #shelf-list > .shelf-card,
     box-shadow: none !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   三、清除书籍卡片装饰线
+   四、清除书籍卡片装饰线
 ========================================================= */
+
 html.home-grid-enabled #shelf-list > .shelf-card::before,
 html.home-grid-enabled #shelf-list > .shelf-card::after,
 html.home-grid-enabled #shelf-list .shelf-card__open::before,
@@ -87,9 +104,11 @@ html.home-grid-enabled #shelf-list .shelf-card__cover::after,
     border: none !important;
     box-shadow: none !important;
 }
+
 /* =========================================================
-   四、书籍打开区域
+   五、书籍打开区域
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__open,
 #shelf-list.shelf-list--grid .shelf-card__open {
     position: relative !important;
@@ -113,11 +132,11 @@ html.home-grid-enabled #shelf-list .shelf-card__open,
     text-align: center !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   五、书籍封面容器
-   关键：封面本身决定尺寸，而不是内部图片或图案。
-   所有封面统一为 3:4。
+   六、书籍封面容器
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover,
 #shelf-list.shelf-list--grid .shelf-card__cover {
     position: relative !important;
@@ -140,11 +159,11 @@ html.home-grid-enabled #shelf-list .shelf-card__cover,
     font-size: 12px !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   六、有封面时的图片
-   图片元素铺满容器，使用 contain 保留完整画面。
-   图片比例不一致时允许留白，不进行裁切。
+   七、有封面时的图片
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover img,
 html.home-grid-enabled #shelf-list .shelf-card__cover-image,
 #shelf-list.shelf-list--grid .shelf-card__cover img,
@@ -168,13 +187,11 @@ html.home-grid-enabled #shelf-list .shelf-card__cover-image,
     box-shadow: none !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   七、无封面默认图案容器
-   关键修复：
-   1. 默认图案必须铺满整个 3:4 封面。
-   2. 不让默认图案的内容决定封面大小。
-   3. 不清除原本的背景图案、文字和装饰。
+   八、无封面默认图案容器
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover > .shelf-card__cover--default,
 #shelf-list.shelf-list--grid .shelf-card__cover > .shelf-card__cover--default {
     position: absolute !important;
@@ -196,28 +213,31 @@ html.home-grid-enabled #shelf-list .shelf-card__cover > .shelf-card__cover--defa
     color: inherit !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   八、兼容默认封面本身就是容器的情况
-   仅当该元素直接作为封面容器时生效。
+   九、兼容默认封面本身就是容器的情况
 ========================================================= */
+
 html.home-grid-enabled #shelf-list > .shelf-card .shelf-card__cover--default:not(.shelf-card__cover > .shelf-card__cover--default),
 #shelf-list.shelf-list--grid > .shelf-card .shelf-card__cover--default:not(.shelf-card__cover > .shelf-card__cover--default) {
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   九、默认封面内部元素
-   不隐藏固定图案、装饰和标题。
-   防止内部内容撑破封面。
+   十、默认封面内部元素
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover--default > *,
 #shelf-list.shelf-list--grid .shelf-card__cover--default > * {
     min-width: 0 !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十、书名区域
+   十一、书名区域
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__body,
 #shelf-list.shelf-list--grid .shelf-card__body {
     position: relative !important;
@@ -238,10 +258,11 @@ html.home-grid-enabled #shelf-list .shelf-card__body,
     font-size: 12px !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十一、书名
-   显示在封面下方，最多两行。
+   十二、书名
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__title,
 #shelf-list.shelf-list--grid .shelf-card__title {
     display: -webkit-box !important;
@@ -268,9 +289,11 @@ html.home-grid-enabled #shelf-list .shelf-card__title,
     box-shadow: none !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十二、隐藏简介、字数、更新时间等信息
+   十三、隐藏简介、字数、更新时间等信息
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__description,
 html.home-grid-enabled #shelf-list .shelf-card__meta,
 html.home-grid-enabled #shelf-list .shelf-card__word-count,
@@ -285,10 +308,11 @@ html.home-grid-enabled #shelf-list .shelf-card__footer,
 #shelf-list.shelf-list--grid .shelf-card__footer {
     display: none !important;
 }
+
 /* =========================================================
-   十三、书籍操作菜单
-   固定在封面右上角。
+   十四、书籍操作菜单
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__menu-button,
 #shelf-list.shelf-list--grid .shelf-card__menu-button {
     position: absolute !important;
@@ -306,9 +330,11 @@ html.home-grid-enabled #shelf-list .shelf-card__menu-button,
     padding: 0 !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十四、书籍卡片内部防溢出
+   十五、书籍卡片内部防溢出
 ========================================================= */
+
 html.home-grid-enabled #shelf-list .shelf-card__body > *,
 html.home-grid-enabled #shelf-list .shelf-card__open > *,
 #shelf-list.shelf-list--grid .shelf-card__body > *,
@@ -317,10 +343,12 @@ html.home-grid-enabled #shelf-list .shelf-card__open > *,
     max-width: 100% !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十五、分组网格容器
+   十六、分组网格容器
    固定三列。
 ========================================================= */
+
 html.home-grid-enabled #home-groups-list,
 #home-groups-list.home-groups-list--grid,
 #home-groups .home-groups__list {
@@ -341,9 +369,12 @@ html.home-grid-enabled #home-groups-list,
     overflow: visible !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十六、分组卡片
+   十七、分组卡片
+   网格模式下使用青色背景。
 ========================================================= */
+
 html.home-grid-enabled #home-groups-list > .home-group-card,
 #home-groups-list.home-groups-list--grid > .home-group-card,
 #home-groups .home-groups__list > .home-group-card {
@@ -366,16 +397,18 @@ html.home-grid-enabled #home-groups-list > .home-group-card,
     align-self: start !important;
     overflow: visible !important;
     color: var(--theme-text, #29231f) !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
+    background: var(--home-grid-group-bg) !important;
+    border: 1px solid var(--home-grid-group-border) !important;
+    border-radius: 4px !important;
     box-shadow: none !important;
     transform: none !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十七、清除分组装饰线
+   十八、清除分组装饰线
 ========================================================= */
+
 #home-groups .home-group-card::before,
 #home-groups .home-group-card::after,
 #home-groups-list .home-group-card::before,
@@ -386,10 +419,12 @@ html.home-grid-enabled #home-groups-list > .home-group-card,
     border: none !important;
     box-shadow: none !important;
 }
+
 /* =========================================================
-   十八、分组透明框
-   固定 3:4。
+   十九、分组内部框
+   固定 3:4，同时使用青色背景。
 ========================================================= */
+
 html.home-grid-enabled #home-groups-list .home-group-card__cover,
 #home-groups-list.home-groups-list--grid .home-group-card__cover,
 #home-groups .home-group-card__cover {
@@ -404,19 +439,21 @@ html.home-grid-enabled #home-groups-list .home-group-card__cover,
     aspect-ratio: 3 / 4 !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: transparent !important;
-    background-color: transparent !important;
+    background: var(--home-grid-group-bg) !important;
+    background-color: var(--home-grid-group-bg) !important;
     background-image: none !important;
-    border: 1px solid #c9b9a0 !important;
+    border: 1px solid var(--home-grid-group-border) !important;
     border-radius: 3px !important;
     box-shadow: none !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   十九、分组名称
-   显示在透明框下方，最多两行。
+   二十、分组名称
+   显示在框下方，最多两行。
 ========================================================= */
+
 html.home-grid-enabled #home-groups-list .home-group-card__name,
 #home-groups-list.home-groups-list--grid .home-group-card__name,
 #home-groups .home-group-card__name {
@@ -453,17 +490,21 @@ html.home-grid-enabled #home-groups-list .home-group-card__name,
     box-shadow: none !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   二十、隐藏分组复选框
+   二十一、隐藏分组复选框
 ========================================================= */
+
 #home-groups .home-group-card__checkbox,
 #home-groups-list .home-group-card__checkbox {
     display: none !important;
 }
+
 /* =========================================================
-   二十一、分组操作菜单
+   二十二、分组操作菜单
    固定在透明框右上角。
 ========================================================= */
+
 html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
 #home-groups-list.home-groups-list--grid .home-group-card__menu-button,
 #home-groups .home-group-card__menu-button {
@@ -483,17 +524,21 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
     font-size: 20px !important;
     box-sizing: border-box !important;
 }
+
 /* =========================================================
-   二十二、隐藏“我的分组”标题
+   二十三、隐藏“我的分组”标题
 ========================================================= */
+
 #home-groups .home-groups__header,
 #home-groups .home-groups__title {
     display: none !important;
 }
+
 /* =========================================================
-   二十三、平板与电脑适配
+   二十四、平板与电脑适配
    仍然保持三列。
 ========================================================= */
+
 @media (min-width: 600px) {
     html.home-grid-enabled #shelf-list,
     #shelf-list.shelf-list--grid,
@@ -502,10 +547,12 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
     #home-groups .home-groups__list {
         gap: 10px !important;
     }
+
     html.home-grid-enabled #shelf-list .shelf-card__body,
     #shelf-list.shelf-list--grid .shelf-card__body {
         padding: 6px 3px 0 !important;
     }
+
     html.home-grid-enabled #shelf-list .shelf-card__title,
     #shelf-list.shelf-list--grid .shelf-card__title,
     #home-groups .home-group-card__name,
@@ -513,10 +560,12 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
         font-size: 13px !important;
     }
 }
+
 /* =========================================================
-   二十四、超小屏幕适配
+   二十五、超小屏幕适配
    仍然保持三列。
 ========================================================= */
+
 @media (max-width: 359px) {
     html.home-grid-enabled #shelf-list,
     #shelf-list.shelf-list--grid,
@@ -525,16 +574,19 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
     #home-groups .home-groups__list {
         gap: 4px !important;
     }
+
     html.home-grid-enabled #shelf-list .shelf-card__body,
     #shelf-list.shelf-list--grid .shelf-card__body {
         padding: 4px 1px 0 !important;
     }
+
     html.home-grid-enabled #shelf-list .shelf-card__title,
     #shelf-list.shelf-list--grid .shelf-card__title,
     #home-groups .home-group-card__name,
     #home-groups-list .home-group-card__name {
         font-size: 10px !important;
     }
+
     #home-groups .home-group-card__menu-button,
     #home-groups-list .home-group-card__menu-button {
         top: 3px !important;
@@ -545,9 +597,11 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
         font-size: 17px !important;
     }
 }
+
 /* =========================================================
-   二十五、减少动态效果
+   二十六、减少动态效果
 ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
     #shelf-list.shelf-list--grid .shelf-card,
     #shelf-list.shelf-list--grid .shelf-card__open,
@@ -557,15 +611,19 @@ html.home-grid-enabled #home-groups-list .home-group-card__menu-button,
     #home-groups-list .home-group-card__cover {
         transition: none !important;
     }
+
     #home-groups .home-group-card:hover,
     #home-groups-list .home-group-card:hover {
         transform: none !important;
     }
 }
+
 /* =========================================================
-   二十六、最终强制规则
+   二十七、最终强制规则
 ========================================================= */
+
 /* 书籍与分组始终固定三列 */
+
 html.home-grid-enabled #shelf-list,
 #shelf-list.shelf-list--grid,
 html.home-grid-enabled #home-groups-list,
@@ -573,14 +631,18 @@ html.home-grid-enabled #home-groups-list,
 #home-groups .home-groups__list {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
+
 /* 书籍卡片宽度统一 */
+
 html.home-grid-enabled #shelf-list > .shelf-card,
 #shelf-list.shelf-list--grid > .shelf-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
 }
+
 /* 所有书籍封面统一为 3:4 */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover,
 #shelf-list.shelf-list--grid .shelf-card__cover {
     width: 100% !important;
@@ -588,7 +650,9 @@ html.home-grid-enabled #shelf-list .shelf-card__cover,
     max-width: 100% !important;
     aspect-ratio: 3 / 4 !important;
 }
+
 /* 图片完整显示，不裁切 */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover img,
 html.home-grid-enabled #shelf-list .shelf-card__cover-image,
 #shelf-list.shelf-list--grid .shelf-card__cover img,
@@ -596,7 +660,9 @@ html.home-grid-enabled #shelf-list .shelf-card__cover-image,
     object-fit: contain !important;
     object-position: center center !important;
 }
+
 /* 无封面默认图案必须占满整个封面 */
+
 html.home-grid-enabled #shelf-list .shelf-card__cover > .shelf-card__cover--default,
 #shelf-list.shelf-list--grid .shelf-card__cover > .shelf-card__cover--default {
     position: absolute !important;
@@ -612,7 +678,9 @@ html.home-grid-enabled #shelf-list .shelf-card__cover > .shelf-card__cover--defa
     margin: 0 !important;
     box-sizing: border-box !important;
 }
-/* 分组透明框统一为 3:4 */
+
+/* 分组透明框统一为 3:4，并保持青色 */
+
 html.home-grid-enabled #home-groups-list .home-group-card__cover,
 #home-groups-list.home-groups-list--grid .home-group-card__cover,
 #home-groups .home-group-card__cover {
@@ -620,13 +688,27 @@ html.home-grid-enabled #home-groups-list .home-group-card__cover,
     height: auto !important;
     max-width: 100% !important;
     aspect-ratio: 3 / 4 !important;
+    background: var(--home-grid-group-bg) !important;
+    background-color: var(--home-grid-group-bg) !important;
 }
+
+/* 分组卡片最终强制青色 */
+
+html.home-grid-enabled #home-groups-list > .home-group-card,
+#home-groups-list.home-groups-list--grid > .home-group-card,
+#home-groups .home-groups__list > .home-group-card {
+    background: var(--home-grid-group-bg) !important;
+    background-color: var(--home-grid-group-bg) !important;
+}
+
 /* 最终清除书籍卡片顶部装饰 */
+
 html.home-grid-enabled #shelf-list > .shelf-card,
 #shelf-list.shelf-list--grid > .shelf-card {
     border-top: none !important;
     box-shadow: none !important;
 }
+
 html.home-grid-enabled #shelf-list > .shelf-card::before,
 html.home-grid-enabled #shelf-list > .shelf-card::after,
 html.home-grid-enabled #shelf-list .shelf-card__open::before,
