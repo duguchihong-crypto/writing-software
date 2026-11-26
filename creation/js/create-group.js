@@ -1,21 +1,19 @@
 /* ======================================================
-   写作软件 · 新建分组页面逻辑
-   文件：page-js/create-group.js
+   写作软件 · 新建分组
+   文件：creation/js/create-group.js
 
    功能：
-   1. 验证分组名称
-   2. 实时统计字数
+   1. 分组名称验证
+   2. 实时字数统计
    3. 检查重复名称
    4. 创建并保存分组
-   5. 处理创建成功与失败
-   6. 取消创建及返回操作
-   7. 提示未保存内容
+   5. 创建成功与失败提示
+   6. 取消创建及返回
+   7. 未保存内容提醒
    8. 防止重复提交
    9. 兼容 WritingGroupsStorage
    10. 兼容 WritingStorage
-   11. 兼容 WritingNavigation
-   12. 创建成功后返回首页
-   13. 兼容 GitHub Pages 项目路径
+   11. 兼容 GitHub Pages 项目路径
 ====================================================== */
 
 (function () {
@@ -23,53 +21,44 @@
 
 
     /* ==================================================
-       一、获取页面元素
+       一、配置
     ================================================== */
 
-    const form = document.getElementById(
-        "create-group-form"
-    );
-
-    const nameInput = document.getElementById(
-        "group-name"
-    );
-
-    const nameCounter = document.getElementById(
-        "group-name-counter"
-    );
-
-    const nameError = document.getElementById(
-        "group-name-error"
-    );
-
-    const message = document.getElementById(
-        "create-group-message"
-    );
-
-    const submitButton = document.getElementById(
-        "create-group-submit"
-    );
-
-    const cancelButton = document.getElementById(
-        "cancel-create-group"
-    );
-
-    const cancelTopButton = document.getElementById(
-        "cancel-create-group-top"
-    );
+    const CONFIG = {
+        maxNameLength: 50,
+        redirectDelay: 600
+    };
 
 
     /* ==================================================
-       二、检查必要的页面元素
+       二、获取页面元素
     ================================================== */
 
-    if (
-        !form ||
-        !nameInput ||
-        !submitButton
-    ) {
+    const $ = id => document.getElementById(id);
+
+    const el = {
+        form: $("create-group-form"),
+
+        name: $("group-name"),
+        counter: $("group-name-counter"),
+        error: $("group-name-error"),
+
+        message: $("create-group-message"),
+
+        submit: $("create-group-submit"),
+
+        cancel: $("cancel-create-group"),
+        cancelTop: $("cancel-create-group-top")
+    };
+
+
+    /* ==================================================
+       三、检查必要元素
+    ================================================== */
+
+    if (!el.form || !el.name || !el.submit) {
         console.error(
-            "[新建分组] 页面初始化失败：缺少必要的 HTML 元素。"
+            "[WritingCreateGroup] 页面缺少必要元素。"
         );
 
         return;
@@ -77,215 +66,208 @@
 
 
     /* ==================================================
-       三、基础配置
+       四、运行状态
     ================================================== */
 
-    const MAX_NAME_LENGTH = 50;
+    const state = {
+        submitting: false,
+        saved: false,
+        leaving: false,
+        redirectTimer: null
+    };
 
-    const REDIRECT_DELAY = 600;
+    const originalSubmitHTML = el.submit.innerHTML;
 
 
     /* ==================================================
-       四、页面状态
+       五、页面地址
     ================================================== */
 
-    let isSubmitting = false;
+    // 取消创建：返回 creation/create.html
+    function getCreateUrl() {
+        return new URL(
+            "create.html",
+            window.location.href
+        ).href;
+    }
 
-    let isSaved = false;
 
-    let originalName = nameInput.value;
+    // 创建成功：返回项目根目录 index.html
+    function getHomeUrl() {
+        return new URL(
+            "../index.html",
+            window.location.href
+        ).href;
+    }
 
-    let redirectTimer = null;
 
-    const originalSubmitHTML = submitButton.innerHTML;
+    function navigateToCreate() {
+        state.leaving = true;
+
+        window.location.assign(getCreateUrl());
+    }
+
+
+    function navigateToHome() {
+        state.leaving = true;
+
+        window.location.replace(getHomeUrl());
+    }
 
 
     /* ==================================================
-       五、消息处理
+       六、消息提示
     ================================================== */
 
-    function showMessage(text, type) {
-        if (!message) {
-            return;
-        }
+    function showMessage(text, type = "info") {
+        if (!el.message) return;
 
-        message.textContent = String(text || "");
+        el.message.textContent = String(text || "");
 
-        message.className = "create-group-message";
+        el.message.className = "create-group-message";
 
         if (type === "success") {
-            message.classList.add(
+            el.message.classList.add(
                 "create-group-message--success"
             );
-        }
-
-        if (type === "error") {
-            message.classList.add(
+        } else if (type === "error") {
+            el.message.classList.add(
                 "create-group-message--error"
             );
         }
 
-        message.hidden = false;
+        el.message.hidden = false;
+
+        el.message.setAttribute(
+            "role",
+            type === "error" ? "alert" : "status"
+        );
     }
 
 
     function hideMessage() {
-        if (!message) {
-            return;
-        }
+        if (!el.message) return;
 
-        message.hidden = true;
+        el.message.hidden = true;
+        el.message.textContent = "";
 
-        message.textContent = "";
+        el.message.className = "create-group-message";
 
-        message.className = "create-group-message";
+        el.message.removeAttribute("role");
     }
 
 
     /* ==================================================
-       六、分组名称错误提示
+       七、名称错误提示
     ================================================== */
 
-    function showNameError(text) {
-        if (nameError) {
-            nameError.textContent = text;
-
-            nameError.hidden = false;
+    function setNameError(text = "") {
+        if (el.error) {
+            el.error.textContent = text;
+            el.error.hidden = !text;
         }
 
-        nameInput.setAttribute(
-            "aria-invalid",
-            "true"
-        );
-    }
-
-
-    function clearNameError() {
-        if (nameError) {
-            nameError.textContent = "";
-
-            nameError.hidden = true;
-        }
-
-        nameInput.removeAttribute(
-            "aria-invalid"
-        );
-    }
-
-
-    /* ==================================================
-       七、更新名称字数
-    ================================================== */
-
-    function updateNameCounter() {
-        if (!nameCounter) {
-            return;
-        }
-
-        const length = nameInput.value.length;
-
-        const maxLength =
-            Number(nameInput.maxLength) > 0
-                ? Number(nameInput.maxLength)
-                : MAX_NAME_LENGTH;
-
-        nameCounter.textContent =
-            length + " / " + maxLength;
-
-        if (length >= maxLength) {
-            nameCounter.setAttribute(
-                "data-limit",
-                "true"
-            );
+        if (text) {
+            el.name.setAttribute("aria-invalid", "true");
         } else {
-            nameCounter.removeAttribute(
-                "data-limit"
-            );
+            el.name.removeAttribute("aria-invalid");
         }
     }
 
 
     /* ==================================================
-       八、验证分组名称
+       八、名称字数统计
     ================================================== */
+
+    function updateCounter() {
+        if (!el.counter) return;
+
+        const length = el.name.value.length;
+
+        el.counter.textContent =
+            length + " / " + CONFIG.maxNameLength;
+
+        if (length >= CONFIG.maxNameLength) {
+            el.counter.setAttribute("data-limit", "true");
+        } else {
+            el.counter.removeAttribute("data-limit");
+        }
+    }
+
+
+    /* ==================================================
+       九、名称验证
+    ================================================== */
+
+    function getName() {
+        return el.name.value.trim();
+    }
+
 
     function validateName() {
-        const name = nameInput.value.trim();
-
-        clearNameError();
+        const name = getName();
 
         if (!name) {
-            showNameError(
-                "请输入分组名称。"
+            setNameError("请输入分组名称。");
+            return false;
+        }
+
+        if (name.length > CONFIG.maxNameLength) {
+            setNameError(
+                "分组名称不能超过 " +
+                CONFIG.maxNameLength +
+                " 个字符。"
             );
 
             return false;
         }
 
-        if (name.length > MAX_NAME_LENGTH) {
-            showNameError(
-                "分组名称不能超过 50 个字符。"
-            );
-
-            return false;
-        }
+        setNameError("");
 
         return true;
     }
 
 
     /* ==================================================
-       九、设置提交状态
+       十、提交状态
     ================================================== */
 
-    function setSubmitting(submitting) {
-        isSubmitting = submitting;
+    function setSubmitting(value) {
+        state.submitting = value;
 
-        submitButton.disabled = submitting;
+        el.submit.disabled = value;
 
-        if (cancelButton) {
-            cancelButton.disabled = submitting;
+        if (el.cancel) {
+            el.cancel.disabled = value;
         }
 
-        if (cancelTopButton) {
-            cancelTopButton.disabled = submitting;
+        if (el.cancelTop) {
+            el.cancelTop.disabled = value;
         }
 
-        if (submitting) {
-            submitButton.innerHTML =
+        if (value) {
+            el.submit.innerHTML =
                 '<span aria-hidden="true">…</span>' +
                 '<span>正在创建</span>';
 
-            submitButton.setAttribute(
-                "aria-busy",
-                "true"
-            );
+            el.submit.setAttribute("aria-busy", "true");
         } else {
-            submitButton.innerHTML =
-                originalSubmitHTML;
+            el.submit.innerHTML = originalSubmitHTML;
 
-            submitButton.removeAttribute(
-                "aria-busy"
-            );
+            el.submit.removeAttribute("aria-busy");
         }
     }
 
 
     /* ==================================================
-       十、获取分组存储模块
+       十一、获取分组存储模块
     ================================================== */
 
     function getStorage() {
-        const groupStorage =
-            window.WritingGroupsStorage;
+        const groupStorage = window.WritingGroupsStorage;
+        const writingStorage = window.WritingStorage;
 
-        const writingStorage =
-            window.WritingStorage;
-
-        /*
-         * 优先使用独立分组存储模块。
-         */
-
+        // 优先使用独立分组存储模块
         if (
             groupStorage &&
             typeof groupStorage.createGroup === "function" &&
@@ -294,10 +276,7 @@
             return groupStorage;
         }
 
-        /*
-         * 兼容 WritingStorage。
-         */
-
+        // 兼容统一存储模块
         if (
             writingStorage &&
             typeof writingStorage.createGroup === "function" &&
@@ -307,22 +286,26 @@
         }
 
         throw new Error(
-            "分组存储接口不可用，请检查 groups-storage.js 是否正确加载。"
+            "分组存储模块未正确加载，请检查 groups-storage.js。"
         );
     }
 
 
     /* ==================================================
-       十一、检查分组名称是否重复
+       十二、检查重复名称
     ================================================== */
 
     function hasDuplicateName(storage, name) {
-        if (
-            typeof storage.hasGroupName === "function"
-        ) {
+        const normalizedName = name
+            .trim()
+            .toLocaleLowerCase();
+
+        // 优先使用存储模块提供的方法
+        if (typeof storage.hasGroupName === "function") {
             return storage.hasGroupName(name);
         }
 
+        // 兼容没有 hasGroupName() 的存储模块
         const groups = storage.getGroups();
 
         if (!Array.isArray(groups)) {
@@ -331,11 +314,7 @@
             );
         }
 
-        const normalizedName = name
-            .trim()
-            .toLocaleLowerCase();
-
-        return groups.some(function (group) {
+        return groups.some(group => {
             return String(group.name || "")
                 .trim()
                 .toLocaleLowerCase() === normalizedName;
@@ -344,239 +323,57 @@
 
 
     /* ==================================================
-       十二、清除跳转定时器
-    ================================================== */
-
-    function clearRedirectTimer() {
-        if (redirectTimer !== null) {
-            window.clearTimeout(redirectTimer);
-
-            redirectTimer = null;
-        }
-    }
-
-
-    /* ==================================================
-       十三、返回首页
-       
-       优先使用 WritingNavigation.goHome()。
-       如果导航模块不可用，则根据当前页面
-       的实际 URL 计算项目根目录。
-    ================================================== */
-
-    function navigateToHome() {
-        clearRedirectTimer();
-
-        console.log(
-            "[新建分组] 准备返回首页。"
-        );
-
-        /*
-         * 方法一：使用统一导航模块。
-         */
-
-        if (
-            window.WritingNavigation &&
-            typeof window.WritingNavigation.goHome === "function"
-        ) {
-            try {
-                window.WritingNavigation.goHome();
-
-                return;
-
-            } catch (error) {
-                console.error(
-                    "[新建分组] 导航模块跳转失败：",
-                    error
-                );
-            }
-        }
-
-        /*
-         * 方法二：直接根据当前 URL 计算首页。
-         *
-         * 例如：
-         * /writing-software/pages/create-group.html
-         *
-         * 转换为：
-         * /writing-software/index.html
-         *
-         * 不把首页错误地指向域名根目录。
-         */
-
-        try {
-            const currentUrl = new URL(
-                window.location.href
-            );
-
-            const currentPath = currentUrl.pathname;
-
-            const pageSuffix = "/pages/create-group.html";
-
-            if (currentPath.endsWith(pageSuffix)) {
-                currentUrl.pathname =
-                    currentPath.slice(
-                        0,
-                        -pageSuffix.length
-                    ) + "/index.html";
-
-            } else {
-                /*
-                 * 兼容页面目录结构发生变化的情况。
-                 */
-
-                const lastSlashIndex =
-                    currentPath.lastIndexOf("/");
-
-                const currentDirectory =
-                    currentPath.slice(
-                        0,
-                        lastSlashIndex + 1
-                    );
-
-                currentUrl.pathname =
-                    currentDirectory + "index.html";
-            }
-
-            currentUrl.search = "";
-
-            currentUrl.hash = "";
-
-            console.log(
-                "[新建分组] 首页地址：",
-                currentUrl.href
-            );
-
-            window.location.replace(
-                currentUrl.href
-            );
-
-        } catch (error) {
-            console.error(
-                "[新建分组] 无法计算首页地址：",
-                error
-            );
-
-            showMessage(
-                "分组已创建成功，但无法自动返回首页。请点击返回书架。",
-                "success"
-            );
-        }
-    }
-
-
-    /* ==================================================
-       十四、返回创建选择页
-       
-       取消创建时使用，不影响创建成功后的跳转。
-    ================================================== */
-
-    function navigateToCreatePage() {
-        clearRedirectTimer();
-
-        /*
-         * 优先使用统一导航模块。
-         */
-
-        if (
-            window.WritingNavigation &&
-            typeof window.WritingNavigation.goCreate === "function"
-        ) {
-            try {
-                window.WritingNavigation.goCreate();
-
-                return;
-
-            } catch (error) {
-                console.error(
-                    "[新建分组] 返回创建页面失败：",
-                    error
-                );
-            }
-        }
-
-        /*
-         * 备用方案。
-         *
-         * create.html 与 create-group.html
-         * 位于同一个 pages/ 目录。
-         */
-
-        window.location.href = "./create.html";
-    }
-
-
-    /* ==================================================
-       十五、创建分组
+       十三、创建分组
     ================================================== */
 
     function handleSubmit(event) {
         event.preventDefault();
 
-        /*
-         * 防止重复提交。
-         */
-
-        if (isSubmitting || isSaved) {
+        // 防止重复提交
+        if (state.submitting || state.saved) {
             return;
         }
 
         hideMessage();
+        setNameError("");
 
-        clearNameError();
-
-        /*
-         * 验证分组名称。
-         */
-
+        // 验证名称
         if (!validateName()) {
-            nameInput.focus();
-
+            el.name.focus();
             return;
         }
 
-        const name = nameInput.value.trim();
-
-        /*
-         * 开始提交。
-         */
+        const name = getName();
 
         setSubmitting(true);
 
         try {
             const storage = getStorage();
 
-            /*
-             * 检查名称是否重复。
-             */
-
+            // 检查重名
             if (hasDuplicateName(storage, name)) {
                 setSubmitting(false);
 
-                showNameError(
+                setNameError(
                     "已经存在同名分组，请换一个名称。"
                 );
 
-                nameInput.focus();
+                el.name.focus();
 
                 return;
             }
 
-            /*
-             * 创建并保存分组。
-             */
-
+            // 保存分组
             const group = storage.createGroup({
                 name: name
             });
 
-            /*
-             * 检查创建结果。
-             */
-
+            // 检查保存结果
             if (
                 !group ||
-                !group.id ||
+                group.id === undefined ||
+                group.id === null ||
+                String(group.id).trim() === "" ||
                 !group.name
             ) {
                 throw new Error(
@@ -584,46 +381,30 @@
                 );
             }
 
-            /*
-             * 标记保存成功。
-             */
-
-            isSaved = true;
-
-            originalName = name;
-
-            /*
-             * 显示创建成功消息。
-             */
+            // 保存成功
+            state.saved = true;
 
             showMessage(
                 "分组「" +
                 group.name +
-                "」创建成功！正在返回首页……",
+                "」创建成功！正在返回书架……",
                 "success"
             );
 
-            console.log(
-                "[新建分组] 创建成功：",
+            console.info(
+                "[WritingCreateGroup] 创建成功：",
                 group
             );
 
-            /*
-             * 创建成功后，延迟 600 毫秒返回首页。
-             */
-
-            clearRedirectTimer();
-
-            redirectTimer = window.setTimeout(
-                function () {
-                    navigateToHome();
-                },
-                REDIRECT_DELAY
+            // 延迟返回首页
+            state.redirectTimer = window.setTimeout(
+                navigateToHome,
+                CONFIG.redirectDelay
             );
 
         } catch (error) {
             console.error(
-                "[新建分组] 创建失败：",
+                "[WritingCreateGroup] 创建失败：",
                 error
             );
 
@@ -640,65 +421,59 @@
 
 
     /* ==================================================
-       十六、取消创建
+       十四、取消创建
     ================================================== */
 
-    function handleCancel() {
-        if (isSubmitting || isSaved) {
+    function handleCancel(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (
+            state.submitting ||
+            state.saved ||
+            state.leaving
+        ) {
             return;
         }
 
-        const currentName =
-            nameInput.value.trim();
-
-        const hasChanged =
-            currentName !== originalName.trim();
-
-        /*
-         * 如果输入内容发生变化，提示用户。
-         */
-
-        if (hasChanged) {
+        // 有未保存内容时确认放弃
+        if (getName()) {
             const confirmed = window.confirm(
                 "分组名称尚未保存，确定放弃本次创建吗？"
             );
 
-            if (!confirmed) {
-                return;
-            }
+            if (!confirmed) return;
         }
 
-        navigateToCreatePage();
+        navigateToCreate();
     }
 
 
     /* ==================================================
-       十七、监听输入变化
+       十五、输入事件
     ================================================== */
 
     function handleInput() {
-        updateNameCounter();
+        updateCounter();
 
-        clearNameError();
+        setNameError("");
 
         hideMessage();
     }
 
 
-    nameInput.addEventListener(
+    el.name.addEventListener(
         "input",
         handleInput
     );
 
 
-    /* ==================================================
-       十八、失去焦点时验证
-    ================================================== */
-
-    nameInput.addEventListener(
+    el.name.addEventListener(
         "blur",
         function () {
-            if (nameInput.value.trim()) {
+            if (getName()) {
                 validateName();
             }
         }
@@ -706,28 +481,28 @@
 
 
     /* ==================================================
-       十九、绑定表单提交事件
+       十六、表单事件
     ================================================== */
 
-    form.addEventListener(
+    el.form.addEventListener(
         "submit",
         handleSubmit
     );
 
 
     /* ==================================================
-       二十、绑定取消按钮
+       十七、取消按钮事件
     ================================================== */
 
-    if (cancelButton) {
-        cancelButton.addEventListener(
+    if (el.cancel) {
+        el.cancel.addEventListener(
             "click",
             handleCancel
         );
     }
 
-    if (cancelTopButton) {
-        cancelTopButton.addEventListener(
+    if (el.cancelTop) {
+        el.cancelTop.addEventListener(
             "click",
             handleCancel
         );
@@ -735,77 +510,56 @@
 
 
     /* ==================================================
-       二十一、离开页面前提示
+       十八、离开页面保护
     ================================================== */
 
     window.addEventListener(
         "beforeunload",
         function (event) {
-            /*
-             * 正在提交或已经成功保存时，不提示。
-             */
-
-            if (isSubmitting || isSaved) {
-                return;
-            }
-
-            const currentName =
-                nameInput.value.trim();
-
-            const hasChanged =
-                currentName !== originalName.trim();
-
-            if (!hasChanged) {
+            if (
+                state.submitting ||
+                state.saved ||
+                state.leaving ||
+                !getName()
+            ) {
                 return;
             }
 
             event.preventDefault();
-
             event.returnValue = "";
         }
     );
 
 
     /* ==================================================
-       二十二、页面初始化
+       十九、初始化
     ================================================== */
 
-    function init() {
-        updateNameCounter();
+    function initialize() {
+        el.name.maxLength = CONFIG.maxNameLength;
 
-        clearNameError();
+        updateCounter();
+
+        setNameError("");
 
         hideMessage();
 
-        originalName = nameInput.value;
-
-        console.log(
-            "[新建分组] 页面初始化成功。"
+        console.info(
+            "[WritingCreateGroup] 初始化完成。"
         );
 
-        console.log(
-            "[新建分组] 当前页面地址：",
-            window.location.href
-        );
-
-        console.log(
-            "[新建分组] WritingNavigation：",
-            Boolean(window.WritingNavigation)
-        );
-
-        console.log(
-            "[新建分组] WritingGroupsStorage：",
+        console.info(
+            "[WritingCreateGroup] WritingGroupsStorage：",
             Boolean(window.WritingGroupsStorage)
         );
 
-        console.log(
-            "[新建分组] WritingStorage：",
+        console.info(
+            "[WritingCreateGroup] WritingStorage：",
             Boolean(window.WritingStorage)
         );
     }
 
 
-    init();
-
+    initialize();
 
 })();
