@@ -7,7 +7,7 @@
    2. 与网格模式互斥
    3. 保存并恢复布局设置
    4. 监听跨标签页设置变化
-   5. 支持书籍与分组布局刷新
+   5. 支持统一书架布局刷新
    6. 保留原有公开接口
    7. 避免重复初始化
    8. 兼容书架容器重新生成
@@ -47,7 +47,6 @@
 
     const SELECTORS = {
         shelf: "#shelf-list",
-        groups: "#home-groups-list",
         button: '[data-settings-action="list"]',
         gridButton: '[data-settings-action="grid"]',
         buttonTitle: ".home-settings__option-title",
@@ -72,10 +71,6 @@
         return document.querySelector(SELECTORS.shelf);
     }
 
-    function getGroups() {
-        return document.querySelector(SELECTORS.groups);
-    }
-
     function readStorage(key) {
         try {
             return window.localStorage.getItem(key) === "true";
@@ -84,6 +79,7 @@
                 "[HomeList] 读取设置失败：",
                 error
             );
+
             return false;
         }
     }
@@ -161,18 +157,17 @@
        列表模式：
        html.home-list-enabled
        #shelf-list.shelf-list--list
-       #home-groups-list.home-groups-list--list
 
        网格模式：
        html.home-grid-enabled
        #shelf-list.shelf-list--grid
-       #home-groups-list.home-groups-list--grid
+
+       书籍和分组共用同一个书架容器。
     ====================================================== */
 
     function applyClassesOnly() {
         const root = document.documentElement;
         const shelf = getShelf();
-        const groups = getGroups();
 
         const gridEnabled = !STATE.enabled;
 
@@ -188,7 +183,7 @@
             gridEnabled
         );
 
-        /* 书籍容器 */
+        /* 统一书架 */
 
         if (shelf) {
             shelf.classList.toggle(
@@ -198,20 +193,6 @@
 
             shelf.classList.toggle(
                 "shelf-list--grid",
-                gridEnabled
-            );
-        }
-
-        /* 分组容器 */
-
-        if (groups) {
-            groups.classList.toggle(
-                "home-groups-list--list",
-                STATE.enabled
-            );
-
-            groups.classList.toggle(
-                "home-groups-list--grid",
                 gridEnabled
             );
         }
@@ -226,9 +207,6 @@
 
     /* ======================================================
        七、布局事件同步
-
-       网格模块和列表模块共用此事件。
-       避免两个模块的内部状态不一致。
     ====================================================== */
 
     function dispatchLayoutChange(mode) {
@@ -268,10 +246,6 @@
     ====================================================== */
 
     function enable() {
-        /*
-         * 启用列表模式。
-         */
-
         STATE.enabled = true;
 
         saveCurrentMode();
@@ -287,10 +261,6 @@
     }
 
     function disable() {
-        /*
-         * 关闭列表模式，切换到网格模式。
-         */
-
         STATE.enabled = false;
 
         saveCurrentMode();
@@ -327,11 +297,6 @@
 
     /* ======================================================
        十、监听设置模块事件
-
-       home-settings.js 派发：
-       writing-home-settings-action
-
-       本模块只处理 list。
     ====================================================== */
 
     function bindSettingsEvents() {
@@ -528,7 +493,7 @@
 
     /* ======================================================
        十四、公开接口
-       保留原有方法名称，兼容 home.js
+       保留原有方法名称
     ====================================================== */
 
     window.WritingHomeList = Object.freeze({
