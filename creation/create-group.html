@@ -266,6 +266,7 @@
 
     <!-- ==============================
          底部导航栏
+         与首页统一使用相同 SVG 图标
     ============================== -->
     <footer class="app-footer" id="app-footer">
 
@@ -273,9 +274,10 @@
 
             <!-- 书架 -->
             <a
-                class="bottom-nav__item"
+                class="bottom-nav__item bottom-nav__item--active"
                 href="../index.html"
                 data-nav="home"
+                aria-current="page"
                 aria-label="书架"
             >
 
@@ -284,14 +286,15 @@
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="1.8"
+                    stroke-width="1.7"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     aria-hidden="true"
                 >
-                    <path d="M3 10.5L12 3L21 10.5"></path>
-                    <path d="M5.5 9.5V21H18.5V9.5"></path>
-                    <path d="M9 21V14H15V21"></path>
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22Z"></path>
+                    <path d="M4 5.5V22"></path>
+                    <path d="M8 7h8"></path>
+                    <path d="M8 11h8"></path>
                 </svg>
 
                 <span class="bottom-nav__label">
@@ -313,14 +316,13 @@
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="1.8"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
                     stroke-linejoin="round"
                     aria-hidden="true"
                 >
-                    <path d="M4 5H10V11H4V5Z"></path>
-                    <path d="M14 5H20V11H14V5Z"></path>
-                    <path d="M4 15H10V21H4V15Z"></path>
-                    <path d="M14 15H20V21H14V15Z"></path>
+                    <circle cx="12" cy="12" r="8.5"></circle>
+                    <path d="M14.5 9.5 13 13l-3.5 1.5L11 11Z"></path>
                 </svg>
 
                 <span class="bottom-nav__label">
