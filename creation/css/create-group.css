@@ -1,6 +1,9 @@
 /* ======================================================
-   新建分组页面
+   写作软件 · 新建分组
    文件：creation/css/create-group.css
+
+   设计风格：
+   现代新中式 · 朱红 · 鎏金 · 宣纸白
 
    页面职责：
    1. 页面整体布局
@@ -10,31 +13,43 @@
    5. 表单反馈与操作按钮
    6. 电脑、平板、手机适配
 
-   设计风格：
-   国风朱红 · 鎏金 · 玄黑 · 宣纸白
-
    注意：
-   仅作用于新建分组页面，不修改其他页面公共样式
+   仅作用于新建分组页面，不修改公共样式。
 ====================================================== */
 
 
 /* ======================================================
-   一、页面基础布局
+   一、基础布局
 ====================================================== */
 
 .create-group-page {
+    position: relative;
+
     width: 100%;
-    max-width: 760px;
+    max-width: 560px;
+    min-width: 0;
 
     min-height: calc(100vh - 132px);
     min-height: calc(100dvh - 132px);
 
     margin: 0 auto;
-    padding: 36px 24px 48px;
+    padding: 104px 20px 110px;
 
     box-sizing: border-box;
 
-    color: var(--color-black);
+    color: #38251f;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 10%,
+            rgba(185, 143, 72, 0.12),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            #f8f4e9 0%,
+            #f2ecdf 100%
+        );
 
     overflow-wrap: anywhere;
 }
@@ -45,7 +60,9 @@
 ====================================================== */
 
 .create-group-heading {
-    margin: 0 auto 32px;
+    width: 100%;
+
+    margin: 0 auto 30px;
 
     text-align: center;
 }
@@ -53,18 +70,18 @@
 .create-group-heading__ornament {
     display: block;
 
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 
-    color: var(--color-yellow-dark);
+    color: #b38a42;
 
-    font-size: 23px;
+    font-size: 25px;
     line-height: 1;
 }
 
 .create-group-heading__title {
     margin: 0;
 
-    color: var(--color-red);
+    color: #8f2929;
 
     font-family:
         "Noto Serif SC",
@@ -75,18 +92,25 @@
     font-size: 29px;
     font-weight: 700;
 
+    letter-spacing: 7px;
     line-height: 1.5;
-    letter-spacing: 3px;
 
     overflow-wrap: anywhere;
 }
 
 .create-group-heading__subtitle {
-    margin: 10px 0 0;
+    margin: 12px 0 0;
 
-    color: var(--color-black-soft);
+    color: #927d68;
 
-    font-size: 14px;
+    font-family:
+        "Noto Serif SC",
+        "Songti SC",
+        serif;
+
+    font-size: 13px;
+
+    letter-spacing: 2px;
     line-height: 1.8;
 }
 
@@ -97,7 +121,9 @@
 
     gap: 12px;
 
-    margin: 22px auto 0;
+    width: 170px;
+
+    margin: 19px auto 0;
 }
 
 .create-group-heading__divider::before,
@@ -106,41 +132,55 @@
 
     display: block;
 
-    width: 54px;
+    flex: 1;
+
     height: 1px;
 
-    flex-shrink: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #b58b45
+    );
+}
 
-    background: var(--color-yellow);
+.create-group-heading__divider::after {
+    background: linear-gradient(
+        90deg,
+        #b58b45,
+        transparent
+    );
 }
 
 .create-group-heading__divider span {
-    color: var(--color-yellow-dark);
+    color: #b58b45;
 
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1;
 }
 
 
 /* ======================================================
-   三、表单容器
+   三、表单卡片
 ====================================================== */
 
 .create-group-form {
+    position: relative;
+
     width: 100%;
     min-width: 0;
 
-    padding: 32px;
+    padding: 28px 30px 24px;
 
     box-sizing: border-box;
 
-    background: var(--color-white-pure);
+    background: #fffdf7;
 
-    border: 1px solid var(--color-white-deep);
-    border-radius: 12px;
+    border: 1px solid #e8d8b8;
+    border-radius: 5px;
 
     box-shadow:
-        0 6px 24px rgb(33 31 28 / 5%);
+        0 8px 24px rgba(83, 49, 27, 0.07),
+        0 1px 3px rgba(83, 49, 27, 0.05);
 }
 
 
@@ -153,27 +193,29 @@
     align-items: center;
     justify-content: center;
 
-    width: 76px;
-    height: 76px;
+    width: 66px;
+    height: 66px;
 
-    margin: 0 auto 28px;
+    margin: 0 auto 25px;
 
     box-sizing: border-box;
+
     flex-shrink: 0;
 
-    color: var(--color-red);
+    color: #f9e9c4;
 
-    background: var(--color-white);
+    background: #982f2c;
 
-    border: 1px solid var(--color-yellow);
-    border-radius: 50%;
+    border: 3px double #d6b66e;
+    border-radius: 3px;
 
     box-shadow:
-        inset 0 0 0 5px var(--color-white-pure),
-        inset 0 0 0 6px var(--color-yellow-soft);
+        0 3px 8px rgba(116, 35, 30, 0.16);
 }
 
 .create-group-emblem__character {
+    color: #f9e9c4;
+
     font-family:
         "Noto Serif SC",
         "Songti SC",
@@ -183,6 +225,7 @@
     font-size: 32px;
     font-weight: 700;
 
+    letter-spacing: 2px;
     line-height: 1;
 }
 
@@ -194,7 +237,7 @@
 .create-group-field {
     min-width: 0;
 
-    margin-bottom: 24px;
+    margin-bottom: 26px;
 }
 
 .create-group-field__label-row {
@@ -204,24 +247,30 @@
 
     gap: 12px;
 
-    margin-bottom: 10px;
+    margin-bottom: 11px;
 }
 
 .create-group-field__label {
     min-width: 0;
 
-    color: var(--color-black);
+    color: #59382c;
+
+    font-family:
+        "Noto Serif SC",
+        "Songti SC",
+        serif;
 
     font-size: 15px;
     font-weight: 700;
 
+    letter-spacing: 1px;
     line-height: 1.6;
 }
 
 .create-group-field__required {
     margin-left: 4px;
 
-    color: var(--color-red);
+    color: #a52e2b;
 
     font-size: 14px;
 }
@@ -229,19 +278,16 @@
 .create-group-field__counter {
     flex-shrink: 0;
 
-    color: var(--color-black-soft);
+    color: #aa9b89;
 
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.6;
 
     font-variant-numeric: tabular-nums;
 }
 
-
-/* 名称达到上限 */
-
 .create-group-field__counter[data-limit="true"] {
-    color: var(--color-red);
+    color: #b52e2a;
 
     font-weight: 700;
 }
@@ -256,24 +302,24 @@
 
     width: 100%;
     min-width: 0;
-    min-height: 50px;
+    height: 46px;
 
-    padding: 12px 15px;
+    padding: 0 14px;
 
     box-sizing: border-box;
 
-    color: var(--color-black);
+    color: #45332a;
 
-    background: var(--color-white-pure);
+    background: #fffefb;
 
-    border: 1px solid var(--color-white-deep);
-    border-radius: 6px;
+    border: 1px solid #dfd1bd;
+    border-radius: 3px;
 
     outline: none;
 
     font-family: inherit;
-    font-size: 15px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: normal;
 
     transition:
         border-color 0.2s ease,
@@ -285,35 +331,35 @@
 }
 
 .create-group-field__input::placeholder {
-    color: #A7A095;
+    color: #b9aa98;
 
     opacity: 1;
 }
 
 .create-group-field__input:hover:not(:disabled) {
-    border-color: var(--color-yellow-dark);
+    border-color: #b58b45;
 }
 
 .create-group-field__input:focus {
-    background: var(--color-white-pure);
+    background: #fffefb;
 
-    border-color: var(--color-cyan);
+    border-color: #a23b34;
 
     box-shadow:
-        0 0 0 3px rgb(40 124 115 / 12%);
+        0 0 0 3px rgba(162, 59, 52, 0.08);
 }
 
 .create-group-field__input[aria-invalid="true"] {
-    border-color: var(--color-red);
+    border-color: #bd3932;
 
     box-shadow:
-        0 0 0 3px rgb(158 36 40 / 8%);
+        0 0 0 3px rgba(189, 57, 50, 0.08);
 }
 
 .create-group-field__input:disabled {
-    color: var(--color-black-soft);
+    color: #927d68;
 
-    background: var(--color-white);
+    background: #f5f0e5;
 
     cursor: not-allowed;
 }
@@ -326,19 +372,19 @@
 .create-group-field__help {
     margin: 10px 0 0;
 
-    color: var(--color-black-soft);
+    color: #a29482;
 
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.8;
 }
 
 .create-group-field__error {
-    margin: 8px 0 0;
+    margin: 6px 0 0;
 
-    color: var(--color-red);
+    color: #b52e2a;
 
     font-size: 12px;
-    line-height: 1.7;
+    line-height: 1.6;
 
     overflow-wrap: anywhere;
 }
@@ -353,21 +399,21 @@
 ====================================================== */
 
 .create-group-message {
-    margin: 0 0 20px;
+    margin: 15px 0;
 
-    padding: 12px 14px;
+    padding: 11px 13px;
 
     box-sizing: border-box;
 
-    color: var(--color-black);
+    color: #80633d;
 
-    background: var(--color-white);
+    background: #f9f3e7;
 
-    border: 1px solid var(--color-white-deep);
-    border-radius: 6px;
+    border: 1px solid #e8d6b4;
+    border-radius: 3px;
 
-    font-size: 13px;
-    line-height: 1.8;
+    font-size: 12px;
+    line-height: 1.6;
 
     overflow-wrap: anywhere;
 }
@@ -380,22 +426,22 @@
 /* 创建成功 */
 
 .create-group-message--success {
-    color: var(--color-cyan-dark);
+    color: #386b48;
 
-    background: rgb(40 124 115 / 7%);
+    background: #eff6ed;
 
-    border-color: rgb(40 124 115 / 25%);
+    border-color: #c9dec5;
 }
 
 
 /* 创建失败 */
 
 .create-group-message--error {
-    color: var(--color-red);
+    color: #a52f2a;
 
-    background: rgb(158 36 40 / 5%);
+    background: #fbefeb;
 
-    border-color: rgb(158 36 40 / 20%);
+    border-color: #e7c2b9;
 }
 
 
@@ -406,16 +452,13 @@
 .create-group-form__actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-
-    flex-wrap: wrap;
 
     gap: 12px;
 
     margin-top: 30px;
-    padding-top: 24px;
+    padding-top: 0;
 
-    border-top: 1px solid var(--color-white-dark);
+    border-top: none;
 }
 
 
@@ -430,21 +473,25 @@
 
     gap: 8px;
 
-    min-width: 112px;
-    min-height: 44px;
+    flex: 1;
 
-    padding: 10px 20px;
+    min-width: 0;
+    min-height: 45px;
+
+    padding: 0 12px;
 
     box-sizing: border-box;
 
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 3px;
 
     font-family: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 400;
 
+    letter-spacing: 2px;
     line-height: 1.5;
+
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
@@ -454,40 +501,28 @@
     -webkit-tap-highlight-color: transparent;
 
     transition:
-        background-color 0.2s ease,
+        background 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease,
-        box-shadow 0.2s ease,
         transform 0.2s ease;
 }
 
-
-/* 键盘焦点 */
-
 .create-group-button:focus-visible {
-    outline: 3px solid rgb(214 177 94 / 55%);
+    outline: 3px solid rgba(162, 59, 52, 0.35);
 
     outline-offset: 3px;
 }
-
-
-/* 点击反馈 */
 
 .create-group-button:active:not(:disabled) {
     transform: translateY(1px);
 }
 
-
-/* 禁用状态 */
-
 .create-group-button:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
 
     cursor: not-allowed;
 
     transform: none;
-
-    box-shadow: none;
 }
 
 
@@ -496,19 +531,11 @@
 ====================================================== */
 
 .create-group-button--cancel {
-    color: var(--color-black-soft);
+    color: #775f4d;
 
-    background: var(--color-white-pure);
+    background: #f7f2e8;
 
-    border-color: var(--color-white-deep);
-}
-
-.create-group-button--cancel:hover:not(:disabled) {
-    color: var(--color-red);
-
-    background: var(--color-white);
-
-    border-color: var(--color-yellow);
+    border-color: #d9cbb6;
 }
 
 
@@ -517,22 +544,14 @@
 ====================================================== */
 
 .create-group-button--submit {
-    color: var(--color-white-pure);
+    color: #fff5df;
 
-    background: var(--color-cyan);
+    background: #922e2a;
 
-    border-color: var(--color-cyan);
-}
-
-.create-group-button--submit:hover:not(:disabled) {
-    color: var(--color-white-pure);
-
-    background: var(--color-cyan-dark);
-
-    border-color: var(--color-cyan-dark);
+    border-color: #842522;
 
     box-shadow:
-        0 3px 10px rgb(40 124 115 / 18%);
+        0 3px 8px rgba(116, 35, 30, 0.12);
 }
 
 
@@ -541,12 +560,12 @@
 ====================================================== */
 
 .create-group-note {
-    margin: 22px 0 0;
+    margin: 23px 0 0;
 
-    color: var(--color-black-soft);
+    color: #a29482;
 
-    font-size: 12px;
-    line-height: 1.9;
+    font-size: 11px;
+    line-height: 1.8;
 
     text-align: center;
 
@@ -556,86 +575,84 @@
 .create-group-note__icon {
     margin-right: 5px;
 
-    color: var(--color-yellow-dark);
+    color: #b38a42;
 }
 
 
 /* ======================================================
-   十四、平板适配
+   十四、鼠标悬停与键盘焦点
+====================================================== */
+
+@media (hover: hover) {
+
+    .create-group-button--cancel:hover:not(:disabled) {
+        background: #eee5d6;
+    }
+
+    .create-group-button--submit:hover:not(:disabled) {
+        background: #7e2623;
+
+        border-color: #7e2623;
+    }
+
+}
+
+
+/* ======================================================
+   十五、平板适配
 ====================================================== */
 
 @media (max-width: 768px) {
 
     .create-group-page {
-        max-width: 600px;
-
-        padding: 30px 20px 40px;
-    }
-
-    .create-group-form {
-        padding: 28px;
+        padding-top: 94px;
     }
 
 }
 
 
 /* ======================================================
-   十五、手机适配
+   十六、手机适配
 ====================================================== */
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
 
     .create-group-page {
         min-height: calc(100vh - 120px);
         min-height: calc(100dvh - 120px);
 
-        padding: 24px 16px 32px;
+        padding: 85px 15px 105px;
     }
 
     .create-group-heading {
-        margin-bottom: 26px;
+        margin-bottom: 24px;
     }
 
     .create-group-heading__ornament {
-        margin-bottom: 8px;
-
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .create-group-heading__title {
-        font-size: 25px;
+        font-size: 26px;
 
-        letter-spacing: 2px;
+        letter-spacing: 5px;
     }
 
     .create-group-heading__subtitle {
-        margin-top: 8px;
+        font-size: 12px;
 
-        font-size: 13px;
-    }
-
-    .create-group-heading__divider {
-        gap: 10px;
-
-        margin-top: 18px;
-    }
-
-    .create-group-heading__divider::before,
-    .create-group-heading__divider::after {
-        width: 42px;
+        letter-spacing: 1px;
     }
 
     .create-group-form {
-        padding: 24px 18px;
-
-        border-radius: 10px;
+        padding: 23px 20px 20px;
     }
 
     .create-group-emblem {
-        width: 68px;
-        height: 68px;
+        width: 62px;
+        height: 62px;
 
-        margin-bottom: 24px;
+        margin-bottom: 23px;
     }
 
     .create-group-emblem__character {
@@ -643,29 +660,25 @@
     }
 
     .create-group-field__input {
-        min-height: 48px;
+        height: 46px;
 
         font-size: 16px;
     }
 
     .create-group-form__actions {
         gap: 10px;
-
-        margin-top: 26px;
-        padding-top: 20px;
     }
 
     .create-group-button {
-        flex: 1;
+        min-height: 45px;
 
-        min-width: 0;
-        min-height: 46px;
+        padding: 0 8px;
 
-        padding: 10px 12px;
+        font-size: 13px;
     }
 
     .create-group-note {
-        margin-top: 18px;
+        margin-top: 19px;
 
         font-size: 11px;
     }
@@ -674,57 +687,62 @@
 
 
 /* ======================================================
-   十六、小屏手机适配
+   十七、小屏手机适配
 ====================================================== */
 
 @media (max-width: 360px) {
 
     .create-group-page {
-        padding-right: 12px;
-        padding-left: 12px;
+        padding-right: 11px;
+        padding-left: 11px;
     }
 
     .create-group-form {
-        padding: 22px 14px;
+        padding-right: 15px;
+        padding-left: 15px;
     }
 
     .create-group-heading__title {
-        font-size: 23px;
+        font-size: 24px;
 
-        letter-spacing: 1px;
-    }
-
-    .create-group-heading__divider::before,
-    .create-group-heading__divider::after {
-        width: 32px;
+        letter-spacing: 3px;
     }
 
     .create-group-field__label-row {
-        align-items: flex-start;
-
         gap: 8px;
     }
 
     .create-group-field__counter {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .create-group-form__actions {
-        flex-direction: column-reverse;
-        align-items: stretch;
+        gap: 8px;
     }
 
     .create-group-button {
-        width: 100%;
+        padding: 0 6px;
 
-        flex: auto;
+        font-size: 12px;
+        letter-spacing: 1px;
     }
 
 }
 
 
 /* ======================================================
-   十七、减少动态效果
+   十八、键盘焦点
+====================================================== */
+
+.create-group-field__input:focus-visible {
+    outline: 3px solid rgba(162, 59, 52, 0.25);
+
+    outline-offset: 2px;
+}
+
+
+/* ======================================================
+   十九、减少动态效果
 ====================================================== */
 
 @media (prefers-reduced-motion: reduce) {
