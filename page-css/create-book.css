@@ -1,44 +1,39 @@
 /* ======================================================
    写作软件 · 新建书籍
    国风主题：朱红、鎏金、宣纸白
+   文件职责：
+   1. 新建书籍页面主体。
+   2. 页面标题与装饰。
+   3. 书籍名称输入。
+   4. 书籍封面预览与选择。
+   5. 表单操作按钮。
+   6. 封面裁剪弹窗。
+   7. 响应式布局。
+   注意：
+   底部导航统一由 css/footer.css 管理。
 ====================================================== */
-
-
 /* ======================================================
    一、基础布局
 ====================================================== */
-
 #app.create-book-app {
     position: relative;
-
     display: flex;
     flex-direction: column;
-
     min-height: 100vh;
     min-height: 100dvh;
-
     background: #f5f0e5;
-
     color: #38251f;
-
     overflow-x: hidden;
 }
-
-
 .create-book-main {
     position: relative;
-
     flex: 1;
-
     width: 100%;
-
     box-sizing: border-box;
-
     padding:
         104px
         20px
         110px;
-
     background:
         radial-gradient(
             ellipse at 50% 10%,
@@ -51,101 +46,64 @@
             #f2ecdf 100%
         );
 }
-
-
 .create-book-container {
     width: 100%;
     max-width: 520px;
-
     margin: 0 auto;
 }
-
-
 /* ======================================================
    二、页面标题
 ====================================================== */
-
 .create-book-heading {
     text-align: center;
-
     margin: 0 auto 30px;
 }
-
-
 .create-book-heading__ornament {
     margin-bottom: 10px;
-
     color: #b38a42;
-
     font-size: 25px;
-
     line-height: 1;
 }
-
-
 .create-book-heading__title {
     margin: 0;
-
     color: #8f2929;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         "SimSun",
         serif;
-
     font-size: 29px;
-
     font-weight: 700;
-
     letter-spacing: 7px;
 }
-
-
 .create-book-heading__subtitle {
     margin: 12px 0 0;
-
     color: #927d68;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         serif;
-
     font-size: 13px;
-
     letter-spacing: 2px;
 }
-
-
 .create-book-heading__divider {
     display: flex;
     align-items: center;
     justify-content: center;
-
     gap: 12px;
-
     width: 170px;
-
     margin: 19px auto 0;
 }
-
-
 .create-book-heading__divider span {
     display: block;
-
     flex: 1;
-
     height: 1px;
-
     background: linear-gradient(
         90deg,
         transparent,
         #b58b45
     );
 }
-
-
 .create-book-heading__divider span:last-child {
     background: linear-gradient(
         90deg,
@@ -153,305 +111,186 @@
         transparent
     );
 }
-
-
 .create-book-heading__divider i {
     color: #b58b45;
-
     font-size: 13px;
-
     font-style: normal;
 }
-
-
 /* ======================================================
    三、表单卡片
 ====================================================== */
-
 .create-book-form {
     position: relative;
-
     box-sizing: border-box;
-
     width: 100%;
-
     padding: 28px 30px 24px;
-
     background: #fffdf7;
-
     border: 1px solid #e8d8b8;
-
     border-radius: 5px;
-
     box-shadow:
         0 8px 24px rgba(83, 49, 27, 0.07),
         0 1px 3px rgba(83, 49, 27, 0.05);
 }
-
-
 .create-book-card__top-decoration {
     display: flex;
     align-items: center;
     justify-content: center;
-
     gap: 10px;
-
     margin-bottom: 20px;
 }
-
-
 .create-book-card__top-decoration span {
     width: 35px;
-
     height: 1px;
-
     background: #d7bd88;
 }
-
-
 .create-book-card__top-decoration span:nth-child(2) {
     width: auto;
     height: auto;
-
     background: none;
-
     color: #b38a42;
-
     font-size: 13px;
 }
-
-
 /* ======================================================
    四、书籍印章
 ====================================================== */
-
 .create-book-emblem {
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 66px;
     height: 66px;
-
     margin: 0 auto 25px;
-
     background: #982f2c;
-
     border: 3px double #d6b66e;
-
     border-radius: 3px;
-
     box-shadow:
         0 3px 8px rgba(116, 35, 30, 0.16);
 }
-
-
 .create-book-emblem span {
     color: #f9e9c4;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         "SimSun",
         serif;
-
     font-size: 32px;
-
     font-weight: 700;
-
     letter-spacing: 2px;
 }
-
-
 /* ======================================================
    五、表单区块
 ====================================================== */
-
 .create-book-section {
     margin-bottom: 26px;
 }
-
-
 .create-book-field__label {
     display: block;
-
     margin-bottom: 11px;
-
     color: #59382c;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         serif;
-
     font-size: 15px;
-
     font-weight: 700;
-
     letter-spacing: 1px;
 }
-
-
 .required-mark {
     margin-left: 3px;
-
     color: #a52e2b;
 }
-
-
 .create-book-field__input {
     display: block;
-
     box-sizing: border-box;
-
     width: 100%;
     height: 46px;
-
     padding: 0 14px;
-
     color: #45332a;
-
     background: #fffefb;
-
     border: 1px solid #dfd1bd;
-
     border-radius: 3px;
-
     outline: none;
-
     font-size: 14px;
-
     transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease;
 }
-
-
 .create-book-field__input::placeholder {
     color: #b9aa98;
 }
-
-
 .create-book-field__input:focus {
     border-color: #a23b34;
-
     box-shadow:
         0 0 0 3px rgba(162, 59, 52, 0.08);
 }
-
-
 .create-book-field__input[aria-invalid="true"] {
     border-color: #bd3932;
 }
-
-
 .create-book-field-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     min-height: 22px;
-
     margin-top: 5px;
 }
-
-
 .create-book-counter {
     margin-left: auto;
-
     color: #aa9b89;
-
     font-size: 11px;
 }
-
-
 .create-book-field__error {
     margin: 6px 0 0;
-
     color: #b52e2a;
-
     font-size: 12px;
-
     line-height: 1.6;
 }
-
-
 /* ======================================================
    六、封面区域
 ====================================================== */
-
 .create-book-cover-section {
     margin-top: 8px;
 }
-
-
 .create-book-section__heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
-
-
 .create-book-section__heading .create-book-field__label {
     margin-bottom: 12px;
 }
-
-
 .create-book-section__optional {
     margin-bottom: 11px;
-
     color: #a89883;
-
     font-size: 11px;
 }
-
-
 .create-book-cover {
     display: flex;
     flex-direction: column;
     align-items: center;
-
     gap: 18px;
 }
-
-
 /* ======================================================
    七、封面预览
 ====================================================== */
-
 .create-book-cover__preview {
     position: relative;
-
     box-sizing: border-box;
-
     width: 190px;
-
     aspect-ratio: 2 / 3;
-
     overflow: hidden;
-
     background: #f3ead9;
-
     border: 1px solid #d6bd8b;
-
     box-shadow:
         0 4px 12px rgba(73, 43, 26, 0.12);
 }
-
-
 .create-book-cover__placeholder {
     position: absolute;
-
     inset: 0;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 9px;
-
     box-sizing: border-box;
-
     background:
         linear-gradient(
             145deg,
@@ -459,564 +298,315 @@
             #eadbc1
         );
 }
-
-
 .create-book-cover__placeholder-border {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     width: 100%;
     height: 100%;
-
     border: 1px solid #c8a86c;
-
     outline: 1px solid rgba(200, 168, 108, 0.5);
-
     outline-offset: -6px;
 }
-
-
 .create-book-cover__placeholder-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 48px;
     height: 48px;
-
     margin-bottom: 14px;
-
     color: #f7e8c9;
-
     background: #922f2b;
-
     border: 2px double #d8b979;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         serif;
-
     font-size: 25px;
-
     font-weight: 700;
 }
-
-
 .create-book-cover__placeholder-title {
     color: #8d6849;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         serif;
-
     font-size: 14px;
-
     letter-spacing: 3px;
 }
-
-
 .create-book-cover__placeholder-description {
     margin-top: 8px;
-
     color: #b69a70;
-
     font-family: Georgia, serif;
-
     font-size: 8px;
-
     letter-spacing: 3px;
 }
-
-
 .create-book-cover__image {
     position: absolute;
-
     inset: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
 }
-
-
 .create-book-cover__image[hidden],
 .create-book-cover__placeholder[hidden] {
     display: none !important;
 }
-
-
 /* ======================================================
    八、封面按钮
 ====================================================== */
-
 .create-book-cover__actions {
     display: flex;
     align-items: center;
     justify-content: center;
-
     flex-wrap: wrap;
-
     gap: 12px;
 }
-
-
 .create-book-cover__select-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     min-width: 150px;
     min-height: 40px;
-
     padding: 0 20px;
-
     box-sizing: border-box;
-
     color: #fff6e6;
-
     background: #96332e;
-
     border: 1px solid #8b2926;
-
     border-radius: 3px;
-
     cursor: pointer;
-
     font-size: 13px;
-
     letter-spacing: 1px;
-
     transition:
         background 0.2s ease,
         transform 0.2s ease;
 }
-
-
 .create-book-cover__select-button:hover {
     background: #7e2623;
 }
-
-
 .create-book-cover__select-button:active {
     transform: scale(0.98);
 }
-
-
 .create-book-cover__select-button span:first-child {
     margin-right: 7px;
-
     color: #e8cb8e;
-
     font-size: 17px;
 }
-
-
 .create-book-cover__remove-button {
     min-height: 38px;
-
     padding: 0 14px;
-
     color: #a33a32;
-
     background: transparent;
-
     border: 1px solid #d8b8a7;
-
     border-radius: 3px;
-
     cursor: pointer;
-
     font-size: 12px;
 }
-
-
 .create-book-cover__remove-button:hover {
     background: #fbefeb;
 }
-
-
 .create-book-cover__remove-button[hidden] {
     display: none !important;
 }
-
-
 .create-book-hint {
     margin: 13px 0 0;
-
     color: #a29482;
-
     font-size: 11px;
-
     line-height: 1.7;
-
     text-align: center;
 }
-
-
 /* ======================================================
    九、消息提示
 ====================================================== */
-
 .create-book-message {
     margin: 15px 0;
-
     padding: 11px 13px;
-
     border: 1px solid #e2d5bf;
-
     border-radius: 3px;
-
     font-size: 12px;
-
     line-height: 1.6;
 }
-
-
 .create-book-message[hidden] {
     display: none !important;
 }
-
-
 .create-book-message.is-success {
     color: #386b48;
-
     background: #eff6ed;
-
     border-color: #c9dec5;
 }
-
-
 .create-book-message.is-error {
     color: #a52f2a;
-
     background: #fbefeb;
-
     border-color: #e7c2b9;
 }
-
-
 .create-book-message.is-info {
     color: #80633d;
-
     background: #f9f3e7;
-
     border-color: #e8d6b4;
 }
-
-
 /* ======================================================
    十、操作按钮
 ====================================================== */
-
 .create-book-actions {
     display: flex;
     align-items: center;
-
     gap: 12px;
-
     margin-top: 30px;
 }
-
-
 .create-book-actions button {
     flex: 1;
-
     min-height: 45px;
-
     border-radius: 3px;
-
     cursor: pointer;
-
     font-size: 14px;
-
     letter-spacing: 2px;
-
     transition:
         background 0.2s ease,
         border-color 0.2s ease,
         transform 0.2s ease;
 }
-
-
 .create-book-cancel {
     color: #775f4d;
-
     background: #f7f2e8;
-
     border: 1px solid #d9cbb6;
 }
-
-
 .create-book-cancel:hover {
     background: #eee5d6;
 }
-
-
 .create-book-submit {
     color: #fff5df;
-
     background: #922e2a;
-
     border: 1px solid #842522;
-
     box-shadow:
         0 3px 8px rgba(116, 35, 30, 0.12);
 }
-
-
 .create-book-submit:hover {
     background: #7e2623;
 }
-
-
 .create-book-actions button:active {
     transform: scale(0.98);
 }
-
-
 .create-book-actions button:disabled {
     opacity: 0.55;
-
     cursor: not-allowed;
-
     transform: none;
 }
-
-
 /* ======================================================
    十一、卡片装饰
 ====================================================== */
-
 .create-book-card__bottom-decoration {
     display: flex;
     justify-content: center;
-
     margin-top: 23px;
-
     color: #c2a36c;
-
     font-size: 12px;
 }
-
-
 /* ======================================================
-   十二、底部导航
+   十二、裁剪弹窗
 ====================================================== */
-
-#app > .app-footer {
-    position: fixed;
-
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    z-index: 1000;
-
-    width: 100%;
-
-    box-sizing: border-box;
-
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-
-    background: #30221d;
-
-    border-top: 1px solid #a9874d;
-}
-
-
-#app > .app-footer .bottom-nav {
-    width: 100%;
-}
-
-
-/* ======================================================
-   十三、裁剪弹窗
-====================================================== */
-
 .cover-crop-modal {
     position: fixed;
-
     inset: 0;
-
     z-index: 2000;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 18px;
-
     box-sizing: border-box;
 }
-
-
 .cover-crop-modal[hidden] {
     display: none !important;
 }
-
-
 .cover-crop-modal__backdrop {
     position: absolute;
-
     inset: 0;
-
     background: rgba(25, 16, 13, 0.76);
-
     backdrop-filter: blur(3px);
 }
-
-
 .cover-crop-dialog {
     position: relative;
-
     z-index: 1;
-
     box-sizing: border-box;
-
     width: 100%;
     max-width: 460px;
-
     max-height: calc(100dvh - 36px);
-
     padding: 23px;
-
     overflow-y: auto;
-
     background: #fffdf7;
-
     border: 1px solid #c5a36a;
-
     border-radius: 5px;
-
     box-shadow:
         0 15px 50px rgba(0, 0, 0, 0.28);
 }
-
-
 .cover-crop-dialog__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-bottom: 13px;
 }
-
-
 .cover-crop-dialog__eyebrow {
     margin: 0 0 5px;
-
     color: #b18b4d;
-
     font-family: Georgia, serif;
-
     font-size: 9px;
-
     letter-spacing: 3px;
 }
-
-
 .cover-crop-dialog__title {
     margin: 0;
-
     color: #8f2929;
-
     font-family:
         "Noto Serif SC",
         "Songti SC",
         serif;
-
     font-size: 21px;
-
     letter-spacing: 3px;
 }
-
-
 .cover-crop-dialog__close {
     width: 34px;
     height: 34px;
-
     color: #8e3b32;
-
     background: #f6eee2;
-
     border: 1px solid #e4d3b6;
-
     border-radius: 3px;
-
     cursor: pointer;
-
     font-size: 23px;
 }
-
-
 .cover-crop-dialog__instructions {
     margin: 0 0 15px;
-
     color: #8c7967;
-
     font-size: 12px;
-
     line-height: 1.7;
 }
-
-
 /* ======================================================
-   十四、裁剪区域
+   十三、裁剪区域
 ====================================================== */
-
 .cover-crop-stage {
     position: relative;
-
     width: 100%;
-
     aspect-ratio: 2 / 3;
-
     max-height: 390px;
-
     margin: 0 auto;
-
     overflow: hidden;
-
     background: #201c19;
-
     border: 1px solid #b69a6b;
-
     touch-action: none;
-
     user-select: none;
 }
-
-
 .cover-crop-image {
     position: absolute;
-
     display: block;
-
     max-width: none;
     max-height: none;
-
     object-fit: fill;
-
     user-select: none;
-
     pointer-events: none;
 }
-
-
 .cover-crop-grid {
     position: absolute;
-
     inset: 0;
-
     z-index: 2;
-
     pointer-events: none;
-
     background-image:
         linear-gradient(
             to right,
@@ -1036,346 +626,207 @@
             rgba(255, 255, 255, 0.55) 66.6%,
             transparent 66.9%
         );
-
     border: 1px solid rgba(255, 255, 255, 0.8);
-
     box-sizing: border-box;
 }
-
-
 /* ======================================================
-   十五、比例说明
+   十四、比例说明
 ====================================================== */
-
 .cover-crop-ratio {
     display: flex;
     align-items: center;
-
     gap: 12px;
-
     margin-top: 13px;
-
     padding: 9px 11px;
-
     background: #f6f0e4;
-
     border: 1px solid #e7dac2;
-
     font-size: 11px;
 }
-
-
 .cover-crop-ratio__label {
     color: #927b61;
 }
-
-
 .cover-crop-ratio__value {
     color: #96332e;
-
     font-weight: 700;
 }
-
-
 .cover-crop-ratio__size {
     margin-left: auto;
-
     color: #9c8b77;
 }
-
-
 /* ======================================================
-   十六、缩放控制
+   十五、缩放控制
 ====================================================== */
-
 .cover-crop-zoom {
     margin-top: 19px;
 }
-
-
 .cover-crop-zoom__label {
     display: block;
-
     margin-bottom: 10px;
-
     color: #644a38;
-
     font-size: 12px;
 }
-
-
 .cover-crop-zoom__controls {
     display: flex;
     align-items: center;
-
     gap: 10px;
 }
-
-
 .cover-crop-zoom__icon {
     flex: 0 0 32px;
-
     width: 32px;
     height: 32px;
-
     color: #96332e;
-
     background: #f7f0e4;
-
     border: 1px solid #dfceb0;
-
     border-radius: 3px;
-
     cursor: pointer;
-
     font-size: 18px;
 }
-
-
 .cover-crop-zoom__icon:disabled {
     opacity: 0.4;
-
     cursor: not-allowed;
 }
-
-
 .cover-crop-zoom__slider {
     flex: 1;
-
     min-width: 0;
-
     accent-color: #96332e;
-
     cursor: pointer;
 }
-
-
 .cover-crop-zoom__value {
     display: block;
-
     margin-top: 7px;
-
     color: #987b54;
-
     font-size: 11px;
-
     text-align: right;
 }
-
-
 /* ======================================================
-   十七、裁剪操作按钮
+   十六、裁剪操作按钮
 ====================================================== */
-
 .cover-crop-dialog__actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 10px;
-
     margin-top: 20px;
 }
-
-
 .cover-crop-dialog__actions-right {
     display: flex;
-
     gap: 9px;
 }
-
-
 .cover-crop-button {
     min-height: 38px;
-
     padding: 0 16px;
-
     border-radius: 3px;
-
     cursor: pointer;
-
     font-size: 12px;
-
     letter-spacing: 1px;
 }
-
-
 .cover-crop-button:disabled {
     opacity: 0.5;
-
     cursor: not-allowed;
 }
-
-
 .cover-crop-button--reset {
     color: #775e45;
-
     background: #f7f0e4;
-
     border: 1px solid #dfceb0;
 }
-
-
 .cover-crop-button--cancel {
     color: #775e45;
-
     background: #fffdf7;
-
     border: 1px solid #d9cbb6;
 }
-
-
 .cover-crop-button--confirm {
     color: #fff5df;
-
     background: #922e2a;
-
     border: 1px solid #842522;
 }
-
-
 .cover-crop-button--confirm:hover {
     background: #7e2623;
 }
-
-
 .cover-crop-dialog__error {
     margin: 12px 0 0;
-
     color: #b52e2a;
-
     font-size: 12px;
 }
-
-
 /* ======================================================
-   十八、弹窗打开时禁止背景滚动
+   十七、弹窗打开时禁止背景滚动
 ====================================================== */
-
 body.cover-crop-open {
     overflow: hidden;
 }
-
-
 /* ======================================================
-   十九、平板
+   十八、平板
 ====================================================== */
-
 @media (max-width: 768px) {
-
     .create-book-main {
         padding-top: 94px;
     }
-
 }
-
-
 /* ======================================================
-   二十、手机
+   十九、手机
 ====================================================== */
-
 @media (max-width: 520px) {
-
     .create-book-main {
         padding:
             85px
             15px
             105px;
     }
-
-
     .create-book-heading {
         margin-bottom: 24px;
     }
-
-
     .create-book-heading__title {
         font-size: 26px;
-
         letter-spacing: 5px;
     }
-
-
     .create-book-form {
         padding: 23px 20px 20px;
     }
-
-
     .create-book-cover__preview {
         width: 170px;
     }
-
-
     .cover-crop-dialog {
         padding: 17px;
     }
-
-
     .cover-crop-stage {
         max-height: 340px;
     }
-
 }
-
-
 /* ======================================================
-   二十一、小屏手机
+   二十、小屏手机
 ====================================================== */
-
 @media (max-width: 360px) {
-
     .create-book-main {
         padding-right: 11px;
         padding-left: 11px;
     }
-
-
     .create-book-form {
         padding-right: 15px;
         padding-left: 15px;
     }
-
-
     .create-book-actions {
         gap: 8px;
     }
-
-
     .create-book-actions button {
         font-size: 12px;
-
         letter-spacing: 1px;
     }
-
-
     .cover-crop-dialog__actions {
         flex-wrap: wrap;
     }
-
-
     .cover-crop-button {
         padding: 0 11px;
     }
-
 }
-
-
 /* ======================================================
-   二十二、减少动态效果
+   二十一、减少动态效果
 ====================================================== */
-
 @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {
         scroll-behavior: auto !important;
-
         animation-duration: 0.01ms !important;
-
         animation-iteration-count: 1 !important;
-
         transition-duration: 0.01ms !important;
     }
-
 }
