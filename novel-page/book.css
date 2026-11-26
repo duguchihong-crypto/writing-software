@@ -29,7 +29,6 @@ body {
     background: var(--theme-background, #F8F4E9);
 }
 
-
 /* =========================
    顶部固定栏
 ========================= */
@@ -39,7 +38,6 @@ body {
     top: 0;
     left: 0;
     right: 0;
-
     height: 56px;
 
     display: flex;
@@ -52,7 +50,6 @@ body {
     border-bottom: 2px solid var(--color-yellow, #D6B15E);
 
     color: #fff;
-
     z-index: 100;
 }
 
@@ -96,7 +93,6 @@ body {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
 
 /* =========================
    新建菜单
@@ -146,7 +142,6 @@ body {
     background: rgba(214, 177, 94, 0.2);
 }
 
-
 /* =========================
    隐藏状态
 ========================= */
@@ -154,7 +149,6 @@ body {
 .hidden {
     display: none !important;
 }
-
 
 /* =========================
    中间滚动区域
@@ -185,51 +179,204 @@ body {
     width: 100%;
 }
 
-
 /* =========================
-   目录
+   目录整体
 ========================= */
 
 .book-outline {
     display: flex;
     flex-direction: column;
 
-    gap: 14px;
+    gap: 12px;
     width: 100%;
 }
 
-.outline-volume {
-    width: 100%;
-}
+/* =========================
+   序
+========================= */
 
-.outline-heading {
+.outline-preface {
+    width: 100%;
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--color-yellow, #D6B15E);
+    border-radius: 7px;
+
+    background: rgba(214, 177, 94, 0.10);
+
     color: var(--color-red, #9E2428);
 
     font-family: "Songti SC", "SimSun", serif;
-    font-size: 19px;
+    font-size: 16px;
     font-weight: 600;
 
-    line-height: 1.8;
+    text-align: left;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.outline-part {
-    margin-left: 22px;
-}
+/* =========================
+   卷框体
+========================= */
 
-.outline-part .outline-heading {
-    color: var(--color-black, #211F1C);
-    font-size: 17px;
-}
-
-.outline-chapter {
-    display: block;
-
+.outline-volume {
     width: 100%;
-    margin-left: 44px;
 
-    padding: 9px 0;
+    overflow: hidden;
+
+    border: 1.5px solid var(--color-red, #9E2428);
+    border-radius: 8px;
+
+    background: rgba(158, 36, 40, 0.035);
+}
+
+.outline-volume > .outline-heading {
+    width: 100%;
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 14px;
 
     border: none;
+    background: rgba(158, 36, 40, 0.07);
+
+    color: var(--color-red, #9E2428);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 18px;
+    font-weight: 700;
+
+    text-align: left;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================
+   篇容器
+========================= */
+
+.outline-volume-content {
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    padding: 12px;
+}
+
+.outline-volume-content[hidden],
+.outline-part-content[hidden] {
+    display: none !important;
+}
+
+/* =========================
+   篇框体
+========================= */
+
+.outline-part {
+    width: 100%;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(158, 36, 40, 0.30);
+    border-radius: 7px;
+
+    background: var(--color-white, #F8F4E9);
+}
+
+.outline-part > .outline-heading {
+    width: 100%;
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 12px;
+
+    border: none;
+    background: rgba(214, 177, 94, 0.10);
+
+    color: var(--color-black, #211F1C);
+
+    font-family: "Songti SC", "SimSun", serif;
+    font-size: 16px;
+    font-weight: 600;
+
+    text-align: left;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================
+   折叠按钮文字
+========================= */
+
+.outline-heading-title {
+    flex: 1;
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+}
+
+.outline-fold-icon {
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 10px;
+
+    border: 1px solid rgba(158, 36, 40, 0.25);
+    border-radius: 50%;
+
+    color: var(--color-red, #9E2428);
+
+    font-family: Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 400;
+}
+
+/* =========================
+   章节列表
+========================= */
+
+.outline-part-content {
+    display: flex;
+    flex-direction: column;
+
+    padding: 5px 12px 8px;
+
+    background: rgba(158, 36, 40, 0.025);
+}
+
+.outline-chapter:not(.outline-preface) {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-height: 43px;
+
+    padding: 9px 10px;
+
+    border: none;
+    border-bottom: 1px solid rgba(158, 36, 40, 0.10);
+
     background: transparent;
 
     color: var(--color-black, #211F1C);
@@ -242,10 +389,15 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-.outline-chapter:active {
-    color: var(--color-red, #9E2428);
+.outline-chapter:not(.outline-preface):last-child {
+    border-bottom: none;
 }
 
+.outline-chapter:active,
+.outline-preface:active {
+    color: var(--color-red, #9E2428);
+    background: rgba(214, 177, 94, 0.15);
+}
 
 /* =========================
    全书
@@ -331,7 +483,6 @@ body {
     font-size: 13px;
 }
 
-
 /* =========================
    书籍信息
 ========================= */
@@ -414,7 +565,6 @@ body {
     resize: vertical;
 }
 
-
 /* =========================
    正文编辑
 ========================= */
@@ -483,7 +633,6 @@ body {
     text-align: right;
 }
 
-
 /* =========================
    底部导航
 ========================= */
@@ -529,19 +678,15 @@ body {
 
 .footer-tab.active {
     color: var(--color-yellow, #D6B15E);
-
     border-top-color: var(--color-yellow, #D6B15E);
-
     font-weight: 600;
 }
-
 
 /* =========================
    手机适配
 ========================= */
 
 @media (max-width: 380px) {
-
     .book-header {
         padding: 0 8px;
     }
@@ -554,9 +699,4 @@ body {
         padding-left: 12px;
         padding-right: 12px;
     }
-
-    .outline-chapter {
-        margin-left: 32px;
-    }
-
 }
