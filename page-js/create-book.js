@@ -1812,53 +1812,104 @@
     }
 
 
-    /* ==================================================
-       二十七、返回书架地址
-    ================================================== */
+/* ==================================================
+   二十七、页面地址
+================================================== */
 
-    function getHomeUrl() {
+/*
+ * 返回新建页面
+ * 当前页面：pages/create-book.html
+ * 目标页面：pages/create.html
+ */
 
-        var url = new URL(window.location.href);
+function getCreateUrl() {
 
-        var suffix = "/pages/create-book.html";
+    var url = new URL(window.location.href);
 
-        if (url.pathname.endsWith(suffix)) {
+    var suffix = "/pages/create-book.html";
+
+    if (url.pathname.endsWith(suffix)) {
+
+        url.pathname =
+            url.pathname.slice(0, -suffix.length) +
+            "/pages/create.html";
+
+    } else {
+
+        var pagesIndex = url.pathname.lastIndexOf("/pages/");
+
+        if (pagesIndex !== -1) {
 
             url.pathname =
-                url.pathname.slice(0, -suffix.length) +
+                url.pathname.slice(0, pagesIndex) +
+                "/pages/create.html";
+
+        } else {
+
+            url.pathname =
+                url.pathname.slice(
+                    0,
+                    url.pathname.lastIndexOf("/") + 1
+                ) +
+                "pages/create.html";
+
+        }
+
+    }
+
+    url.search = "";
+    url.hash = "";
+
+    return url.href;
+
+}
+
+
+/*
+ * 创建成功后返回首页书架
+ */
+
+function getHomeUrl() {
+
+    var url = new URL(window.location.href);
+
+    var suffix = "/pages/create-book.html";
+
+    if (url.pathname.endsWith(suffix)) {
+
+        url.pathname =
+            url.pathname.slice(0, -suffix.length) +
+            "/index.html";
+
+    } else {
+
+        var pagesIndex = url.pathname.lastIndexOf("/pages/");
+
+        if (pagesIndex !== -1) {
+
+            url.pathname =
+                url.pathname.slice(0, pagesIndex) +
                 "/index.html";
 
         } else {
 
-            var pagesIndex = url.pathname.lastIndexOf("/pages/");
-
-            if (pagesIndex !== -1) {
-
-                url.pathname =
-                    url.pathname.slice(0, pagesIndex) +
-                    "/index.html";
-
-            } else {
-
-                url.pathname =
-                    url.pathname.slice(
-                        0,
-                        url.pathname.lastIndexOf("/") + 1
-                    ) +
-                    "index.html";
-
-            }
+            url.pathname =
+                url.pathname.slice(
+                    0,
+                    url.pathname.lastIndexOf("/") + 1
+                ) +
+                "index.html";
 
         }
 
-        url.search = "";
-        url.hash = "";
-
-        return url.href;
-
     }
 
+    url.search = "";
+    url.hash = "";
 
+    return url.href;
+
+}
     /* ==================================================
        二十八、提交书籍
     ================================================== */
@@ -2027,7 +2078,7 @@
 
         isLeavingPage = true;
 
-        window.location.assign(getHomeUrl());
+        window.location.assign(getCreateUrl());
 
     }
 
