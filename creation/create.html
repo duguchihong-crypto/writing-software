@@ -1,37 +1,70 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+
     <meta name="theme-color" content="#9E2428">
     <meta name="color-scheme" content="light">
+
     <meta
         name="description"
         content="创建新的小说或分组，开始整理你的写作作品。"
     >
+
     <title>新建 · 写作软件</title>
-    <!-- 公共主题样式 -->
+
+    <!-- ==============================
+         公共样式
+    ============================== -->
     <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/base.css">
-    <!-- 公共导航样式 -->
     <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="../css/footer.css">
-    <!-- 当前页面样式 -->
-    <link rel="stylesheet" href="css/create.css">
+
+    <!-- ==============================
+         当前页面样式
+    ============================== -->
+    <link rel="stylesheet" href="./css/create.css">
+
+    <!-- ==============================
+         公共导航功能
+    ============================== -->
+    <script src="../js/navigation.js" defer></script>
+
 </head>
+
 <body>
+
 <div class="app" id="app">
-    <!-- 顶部导航栏 -->
+
+    <!-- ==============================
+         顶部导航栏
+    ============================== -->
     <header class="app-header" id="app-header">
+
         <div class="app-header__brand">
-            <span class="app-header__brand-name">
-                写作软件
-            </span>
+
+            <a
+                class="app-header__brand-link"
+                href="../index.html"
+                aria-label="返回写作软件首页"
+            >
+                <span class="app-header__brand-name">
+                    写作软件
+                </span>
+            </a>
+
         </div>
+
         <div class="app-header__actions">
+
+            <!-- 返回书架 -->
             <a
                 class="app-header__button app-header__button--settings"
                 href="../index.html"
@@ -40,85 +73,137 @@
                 <span aria-hidden="true">←</span>
                 <span>返回</span>
             </a>
+
         </div>
+
     </header>
-    <!-- 页面主体 -->
+
+    <!-- ==============================
+         页面主体
+    ============================== -->
     <main
         class="app-main create-main"
         id="app-main"
     >
+
         <div class="create-page">
+
             <!-- 页面标题 -->
             <div class="create-page__heading">
+
                 <p class="create-page__eyebrow">
                     CREATE
                 </p>
+
                 <h1 class="create-page__title">
                     新建
                 </h1>
-                <div class="create-page__divider">
+
+                <div
+                    class="create-page__divider"
+                    aria-hidden="true"
+                >
                     <span></span>
                     <span></span>
                     <span></span>
                 </div>
+
                 <p class="create-page__subtitle">
                     选择你想创建的内容
                 </p>
+
             </div>
-            <!-- 新建选项 -->
+
+            <!-- ==============================
+                 新建选项
+            ============================== -->
             <div class="create-options">
+
                 <!-- 新建书籍 -->
                 <a
-                    href="create-book.html"
+                    href="./create-book.html"
                     class="create-option create-option--book"
+                    aria-label="新建书籍"
                 >
+
                     <div class="create-option__icon">
-                        <span>📖</span>
+                        <span aria-hidden="true">📖</span>
                     </div>
+
                     <div class="create-option__content">
+
                         <h2 class="create-option__title">
                             新建书籍
                         </h2>
+
                         <p class="create-option__description">
                             创建一本新的小说，开始你的写作。
                         </p>
+
                         <span class="create-option__detail">
                             CREATE BOOK
                         </span>
+
                     </div>
-                    <span class="create-option__arrow">
+
+                    <span
+                        class="create-option__arrow"
+                        aria-hidden="true"
+                    >
                         →
                     </span>
+
                 </a>
+
                 <!-- 新建分组 -->
                 <a
-                    href="create-group.html"
+                    href="./create-group.html"
                     class="create-option create-option--group"
+                    aria-label="新建分组"
                 >
+
                     <div class="create-option__icon">
-                        <span>📁</span>
+                        <span aria-hidden="true">📁</span>
                     </div>
+
                     <div class="create-option__content">
+
                         <h2 class="create-option__title">
                             新建分组
                         </h2>
+
                         <p class="create-option__description">
                             创建一个分组，整理和管理你的书籍。
                         </p>
+
                         <span class="create-option__detail">
                             CREATE GROUP
                         </span>
+
                     </div>
-                    <span class="create-option__arrow">
+
+                    <span
+                        class="create-option__arrow"
+                        aria-hidden="true"
+                    >
                         →
                     </span>
+
                 </a>
+
             </div>
+
         </div>
+
     </main>
-    <!-- 底部导航栏 -->
+
+    <!-- ==============================
+         底部导航栏
+    ============================== -->
     <footer class="app-footer" id="app-footer">
+
         <nav class="bottom-nav" aria-label="主导航">
+
             <!-- 书架 -->
             <a
                 class="bottom-nav__item"
@@ -126,6 +211,7 @@
                 data-nav="home"
                 aria-label="书架"
             >
+
                 <svg
                     class="bottom-nav__icon"
                     viewBox="0 0 24 24"
@@ -139,14 +225,19 @@
                     <path
                         d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22Z"
                     ></path>
+
                     <path d="M4 5.5V22"></path>
                     <path d="M8 7h8"></path>
                     <path d="M8 11h8"></path>
+
                 </svg>
+
                 <span class="bottom-nav__label">
                     书架
                 </span>
+
             </a>
+
             <!-- 工具 -->
             <a
                 class="bottom-nav__item"
@@ -154,6 +245,7 @@
                 data-nav="tools"
                 aria-label="工具"
             >
+
                 <svg
                     class="bottom-nav__icon"
                     viewBox="0 0 24 24"
@@ -169,18 +261,24 @@
                         cy="12"
                         r="8.5"
                     ></circle>
+
                     <path
                         d="M14.5 9.5 13 13l-3.5 1.5L11 11Z"
                     ></path>
+
                 </svg>
+
                 <span class="bottom-nav__label">
                     工具
                 </span>
+
             </a>
+
         </nav>
+
     </footer>
+
 </div>
-<!-- 公共 JavaScript -->
-<script src="../js/navigation.js" defer></script>
+
 </body>
 </html>
