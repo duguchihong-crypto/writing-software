@@ -1,11 +1,11 @@
 /* ======================================================
    写作软件 · 新建书籍
-   文件：page-js/create-book.js
+   文件：creation/js/create-book.js
 
    功能：
    1. 书名验证
    2. 选择、更换、移除封面
-   3. 手动裁剪封面，固定 2:3 比例
+   3. 手动裁剪封面（2:3）
    4. 拖动、滑块缩放、双指缩放
    5. 输出 400 × 600 JPEG
    6. 创建书籍
@@ -15,1320 +15,1101 @@
 ====================================================== */
 
 (function () {
-
     "use strict";
 
-
     /* ==================================================
-       一、基础配置
+       一、配置
     ================================================== */
 
-    var MAX_TITLE_LENGTH = 100;
-    var MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+    const CONFIG = {
+        maxTitleLength: 100,
+        maxImageSize: 10 * 1024 * 1024,
 
-    var OUTPUT_WIDTH = 400;
-    var OUTPUT_HEIGHT = 600;
+        outputWidth: 400,
+        outputHeight: 600,
+        imageQuality: 0.82,
 
-    var IMAGE_QUALITY = 0.82;
+        minZoom: 1,
+        maxZoom: 3,
+        zoomStep: 0.1,
 
-    var MIN_ZOOM = 1;
-    var MAX_ZOOM = 3;
-
-    var REDIRECT_DELAY = 600;
-
-
-    /* ==================================================
-       二、获取 HTML 元素
-    ================================================== */
-
-    var elements = {
-
-        form: document.getElementById("create-book-form"),
-
-        title: document.getElementById("book-title"),
-        titleCounter: document.getElementById("book-title-counter"),
-        titleError: document.getElementById("book-title-error"),
-
-        coverInput: document.getElementById("book-cover-input"),
-        coverPlaceholder: document.getElementById("cover-placeholder"),
-        coverPreviewImage: document.getElementById("cover-preview-image"),
-        coverSelectLabel: document.getElementById("cover-select-label"),
-        removeCoverButton: document.getElementById("remove-cover-button"),
-        coverError: document.getElementById("cover-error"),
-
-        message: document.getElementById("create-book-message"),
-
-        submitButton: document.getElementById("create-book-submit"),
-
-        cancelButton: document.getElementById("cancel-create-book"),
-        cancelTopButton: document.getElementById("cancel-create-book-top"),
-
-        cropModal: document.getElementById("cover-crop-modal"),
-        cropBackdrop: document.getElementById("cover-crop-backdrop"),
-        cropDialog: document.getElementById("cover-crop-dialog"),
-        cropCloseButton: document.getElementById("cover-crop-close"),
-
-        cropStage: document.getElementById("cover-crop-stage"),
-        cropImage: document.getElementById("cover-crop-image"),
-
-        cropZoom: document.getElementById("cover-crop-zoom"),
-        cropZoomValue: document.getElementById("cover-crop-zoom-value"),
-
-        cropZoomInButton: document.getElementById("cover-crop-zoom-in"),
-        cropZoomOutButton: document.getElementById("cover-crop-zoom-out"),
-
-        cropResetButton: document.getElementById("cover-crop-reset"),
-        cropCancelButton: document.getElementById("cover-crop-cancel"),
-        cropConfirmButton: document.getElementById("cover-crop-confirm")
-
+        redirectDelay: 600
     };
 
 
     /* ==================================================
-       三、运行状态
+       二、获取页面元素
     ================================================== */
 
-    var selectedCoverData = "";
+    const $ = id => document.getElementById(id);
 
-    var isSubmitting = false;
-    var isProcessingImage = false;
+    const el = {
+        form: $("create-book-form"),
 
-    var isSaved = false;
-    var isLeavingPage = false;
+        title: $("book-title"),
+        titleCounter: $("book-title-counter"),
+        titleError: $("book-title-error"),
 
-    var imageSelectionToken = 0;
+        coverInput: $("book-cover-input"),
+        coverPlaceholder: $("cover-placeholder"),
+        coverPreview: $("cover-preview-image"),
+        coverSelectLabel: $("cover-select-label"),
+        removeCoverButton: $("remove-cover-button"),
+        coverError: $("cover-error"),
 
-    var redirectTimer = null;
+        message: $("create-book-message"),
+        submitButton: $("create-book-submit"),
 
-    var submitButtonOriginalHTML = elements.submitButton
-        ? elements.submitButton.innerHTML
-        : "创建书籍";
+        cancelButton: $("cancel-create-book"),
+        cancelTopButton: $("cancel-create-book-top"),
+
+        cropModal: $("cover-crop-modal"),
+        cropBackdrop: $("cover-crop-backdrop"),
+        cropCloseButton: $("cover-crop-close"),
+
+        cropStage: $("cover-crop-stage"),
+        cropImage: $("cover-crop-image"),
+
+        cropZoom: $("cover-crop-zoom"),
+        cropZoomValue: $("cover-crop-zoom-value"),
+
+        cropZoomIn: $("cover-crop-zoom-in"),
+        cropZoomOut: $("cover-crop-zoom-out"),
+
+        cropReset: $("cover-crop-reset"),
+        cropCancel: $("cover-crop-cancel"),
+        cropConfirm: $("cover-crop-confirm")
+    };
 
 
     /* ==================================================
-       四、裁剪状态
+       三、检查必要元素
     ================================================== */
 
-    var cropObjectUrl = "";
-
-    var cropNaturalWidth = 0;
-    var cropNaturalHeight = 0;
-
-    var cropViewportWidth = 0;
-    var cropViewportHeight = 0;
-
-    var cropFitScale = 1;
-    var cropZoom = 1;
-
-    var cropLeft = 0;
-    var cropTop = 0;
-
-    var cropIsOpen = false;
-    var cropPreviousFocus = null;
-
-    var activePointers = new Map();
-
-    var dragStartX = 0;
-    var dragStartY = 0;
-
-    var dragImageLeft = 0;
-    var dragImageTop = 0;
-
-    var pinchStartDistance = 0;
-    var pinchStartZoom = 1;
-
-    var pinchSourceCenter = null;
-
-
-    /* ==================================================
-       五、检查页面元素
-    ================================================== */
-
-    function validatePageElements() {
-
-        return Boolean(
-            elements.form &&
-            elements.title &&
-            elements.coverInput &&
-            elements.submitButton
-        );
-
-    }
-
-
-    if (!validatePageElements()) {
-
+    if (
+        !el.form ||
+        !el.title ||
+        !el.coverInput ||
+        !el.submitButton
+    ) {
         console.error(
             "[WritingCreateBook] 页面缺少必要元素。"
         );
 
         return;
-
-    }
-
-
-    function hasCropElements() {
-
-        return Boolean(
-            elements.cropModal &&
-            elements.cropBackdrop &&
-            elements.cropStage &&
-            elements.cropImage &&
-            elements.cropZoom &&
-            elements.cropConfirmButton &&
-            elements.cropCancelButton
-        );
-
     }
 
 
     /* ==================================================
-       六、消息提示
+       四、运行状态
     ================================================== */
 
-    function showMessage(text, type) {
+    const state = {
+        cover: "",
 
-        if (!elements.message) {
-            console.error("[WritingCreateBook]", text);
-            return;
-        }
+        submitting: false,
+        processingImage: false,
 
-        elements.message.textContent = String(text || "");
+        saved: false,
+        leaving: false,
 
-        elements.message.classList.remove(
+        cropOpen: false,
+
+        selectionToken: 0,
+        redirectTimer: null
+    };
+
+
+    /* ==================================================
+       五、裁剪状态
+    ================================================== */
+
+    const crop = {
+        objectUrl: "",
+
+        naturalWidth: 0,
+        naturalHeight: 0,
+
+        width: 0,
+        height: 0,
+
+        fitScale: 1,
+        zoom: 1,
+
+        left: 0,
+        top: 0,
+
+        pointers: new Map(),
+
+        dragX: 0,
+        dragY: 0,
+
+        dragLeft: 0,
+        dragTop: 0,
+
+        pinchDistance: 0,
+        pinchZoom: 1,
+        pinchSource: null,
+
+        previousFocus: null,
+
+        resolve: null
+    };
+
+
+    const originalSubmitHTML = el.submitButton.innerHTML;
+
+
+    /* ==================================================
+       六、页面地址
+    ================================================== */
+
+    function getCreateUrl() {
+        return new URL(
+            "create.html",
+            window.location.href
+        ).href;
+    }
+
+
+    function getHomeUrl() {
+        return new URL(
+            "../index.html",
+            window.location.href
+        ).href;
+    }
+
+
+    /* ==================================================
+       七、消息提示
+    ================================================== */
+
+    function showMessage(message, type = "info") {
+        if (!el.message) return;
+
+        el.message.textContent = String(message || "");
+
+        el.message.classList.remove(
             "is-success",
             "is-error",
             "is-info"
         );
 
-        if (type === "success") {
+        el.message.classList.add("is-" + type);
 
-            elements.message.classList.add("is-success");
+        el.message.hidden = false;
 
-        } else if (type === "error") {
-
-            elements.message.classList.add("is-error");
-
-        } else {
-
-            elements.message.classList.add("is-info");
-
-        }
-
-        elements.message.hidden = false;
-
-        elements.message.setAttribute(
+        el.message.setAttribute(
             "role",
             type === "error" ? "alert" : "status"
         );
-
     }
 
 
     function hideMessage() {
+        if (!el.message) return;
 
-        if (!elements.message) return;
+        el.message.textContent = "";
+        el.message.hidden = true;
 
-        elements.message.textContent = "";
-        elements.message.hidden = true;
-
-        elements.message.classList.remove(
+        el.message.classList.remove(
             "is-success",
             "is-error",
             "is-info"
         );
 
-        elements.message.removeAttribute("role");
-
+        el.message.removeAttribute("role");
     }
 
 
     /* ==================================================
-       七、书名验证
+       八、书名验证
     ================================================== */
 
-    function getTitleValue() {
-
-        return elements.title.value.trim();
-
+    function getTitle() {
+        return el.title.value.trim();
     }
 
 
-    function setTitleError(text) {
-
-        if (elements.titleError) {
-
-            elements.titleError.textContent = text;
-            elements.titleError.hidden = !text;
-
+    function setTitleError(message = "") {
+        if (el.titleError) {
+            el.titleError.textContent = message;
+            el.titleError.hidden = !message;
         }
 
-        if (text) {
-
-            elements.title.setAttribute("aria-invalid", "true");
-
+        if (message) {
+            el.title.setAttribute("aria-invalid", "true");
         } else {
-
-            elements.title.removeAttribute("aria-invalid");
-
+            el.title.removeAttribute("aria-invalid");
         }
-
     }
 
 
     function validateTitle() {
-
-        var title = getTitleValue();
+        const title = getTitle();
 
         if (!title) {
-
             setTitleError("请输入书名。");
             return false;
-
         }
 
-        if (title.length > MAX_TITLE_LENGTH) {
-
+        if (title.length > CONFIG.maxTitleLength) {
             setTitleError(
                 "书名不能超过 " +
-                MAX_TITLE_LENGTH +
+                CONFIG.maxTitleLength +
                 " 个字符。"
             );
 
             return false;
-
         }
 
         setTitleError("");
-
         return true;
-
     }
 
 
     function updateTitleCounter() {
+        if (!el.titleCounter) return;
 
-        if (!elements.titleCounter) return;
-
-        elements.titleCounter.textContent =
-            elements.title.value.length +
+        el.titleCounter.textContent =
+            el.title.value.length +
             " / " +
-            MAX_TITLE_LENGTH;
-
+            CONFIG.maxTitleLength;
     }
 
 
     /* ==================================================
-       八、封面错误提示
+       九、封面错误提示
     ================================================== */
 
-    function setCoverError(text) {
-
-        if (elements.coverError) {
-
-            elements.coverError.textContent = text;
-            elements.coverError.hidden = !text;
-
+    function setCoverError(message = "") {
+        if (el.coverError) {
+            el.coverError.textContent = message;
+            el.coverError.hidden = !message;
         }
 
-        if (text) {
-
-            elements.coverInput.setAttribute("aria-invalid", "true");
-
+        if (message) {
+            el.coverInput.setAttribute("aria-invalid", "true");
         } else {
-
-            elements.coverInput.removeAttribute("aria-invalid");
-
+            el.coverInput.removeAttribute("aria-invalid");
         }
-
-    }
-
-
-    function clearCoverError() {
-
-        setCoverError("");
-
     }
 
 
     /* ==================================================
-       九、封面预览
+       十、封面预览
     ================================================== */
 
     function updateCoverPreview() {
+        const hasCover = Boolean(state.cover);
 
-        var hasCover = Boolean(selectedCoverData);
-
-        if (elements.coverPreviewImage) {
-
+        if (el.coverPreview) {
             if (hasCover) {
-
-                elements.coverPreviewImage.src = selectedCoverData;
-                elements.coverPreviewImage.hidden = false;
-
+                el.coverPreview.src = state.cover;
+                el.coverPreview.hidden = false;
             } else {
-
-                elements.coverPreviewImage.removeAttribute("src");
-                elements.coverPreviewImage.hidden = true;
-
+                el.coverPreview.removeAttribute("src");
+                el.coverPreview.hidden = true;
             }
-
         }
 
-        if (elements.coverPlaceholder) {
-
-            elements.coverPlaceholder.hidden = hasCover;
-
+        if (el.coverPlaceholder) {
+            el.coverPlaceholder.hidden = hasCover;
         }
 
-        if (elements.removeCoverButton) {
-
-            elements.removeCoverButton.hidden = !hasCover;
-
+        if (el.removeCoverButton) {
+            el.removeCoverButton.hidden = !hasCover;
         }
 
-        if (elements.coverSelectLabel) {
-
-            elements.coverSelectLabel.textContent =
+        if (el.coverSelectLabel) {
+            el.coverSelectLabel.textContent =
                 hasCover ? "更换封面" : "选择封面";
-
         }
-
     }
 
 
     /* ==================================================
-       十、创建按钮状态
+       十一、提交按钮
     ================================================== */
 
     function updateSubmitButton() {
+        const busy =
+            state.submitting ||
+            state.processingImage;
 
-        if (!elements.submitButton) return;
+        el.submitButton.disabled = busy;
 
-        elements.submitButton.disabled =
-            isSubmitting || isProcessingImage;
-
-        if (isSubmitting) {
-
-            elements.submitButton.textContent = "正在创建……";
-
-        } else if (isProcessingImage) {
-
-            elements.submitButton.textContent = "正在处理封面……";
-
+        if (state.submitting) {
+            el.submitButton.textContent = "正在创建……";
+        } else if (state.processingImage) {
+            el.submitButton.textContent = "正在处理封面……";
         } else {
-
-            elements.submitButton.innerHTML =
-                submitButtonOriginalHTML || "创建书籍";
-
+            el.submitButton.innerHTML =
+                originalSubmitHTML || "创建书籍";
         }
 
-        if (isSubmitting || isProcessingImage) {
-
-            elements.submitButton.setAttribute("aria-busy", "true");
-
+        if (busy) {
+            el.submitButton.setAttribute("aria-busy", "true");
         } else {
-
-            elements.submitButton.removeAttribute("aria-busy");
-
+            el.submitButton.removeAttribute("aria-busy");
         }
-
     }
 
 
     /* ==================================================
-       十一、释放裁剪资源
+       十二、裁剪基础计算
     ================================================== */
 
-    function releaseCropImage() {
-
-        if (cropObjectUrl) {
-
-            URL.revokeObjectURL(cropObjectUrl);
-            cropObjectUrl = "";
-
-        }
-
-        if (elements.cropImage) {
-
-            elements.cropImage.onload = null;
-            elements.cropImage.onerror = null;
-
-            elements.cropImage.removeAttribute("src");
-
-            elements.cropImage.style.width = "";
-            elements.cropImage.style.height = "";
-
-            elements.cropImage.style.left = "";
-            elements.cropImage.style.top = "";
-
-        }
-
-        cropNaturalWidth = 0;
-        cropNaturalHeight = 0;
-
-        cropViewportWidth = 0;
-        cropViewportHeight = 0;
-
-        cropFitScale = 1;
-        cropZoom = 1;
-
-        cropLeft = 0;
-        cropTop = 0;
-
-        activePointers.clear();
-
-        pinchStartDistance = 0;
-        pinchStartZoom = 1;
-
-        pinchSourceCenter = null;
-
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
     }
 
 
-    /* ==================================================
-       十二、拖动和双指缩放事件
-    ================================================== */
-
-    function getPointerDistance(a, b) {
-
-        var dx = a.x - b.x;
-        var dy = a.y - b.y;
-
-        return Math.sqrt(dx * dx + dy * dy);
-
-    }
-
-
-    function getPointerCenter(a, b) {
-
-        return {
-
-            x: (a.x + b.x) / 2,
-            y: (a.y + b.y) / 2
-
-        };
-
-    }
-
-
-    function getStagePoint(x, y) {
-
-        var rect = elements.cropStage.getBoundingClientRect();
-
-        return {
-
-            x: x - rect.left,
-            y: y - rect.top
-
-        };
-
+    function getScale() {
+        return crop.fitScale * crop.zoom;
     }
 
 
     function clampCropPosition() {
+        if (!crop.width || !crop.height) return;
 
-        if (
-            !cropViewportWidth ||
-            !cropViewportHeight ||
-            !cropNaturalWidth ||
-            !cropNaturalHeight
-        ) {
+        const scale = getScale();
 
-            return;
+        const imageWidth = crop.naturalWidth * scale;
+        const imageHeight = crop.naturalHeight * scale;
 
-        }
+        crop.left = clamp(
+            crop.left,
+            crop.width - imageWidth,
+            0
+        );
 
-        var scale = cropFitScale * cropZoom;
-
-        var imageWidth = cropNaturalWidth * scale;
-        var imageHeight = cropNaturalHeight * scale;
-
-        var minLeft = cropViewportWidth - imageWidth;
-        var minTop = cropViewportHeight - imageHeight;
-
-        cropLeft = Math.min(0, Math.max(minLeft, cropLeft));
-        cropTop = Math.min(0, Math.max(minTop, cropTop));
-
+        crop.top = clamp(
+            crop.top,
+            crop.height - imageHeight,
+            0
+        );
     }
 
 
-    function updateCropImagePosition() {
+    function updateCropImage() {
+        if (!el.cropImage || !crop.naturalWidth) return;
 
-        if (
-            !elements.cropImage ||
-            !cropNaturalWidth ||
-            !cropNaturalHeight
-        ) {
+        const scale = getScale();
 
-            return;
-
-        }
-
-        var scale = cropFitScale * cropZoom;
-
-        var imageWidth = cropNaturalWidth * scale;
-        var imageHeight = cropNaturalHeight * scale;
+        const imageWidth = crop.naturalWidth * scale;
+        const imageHeight = crop.naturalHeight * scale;
 
         clampCropPosition();
 
-        elements.cropImage.style.width = imageWidth + "px";
-        elements.cropImage.style.height = imageHeight + "px";
+        el.cropImage.style.width = imageWidth + "px";
+        el.cropImage.style.height = imageHeight + "px";
 
-        elements.cropImage.style.left = cropLeft + "px";
-        elements.cropImage.style.top = cropTop + "px";
+        el.cropImage.style.left = crop.left + "px";
+        el.cropImage.style.top = crop.top + "px";
 
-        elements.cropZoom.value = String(cropZoom);
+        el.cropZoom.value = String(crop.zoom);
 
-        if (elements.cropZoomValue) {
-
-            elements.cropZoomValue.textContent =
-                Math.round(cropZoom * 100) + "%";
-
+        if (el.cropZoomValue) {
+            el.cropZoomValue.textContent =
+                Math.round(crop.zoom * 100) + "%";
         }
 
-        if (elements.cropZoomInButton) {
-
-            elements.cropZoomInButton.disabled =
-                cropZoom >= MAX_ZOOM;
-
+        if (el.cropZoomIn) {
+            el.cropZoomIn.disabled =
+                crop.zoom >= CONFIG.maxZoom;
         }
 
-        if (elements.cropZoomOutButton) {
-
-            elements.cropZoomOutButton.disabled =
-                cropZoom <= MIN_ZOOM;
-
+        if (el.cropZoomOut) {
+            el.cropZoomOut.disabled =
+                crop.zoom <= CONFIG.minZoom;
         }
-
     }
 
 
-    function initializeCropGeometry() {
+    function initializeCrop() {
+        const rect = el.cropStage.getBoundingClientRect();
 
-        var rect = elements.cropStage.getBoundingClientRect();
+        crop.width = rect.width;
+        crop.height = rect.height;
 
-        cropViewportWidth = rect.width;
-        cropViewportHeight = rect.height;
-
-        if (
-            cropViewportWidth <= 0 ||
-            cropViewportHeight <= 0
-        ) {
-
+        if (!crop.width || !crop.height) {
             throw new Error(
                 "裁剪区域尺寸无效，请检查 create-book.css。"
             );
-
         }
 
-        cropFitScale = Math.max(
-            cropViewportWidth / cropNaturalWidth,
-            cropViewportHeight / cropNaturalHeight
+        crop.fitScale = Math.max(
+            crop.width / crop.naturalWidth,
+            crop.height / crop.naturalHeight
         );
 
-        cropZoom = MIN_ZOOM;
+        crop.zoom = CONFIG.minZoom;
 
-        var imageWidth = cropNaturalWidth * cropFitScale;
-        var imageHeight = cropNaturalHeight * cropFitScale;
+        const imageWidth =
+            crop.naturalWidth * crop.fitScale;
 
-        cropLeft = (cropViewportWidth - imageWidth) / 2;
-        cropTop = (cropViewportHeight - imageHeight) / 2;
+        const imageHeight =
+            crop.naturalHeight * crop.fitScale;
 
-        elements.cropZoom.min = String(MIN_ZOOM);
-        elements.cropZoom.max = String(MAX_ZOOM);
-        elements.cropZoom.step = "0.01";
-        elements.cropZoom.value = String(cropZoom);
+        crop.left = (crop.width - imageWidth) / 2;
+        crop.top = (crop.height - imageHeight) / 2;
 
-        updateCropImagePosition();
+        el.cropZoom.min = String(CONFIG.minZoom);
+        el.cropZoom.max = String(CONFIG.maxZoom);
+        el.cropZoom.step = "0.01";
 
+        updateCropImage();
     }
 
 
-    function setCropZoom(newZoom) {
+    /* ==================================================
+       十三、缩放
+    ================================================== */
 
-        if (!cropNaturalWidth || !cropNaturalHeight) return;
+    function setZoom(value, centerX, centerY) {
+        if (!crop.naturalWidth) return;
 
-        newZoom = Math.max(
-            MIN_ZOOM,
-            Math.min(MAX_ZOOM, Number(newZoom) || MIN_ZOOM)
+        const oldScale = getScale();
+
+        const x = centerX ?? crop.width / 2;
+        const y = centerY ?? crop.height / 2;
+
+        const sourceX = (x - crop.left) / oldScale;
+        const sourceY = (y - crop.top) / oldScale;
+
+        crop.zoom = clamp(
+            Number(value) || CONFIG.minZoom,
+            CONFIG.minZoom,
+            CONFIG.maxZoom
         );
 
-        var oldScale = cropFitScale * cropZoom;
+        const newScale = getScale();
 
-        var centerSourceX =
-            (cropViewportWidth / 2 - cropLeft) / oldScale;
+        crop.left = x - sourceX * newScale;
+        crop.top = y - sourceY * newScale;
 
-        var centerSourceY =
-            (cropViewportHeight / 2 - cropTop) / oldScale;
-
-        cropZoom = newZoom;
-
-        var newScale = cropFitScale * cropZoom;
-
-        cropLeft =
-            cropViewportWidth / 2 -
-            centerSourceX * newScale;
-
-        cropTop =
-            cropViewportHeight / 2 -
-            centerSourceY * newScale;
-
-        updateCropImagePosition();
-
+        updateCropImage();
     }
 
 
     function resetCrop() {
+        if (!crop.naturalWidth) return;
 
-        if (
-            !cropNaturalWidth ||
-            !cropNaturalHeight ||
-            !cropViewportWidth ||
-            !cropViewportHeight
-        ) {
+        crop.zoom = CONFIG.minZoom;
 
-            return;
+        const imageWidth =
+            crop.naturalWidth * crop.fitScale;
 
-        }
+        const imageHeight =
+            crop.naturalHeight * crop.fitScale;
 
-        cropZoom = MIN_ZOOM;
+        crop.left = (crop.width - imageWidth) / 2;
+        crop.top = (crop.height - imageHeight) / 2;
 
-        var imageWidth = cropNaturalWidth * cropFitScale;
-        var imageHeight = cropNaturalHeight * cropFitScale;
-
-        cropLeft = (cropViewportWidth - imageWidth) / 2;
-        cropTop = (cropViewportHeight - imageHeight) / 2;
-
-        updateCropImagePosition();
-
+        updateCropImage();
     }
 
 
-    function beginPinch() {
+    /* ==================================================
+       十四、触摸和鼠标坐标
+    ================================================== */
 
-        if (activePointers.size < 2) return;
+    function getStagePoint(x, y) {
+        const rect = el.cropStage.getBoundingClientRect();
 
-        var pointers = Array.from(activePointers.values());
-
-        var a = getStagePoint(pointers[0].x, pointers[0].y);
-        var b = getStagePoint(pointers[1].x, pointers[1].y);
-
-        pinchStartDistance = getPointerDistance(a, b);
-        pinchStartZoom = cropZoom;
-
-        var center = getPointerCenter(a, b);
-
-        var scale = cropFitScale * cropZoom;
-
-        pinchSourceCenter = {
-
-            x: (center.x - cropLeft) / scale,
-            y: (center.y - cropTop) / scale
-
+        return {
+            x: x - rect.left,
+            y: y - rect.top
         };
+    }
 
+
+    function getDistance(a, b) {
+        return Math.hypot(
+            a.x - b.x,
+            a.y - b.y
+        );
+    }
+
+
+    function getCenter(a, b) {
+        return {
+            x: (a.x + b.x) / 2,
+            y: (a.y + b.y) / 2
+        };
+    }
+
+
+    /* ==================================================
+       十五、双指缩放
+    ================================================== */
+
+    function beginPinch() {
+        if (crop.pointers.size !== 2) return;
+
+        const points = Array.from(
+            crop.pointers.values()
+        ).map(point =>
+            getStagePoint(point.x, point.y)
+        );
+
+        const center = getCenter(points[0], points[1]);
+
+        crop.pinchDistance = getDistance(
+            points[0],
+            points[1]
+        );
+
+        crop.pinchZoom = crop.zoom;
+
+        const scale = getScale();
+
+        crop.pinchSource = {
+            x: (center.x - crop.left) / scale,
+            y: (center.y - crop.top) / scale
+        };
     }
 
 
     function updatePinch() {
-
         if (
-            activePointers.size < 2 ||
-            !pinchStartDistance ||
-            !pinchSourceCenter
+            crop.pointers.size !== 2 ||
+            !crop.pinchDistance ||
+            !crop.pinchSource
         ) {
-
-            return;
-
-        }
-
-        var pointers = Array.from(activePointers.values());
-
-        var a = getStagePoint(pointers[0].x, pointers[0].y);
-        var b = getStagePoint(pointers[1].x, pointers[1].y);
-
-        var distance = getPointerDistance(a, b);
-        var center = getPointerCenter(a, b);
-
-        var newZoom = Math.max(
-            MIN_ZOOM,
-            Math.min(
-                MAX_ZOOM,
-                pinchStartZoom * distance / pinchStartDistance
-            )
-        );
-
-        cropZoom = newZoom;
-
-        var scale = cropFitScale * cropZoom;
-
-        cropLeft = center.x - pinchSourceCenter.x * scale;
-        cropTop = center.y - pinchSourceCenter.y * scale;
-
-        updateCropImagePosition();
-
-    }
-
-
-    function handlePointerMove(event) {
-
-        if (!cropIsOpen || !activePointers.has(event.pointerId)) {
             return;
         }
 
-        activePointers.set(event.pointerId, {
-
-            x: event.clientX,
-            y: event.clientY
-
-        });
-
-        if (activePointers.size >= 2) {
-
-            event.preventDefault();
-            updatePinch();
-
-            return;
-
-        }
-
-        if (activePointers.size === 1) {
-
-            event.preventDefault();
-
-            cropLeft = dragImageLeft + event.clientX - dragStartX;
-            cropTop = dragImageTop + event.clientY - dragStartY;
-
-            updateCropImagePosition();
-
-        }
-
-    }
-
-
-    function handlePointerEnd(event) {
-
-        if (!activePointers.has(event.pointerId)) return;
-
-        activePointers.delete(event.pointerId);
-
-        if (activePointers.size === 1) {
-
-            var remaining = Array.from(activePointers.values())[0];
-
-            dragStartX = remaining.x;
-            dragStartY = remaining.y;
-
-            dragImageLeft = cropLeft;
-            dragImageTop = cropTop;
-
-            pinchStartDistance = 0;
-            pinchSourceCenter = null;
-
-        } else if (activePointers.size === 0) {
-
-            pinchStartDistance = 0;
-            pinchSourceCenter = null;
-
-        } else {
-
-            beginPinch();
-
-        }
-
-    }
-
-
-    function attachPointerListeners() {
-
-        document.addEventListener(
-            "pointermove",
-            handlePointerMove,
-            {
-                capture: true,
-                passive: false
-            }
+        const points = Array.from(
+            crop.pointers.values()
+        ).map(point =>
+            getStagePoint(point.x, point.y)
         );
 
-        document.addEventListener(
-            "pointerup",
-            handlePointerEnd,
-            true
+        const distance = getDistance(
+            points[0],
+            points[1]
         );
 
-        document.addEventListener(
-            "pointercancel",
-            handlePointerEnd,
-            true
+        const center = getCenter(
+            points[0],
+            points[1]
         );
 
-    }
-
-
-    function detachPointerListeners() {
-
-        document.removeEventListener(
-            "pointermove",
-            handlePointerMove,
-            true
+        crop.zoom = clamp(
+            crop.pinchZoom * distance / crop.pinchDistance,
+            CONFIG.minZoom,
+            CONFIG.maxZoom
         );
 
-        document.removeEventListener(
-            "pointerup",
-            handlePointerEnd,
-            true
-        );
+        const scale = getScale();
 
-        document.removeEventListener(
-            "pointercancel",
-            handlePointerEnd,
-            true
-        );
+        crop.left =
+            center.x - crop.pinchSource.x * scale;
 
-    }
+        crop.top =
+            center.y - crop.pinchSource.y * scale;
 
-
-    if (elements.cropStage) {
-
-        elements.cropStage.style.touchAction = "none";
-
-        elements.cropStage.addEventListener(
-            "pointerdown",
-            function (event) {
-
-                if (!cropIsOpen) return;
-
-                if (
-                    event.pointerType === "mouse" &&
-                    event.button !== 0
-                ) {
-
-                    return;
-
-                }
-
-                event.preventDefault();
-
-                activePointers.set(event.pointerId, {
-
-                    x: event.clientX,
-                    y: event.clientY
-
-                });
-
-                if (activePointers.size === 1) {
-
-                    dragStartX = event.clientX;
-                    dragStartY = event.clientY;
-
-                    dragImageLeft = cropLeft;
-                    dragImageTop = cropTop;
-
-                } else if (activePointers.size === 2) {
-
-                    beginPinch();
-
-                }
-
-            }
-        );
-
-        elements.cropStage.addEventListener(
-            "dragstart",
-            function (event) {
-                event.preventDefault();
-            }
-        );
-
+        updateCropImage();
     }
 
 
     /* ==================================================
-       十三、关闭裁剪弹窗
+       十六、拖动和指针事件
     ================================================== */
 
-    function closeCropModal() {
+    function onPointerDown(event) {
+        if (!state.cropOpen) return;
 
-        cropIsOpen = false;
+        if (
+            event.pointerType === "mouse" &&
+            event.button !== 0
+        ) {
+            return;
+        }
 
-        detachPointerListeners();
+        event.preventDefault();
 
-        if (elements.cropModal) {
+        crop.pointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY
+        });
 
-            elements.cropModal.hidden = true;
+        if (crop.pointers.size === 1) {
+            crop.dragX = event.clientX;
+            crop.dragY = event.clientY;
 
+            crop.dragLeft = crop.left;
+            crop.dragTop = crop.top;
+        }
+
+        if (crop.pointers.size === 2) {
+            beginPinch();
+        }
+    }
+
+
+    function onPointerMove(event) {
+        if (
+            !state.cropOpen ||
+            !crop.pointers.has(event.pointerId)
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+
+        crop.pointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY
+        });
+
+        if (crop.pointers.size >= 2) {
+            updatePinch();
+            return;
+        }
+
+        crop.left =
+            crop.dragLeft +
+            event.clientX -
+            crop.dragX;
+
+        crop.top =
+            crop.dragTop +
+            event.clientY -
+            crop.dragY;
+
+        updateCropImage();
+    }
+
+
+    function onPointerEnd(event) {
+        if (!crop.pointers.has(event.pointerId)) return;
+
+        crop.pointers.delete(event.pointerId);
+
+        crop.pinchDistance = 0;
+        crop.pinchSource = null;
+
+        if (crop.pointers.size === 1) {
+            const point = Array.from(
+                crop.pointers.values()
+            )[0];
+
+            crop.dragX = point.x;
+            crop.dragY = point.y;
+
+            crop.dragLeft = crop.left;
+            crop.dragTop = crop.top;
+        }
+
+        if (crop.pointers.size === 2) {
+            beginPinch();
+        }
+    }
+
+
+    function attachPointerEvents() {
+        document.addEventListener(
+            "pointermove",
+            onPointerMove,
+            { capture: true, passive: false }
+        );
+
+        document.addEventListener(
+            "pointerup",
+            onPointerEnd,
+            true
+        );
+
+        document.addEventListener(
+            "pointercancel",
+            onPointerEnd,
+            true
+        );
+    }
+
+
+    function detachPointerEvents() {
+        document.removeEventListener(
+            "pointermove",
+            onPointerMove,
+            true
+        );
+
+        document.removeEventListener(
+            "pointerup",
+            onPointerEnd,
+            true
+        );
+
+        document.removeEventListener(
+            "pointercancel",
+            onPointerEnd,
+            true
+        );
+
+        crop.pointers.clear();
+    }
+
+
+    /* ==================================================
+       十七、释放裁剪资源
+    ================================================== */
+
+    function releaseCropResources() {
+        if (crop.objectUrl) {
+            URL.revokeObjectURL(crop.objectUrl);
+            crop.objectUrl = "";
+        }
+
+        if (el.cropImage) {
+            el.cropImage.onload = null;
+            el.cropImage.onerror = null;
+
+            el.cropImage.removeAttribute("src");
+
+            el.cropImage.style.width = "";
+            el.cropImage.style.height = "";
+            el.cropImage.style.left = "";
+            el.cropImage.style.top = "";
+        }
+
+        crop.naturalWidth = 0;
+        crop.naturalHeight = 0;
+
+        crop.width = 0;
+        crop.height = 0;
+
+        crop.fitScale = 1;
+        crop.zoom = 1;
+
+        crop.left = 0;
+        crop.top = 0;
+
+        crop.pinchDistance = 0;
+        crop.pinchSource = null;
+
+        crop.pointers.clear();
+    }
+
+
+    /* ==================================================
+       十八、关闭裁剪弹窗
+    ================================================== */
+
+    function closeCropModal(result = false) {
+        if (!state.cropOpen) return;
+
+        state.cropOpen = false;
+
+        detachPointerEvents();
+
+        document.removeEventListener(
+            "keydown",
+            onCropKeydown,
+            true
+        );
+
+        if (el.cropModal) {
+            el.cropModal.hidden = true;
         }
 
         document.body.classList.remove("cover-crop-open");
 
-        document.removeEventListener(
-            "keydown",
-            handleCropKeydown,
-            true
-        );
+        releaseCropResources();
 
-        releaseCropImage();
+        const resolve = crop.resolve;
+        crop.resolve = null;
 
-        if (
-            cropPreviousFocus &&
-            typeof cropPreviousFocus.focus === "function" &&
-            document.contains(cropPreviousFocus)
-        ) {
-
-            cropPreviousFocus.focus();
-
+        if (resolve) {
+            resolve(result);
         }
 
-        cropPreviousFocus = null;
+        if (
+            crop.previousFocus &&
+            document.contains(crop.previousFocus)
+        ) {
+            crop.previousFocus.focus();
+        }
 
+        crop.previousFocus = null;
     }
 
 
     /* ==================================================
-       十四、取消裁剪
+       十九、取消裁剪
     ================================================== */
 
     function cancelCrop() {
+        if (!state.cropOpen) return;
 
-        if (!cropIsOpen) return;
+        state.selectionToken++;
 
-        imageSelectionToken++;
+        closeCropModal(false);
 
-        closeCropModal();
+        el.coverInput.value = "";
 
-        elements.coverInput.value = "";
-
-        isProcessingImage = false;
+        state.processingImage = false;
 
         updateSubmitButton();
-
     }
 
 
-    /* ==================================================
-       十五、裁剪键盘操作
-    ================================================== */
-
-    function handleCropKeydown(event) {
-
-        if (!cropIsOpen) return;
-
-        if (event.key === "Escape") {
-
+    function onCropKeydown(event) {
+        if (
+            state.cropOpen &&
+            event.key === "Escape"
+        ) {
             event.preventDefault();
             event.stopPropagation();
 
             cancelCrop();
-
         }
-
     }
 
 
     /* ==================================================
-       十六、打开裁剪弹窗
+       二十、打开裁剪弹窗
     ================================================== */
 
     function openCropModal(file, token) {
-
-        return new Promise(function (resolve, reject) {
-
-            if (!hasCropElements()) {
-
+        return new Promise((resolve, reject) => {
+            if (
+                !el.cropModal ||
+                !el.cropStage ||
+                !el.cropImage ||
+                !el.cropZoom ||
+                !el.cropConfirm ||
+                !el.cropCancel
+            ) {
                 reject(
                     new Error("裁剪窗口的 HTML 元素不完整。")
                 );
 
                 return;
-
             }
 
-            releaseCropImage();
+            releaseCropResources();
 
-            cropPreviousFocus = document.activeElement;
+            crop.previousFocus = document.activeElement;
+            crop.resolve = resolve;
 
-            cropIsOpen = true;
+            state.cropOpen = true;
 
             try {
-
-                cropObjectUrl = URL.createObjectURL(file);
-
+                crop.objectUrl = URL.createObjectURL(file);
             } catch (error) {
-
-                cropIsOpen = false;
+                crop.resolve = null;
+                state.cropOpen = false;
 
                 reject(
                     new Error("无法打开图片，请重新选择。")
                 );
 
                 return;
-
             }
 
-            elements.cropModal.hidden = false;
+            el.cropModal.hidden = false;
 
             document.body.classList.add("cover-crop-open");
 
             document.addEventListener(
                 "keydown",
-                handleCropKeydown,
+                onCropKeydown,
                 true
             );
 
-            attachPointerListeners();
+            attachPointerEvents();
 
-            elements.cropConfirmButton.disabled = true;
-            elements.cropCancelButton.disabled = false;
+            el.cropConfirm.disabled = true;
+            el.cropCancel.disabled = false;
+            el.cropZoom.disabled = true;
 
-            if (elements.cropCloseButton) {
-                elements.cropCloseButton.disabled = false;
+            if (el.cropCloseButton) {
+                el.cropCloseButton.disabled = false;
             }
 
-            if (elements.cropResetButton) {
-                elements.cropResetButton.disabled = true;
+            if (el.cropReset) {
+                el.cropReset.disabled = true;
             }
 
-            elements.cropZoom.disabled = true;
-
-
-            elements.cropImage.onload = function () {
-
+            el.cropImage.onload = () => {
                 if (
-                    token !== imageSelectionToken ||
-                    !cropIsOpen
+                    token !== state.selectionToken ||
+                    !state.cropOpen
                 ) {
-
                     return;
-
                 }
 
-                cropNaturalWidth = elements.cropImage.naturalWidth;
-                cropNaturalHeight = elements.cropImage.naturalHeight;
+                crop.naturalWidth =
+                    el.cropImage.naturalWidth;
 
-                if (!cropNaturalWidth || !cropNaturalHeight) {
+                crop.naturalHeight =
+                    el.cropImage.naturalHeight;
 
-                    closeCropModal();
+                if (
+                    !crop.naturalWidth ||
+                    !crop.naturalHeight
+                ) {
+                    closeCropModal(false);
 
                     reject(
                         new Error("图片尺寸无效，请重新选择。")
                     );
 
                     return;
-
                 }
 
-                window.requestAnimationFrame(function () {
-
+                requestAnimationFrame(() => {
                     if (
-                        token !== imageSelectionToken ||
-                        !cropIsOpen
+                        token !== state.selectionToken ||
+                        !state.cropOpen
                     ) {
-
                         return;
-
                     }
 
                     try {
+                        initializeCrop();
 
-                        initializeCropGeometry();
+                        el.cropConfirm.disabled = false;
+                        el.cropZoom.disabled = false;
 
-                        elements.cropConfirmButton.disabled = false;
-
-                        if (elements.cropResetButton) {
-                            elements.cropResetButton.disabled = false;
+                        if (el.cropReset) {
+                            el.cropReset.disabled = false;
                         }
 
-                        elements.cropZoom.disabled = false;
-
-                        elements.cropConfirmButton.focus();
-
-                        resolve(true);
+                        el.cropConfirm.focus();
 
                     } catch (error) {
-
-                        closeCropModal();
-
+                        closeCropModal(false);
                         reject(error);
-
                     }
-
                 });
-
             };
 
+            el.cropImage.onerror = () => {
+                if (token !== state.selectionToken) return;
 
-            elements.cropImage.onerror = function () {
-
-                if (token !== imageSelectionToken) return;
-
-                closeCropModal();
+                closeCropModal(false);
 
                 reject(
                     new Error("图片加载失败，请重新选择。")
                 );
-
             };
 
-
-            elements.cropImage.src = cropObjectUrl;
-
+            el.cropImage.src = crop.objectUrl;
         });
-
     }
 
 
     /* ==================================================
-       十七、生成裁剪封面
+       二十一、生成封面图片
     ================================================== */
 
     function createCroppedCover() {
-
         if (
-            !cropIsOpen ||
-            !cropNaturalWidth ||
-            !cropNaturalHeight ||
-            !cropViewportWidth ||
-            !cropViewportHeight
+            !state.cropOpen ||
+            !crop.naturalWidth ||
+            !crop.naturalHeight ||
+            !crop.width ||
+            !crop.height
         ) {
-
             throw new Error("裁剪区域尚未准备好，请重试。");
-
         }
 
-        var scale = cropFitScale * cropZoom;
+        const scale = getScale();
 
-        var sourceX = -cropLeft / scale;
-        var sourceY = -cropTop / scale;
+        const sourceX = -crop.left / scale;
+        const sourceY = -crop.top / scale;
 
-        var sourceWidth = cropViewportWidth / scale;
-        var sourceHeight = cropViewportHeight / scale;
+        const sourceWidth = crop.width / scale;
+        const sourceHeight = crop.height / scale;
 
-        sourceX = Math.max(
-            0,
-            Math.min(cropNaturalWidth, sourceX)
-        );
+        const canvas = document.createElement("canvas");
 
-        sourceY = Math.max(
-            0,
-            Math.min(cropNaturalHeight, sourceY)
-        );
+        canvas.width = CONFIG.outputWidth;
+        canvas.height = CONFIG.outputHeight;
 
-        sourceWidth = Math.min(
-            sourceWidth,
-            cropNaturalWidth - sourceX
-        );
-
-        sourceHeight = Math.min(
-            sourceHeight,
-            cropNaturalHeight - sourceY
-        );
-
-        if (sourceWidth <= 0 || sourceHeight <= 0) {
-
-            throw new Error("裁剪范围无效，请重新调整图片。");
-
-        }
-
-        var canvas = document.createElement("canvas");
-
-        canvas.width = OUTPUT_WIDTH;
-        canvas.height = OUTPUT_HEIGHT;
-
-        var context = canvas.getContext("2d");
+        const context = canvas.getContext("2d");
 
         if (!context) {
-
             throw new Error("无法创建图片，请重试。");
-
         }
 
         try {
-
             context.fillStyle = "#FFFFFF";
 
             context.fillRect(
                 0,
                 0,
-                OUTPUT_WIDTH,
-                OUTPUT_HEIGHT
+                canvas.width,
+                canvas.height
             );
 
             context.imageSmoothingEnabled = true;
             context.imageSmoothingQuality = "high";
 
             context.drawImage(
-                elements.cropImage,
+                el.cropImage,
                 sourceX,
                 sourceY,
                 sourceWidth,
                 sourceHeight,
                 0,
                 0,
-                OUTPUT_WIDTH,
-                OUTPUT_HEIGHT
+                CONFIG.outputWidth,
+                CONFIG.outputHeight
             );
 
-            var dataUrl = canvas.toDataURL(
+            const result = canvas.toDataURL(
                 "image/jpeg",
-                IMAGE_QUALITY
+                CONFIG.imageQuality
             );
 
-            if (!dataUrl.startsWith("data:image/jpeg;base64,")) {
-
+            if (!result.startsWith("data:image/jpeg;base64,")) {
                 throw new Error("封面生成失败，请重试。");
-
             }
 
-            return dataUrl;
+            return result;
 
         } finally {
-
             canvas.width = 0;
             canvas.height = 0;
-
         }
-
     }
 
 
     /* ==================================================
-       十八、确认裁剪
+       二十二、确认裁剪
     ================================================== */
 
     function confirmCrop() {
-
         if (
-            !cropIsOpen ||
-            isSubmitting ||
-            !cropNaturalWidth ||
-            !cropNaturalHeight
+            !state.cropOpen ||
+            state.submitting ||
+            !crop.naturalWidth
         ) {
-
             return;
-
         }
 
-        elements.cropConfirmButton.disabled = true;
-
-        elements.cropConfirmButton.textContent = "正在生成……";
+        el.cropConfirm.disabled = true;
+        el.cropConfirm.textContent = "正在生成……";
 
         try {
-
-            selectedCoverData = createCroppedCover();
+            state.cover = createCroppedCover();
 
             updateCoverPreview();
 
-            clearCoverError();
-
+            setCoverError("");
             hideMessage();
 
-            closeCropModal();
+            closeCropModal(true);
 
-            elements.coverInput.value = "";
+            el.coverInput.value = "";
 
         } catch (error) {
-
             console.error(
                 "[WritingCreateBook] 裁剪失败：",
                 error
@@ -1339,148 +1120,71 @@
                 "error"
             );
 
+            el.cropConfirm.disabled = false;
+
         } finally {
+            el.cropConfirm.textContent = "确认裁剪";
 
-            elements.cropConfirmButton.textContent = "确认裁剪";
-
-            elements.cropConfirmButton.disabled = true;
-
-            isProcessingImage = false;
-
-            updateSubmitButton();
-
-        }
-
-    }
-
-
-    /* ==================================================
-       十九、读取图片
-    ================================================== */
-
-    function loadImageFromFile(file) {
-
-        return new Promise(function (resolve, reject) {
-
-            var objectUrl;
-
-            try {
-
-                objectUrl = URL.createObjectURL(file);
-
-            } catch (error) {
-
-                reject(
-                    new Error("无法读取图片，请重新选择。")
-                );
-
-                return;
-
+            if (!state.cropOpen) {
+                state.processingImage = false;
+                updateSubmitButton();
             }
-
-            var image = new Image();
-
-            image.onload = function () {
-
-                URL.revokeObjectURL(objectUrl);
-
-                if (!image.naturalWidth || !image.naturalHeight) {
-
-                    reject(
-                        new Error("图片尺寸无效，请重新选择。")
-                    );
-
-                    return;
-
-                }
-
-                resolve(image);
-
-            };
-
-            image.onerror = function () {
-
-                URL.revokeObjectURL(objectUrl);
-
-                reject(
-                    new Error("无法读取这张图片，请更换图片后重试。")
-                );
-
-            };
-
-            image.src = objectUrl;
-
-        });
-
+        }
     }
 
 
     /* ==================================================
-       二十、处理图片选择
+       二十三、选择封面
     ================================================== */
 
     async function handleCoverSelection(file) {
-
-        clearCoverError();
-        hideMessage();
-
         if (!file) return;
 
-        var currentToken = ++imageSelectionToken;
+        setCoverError("");
+        hideMessage();
 
-        if (!file.type || !file.type.startsWith("image/")) {
+        const token = ++state.selectionToken;
 
+        if (
+            !file.type ||
+            !file.type.startsWith("image/")
+        ) {
             setCoverError("请选择有效的图片文件。");
-
             return;
-
         }
 
-        if (file.size > MAX_IMAGE_SIZE) {
-
+        if (file.size > CONFIG.maxImageSize) {
             setCoverError(
                 "图片不能超过 10 MB，请选择较小的图片。"
             );
 
             return;
-
         }
 
-        isProcessingImage = true;
-
+        state.processingImage = true;
         updateSubmitButton();
 
-        showMessage("正在读取图片……", "info");
+        showMessage("正在读取图片……");
 
         try {
+            const result = await openCropModal(file, token);
 
-            var image = await loadImageFromFile(file);
+            if (token !== state.selectionToken) return;
 
-            if (currentToken !== imageSelectionToken) return;
-
-            if (!image.naturalWidth || !image.naturalHeight) {
-
-                throw new Error("图片尺寸无效，请重新选择。");
-
+            if (result) {
+                hideMessage();
             }
 
-            await openCropModal(file, currentToken);
-
-            if (currentToken !== imageSelectionToken) return;
-
-            hideMessage();
-
         } catch (error) {
-
-            if (currentToken !== imageSelectionToken) return;
+            if (token !== state.selectionToken) return;
 
             console.error(
                 "[WritingCreateBook] 图片处理失败：",
                 error
             );
 
-            if (cropIsOpen) {
-                closeCropModal();
+            if (state.cropOpen) {
+                closeCropModal(false);
             }
 
             setCoverError(
@@ -1489,496 +1193,274 @@
 
             hideMessage();
 
-            isProcessingImage = false;
-
+            state.processingImage = false;
             updateSubmitButton();
-
         }
-
     }
 
 
-    /* ==================================================
-       二十一、封面选择器
-    ================================================== */
-
-    function openNativeFilePicker() {
-
-        if (isSubmitting || isProcessingImage || isSaved) {
+    function openFilePicker() {
+        if (
+            state.submitting ||
+            state.processingImage ||
+            state.saved
+        ) {
             return;
         }
 
-        clearCoverError();
+        setCoverError("");
         hideMessage();
 
-        try {
-
-            elements.coverInput.click();
-
-        } catch (error) {
-
-            console.error(
-                "[WritingCreateBook] 打开文件选择器失败：",
-                error
-            );
-
-            setCoverError(
-                "无法打开图片选择器，请刷新页面后重试。"
-            );
-
-        }
-
+        el.coverInput.click();
     }
 
 
-    elements.coverInput.addEventListener(
-        "change",
-        function () {
+    el.coverInput.addEventListener("change", () => {
+        const file =
+            el.coverInput.files &&
+            el.coverInput.files[0];
 
-            var file =
-                elements.coverInput.files &&
-                elements.coverInput.files[0];
+        el.coverInput.value = "";
 
-            if (!file) return;
-
-            elements.coverInput.value = "";
-
+        if (file) {
             handleCoverSelection(file);
-
         }
-    );
+    });
 
 
     /* ==================================================
-       二十二、移除封面
+       二十四、移除封面
     ================================================== */
 
     function clearCoverPreview() {
+        state.selectionToken++;
 
-        imageSelectionToken++;
-
-        if (cropIsOpen) {
-
-            closeCropModal();
-
-        } else {
-
-            releaseCropImage();
-
+        if (state.cropOpen) {
+            closeCropModal(false);
         }
 
-        selectedCoverData = "";
+        state.cover = "";
 
-        elements.coverInput.value = "";
+        el.coverInput.value = "";
 
-        isProcessingImage = false;
+        state.processingImage = false;
 
-        clearCoverError();
-
+        setCoverError("");
         updateCoverPreview();
-
         updateSubmitButton();
-
     }
 
 
-    if (elements.removeCoverButton) {
+    if (el.removeCoverButton) {
+        el.removeCoverButton.addEventListener("click", event => {
+            event.preventDefault();
 
-        elements.removeCoverButton.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                if (isSubmitting || isProcessingImage) return;
-
-                clearCoverPreview();
-
-                hideMessage();
-
+            if (
+                state.submitting ||
+                state.processingImage
+            ) {
+                return;
             }
-        );
 
+            clearCoverPreview();
+            hideMessage();
+        });
     }
 
 
     /* ==================================================
-       二十三、裁剪按钮
+       二十五、裁剪控件事件
     ================================================== */
 
-    if (elements.cropZoom) {
+    if (el.cropStage) {
+        el.cropStage.style.touchAction = "none";
 
-        elements.cropZoom.addEventListener(
-            "input",
-            function () {
-
-                setCropZoom(this.value);
-
-            }
+        el.cropStage.addEventListener(
+            "pointerdown",
+            onPointerDown
         );
 
+        el.cropStage.addEventListener(
+            "dragstart",
+            event => event.preventDefault()
+        );
     }
 
 
-    if (elements.cropZoomInButton) {
-
-        elements.cropZoomInButton.addEventListener(
-            "click",
-            function () {
-
-                setCropZoom(cropZoom + 0.1);
-
-            }
-        );
-
+    if (el.cropZoom) {
+        el.cropZoom.addEventListener("input", () => {
+            setZoom(el.cropZoom.value);
+        });
     }
 
 
-    if (elements.cropZoomOutButton) {
-
-        elements.cropZoomOutButton.addEventListener(
-            "click",
-            function () {
-
-                setCropZoom(cropZoom - 0.1);
-
-            }
-        );
-
+    if (el.cropZoomIn) {
+        el.cropZoomIn.addEventListener("click", () => {
+            setZoom(crop.zoom + CONFIG.zoomStep);
+        });
     }
 
 
-    if (elements.cropResetButton) {
-
-        elements.cropResetButton.addEventListener(
-            "click",
-            resetCrop
-        );
-
+    if (el.cropZoomOut) {
+        el.cropZoomOut.addEventListener("click", () => {
+            setZoom(crop.zoom - CONFIG.zoomStep);
+        });
     }
 
 
-    if (elements.cropCancelButton) {
-
-        elements.cropCancelButton.addEventListener(
-            "click",
-            cancelCrop
-        );
-
+    if (el.cropReset) {
+        el.cropReset.addEventListener("click", resetCrop);
     }
 
 
-    if (elements.cropConfirmButton) {
+    if (el.cropCancel) {
+        el.cropCancel.addEventListener("click", cancelCrop);
+    }
 
-        elements.cropConfirmButton.addEventListener(
-            "click",
-            confirmCrop
-        );
 
+    if (el.cropConfirm) {
+        el.cropConfirm.addEventListener("click", confirmCrop);
+    }
+
+
+    if (el.cropCloseButton) {
+        el.cropCloseButton.addEventListener("click", event => {
+            event.preventDefault();
+            cancelCrop();
+        });
+    }
+
+
+    if (el.cropBackdrop) {
+        el.cropBackdrop.addEventListener("click", event => {
+            event.preventDefault();
+            cancelCrop();
+        });
     }
 
 
     /* ==================================================
-       二十四、修复：右上角 × 关闭按钮
-    ================================================== */
-
-    if (elements.cropCloseButton) {
-
-        elements.cropCloseButton.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                cancelCrop();
-
-            }
-        );
-
-    }
-
-
-    /* ==================================================
-       二十五、修复：点击黑色背景关闭
-    ================================================== */
-
-    if (elements.cropBackdrop) {
-
-        elements.cropBackdrop.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                cancelCrop();
-
-            }
-        );
-
-    }
-
-
-    /* ==================================================
-       二十六、创建书籍
+       二十六、存储模块
     ================================================== */
 
     function getStorage() {
-
-        var storage = window.WritingStorage;
+        const storage = window.WritingStorage;
 
         if (!storage) {
-
             throw new Error(
-                "书籍存储模块未加载，请检查 ../jS/storage.js。"
+                "书籍存储模块未加载，请检查 ../js/storage.js。"
             );
-
         }
 
         if (typeof storage.createBook !== "function") {
-
             throw new Error(
                 "存储模块缺少 createBook() 方法，请检查 storage.js。"
             );
-
         }
 
         return storage;
-
     }
 
 
     function getCreateErrorMessage(error) {
-
-        if (!error) return "创建失败，请重试。";
-
-        if (error.code === "STORAGE_FULL") {
-
-            return "浏览器存储空间不足，请移除封面或更换较小的图片。";
-
+        if (!error) {
+            return "创建失败，请重试。";
         }
 
-        if (error.code === "STORAGE_UNAVAILABLE") {
+        const messages = {
+            STORAGE_FULL:
+                "浏览器存储空间不足，请移除封面或更换较小的图片。",
 
-            return "当前浏览器无法使用本地存储，请检查浏览器设置。";
+            STORAGE_UNAVAILABLE:
+                "当前浏览器无法使用本地存储，请检查浏览器设置。",
 
-        }
+            TITLE_REQUIRED:
+                "请输入书名。",
 
-        if (error.code === "TITLE_REQUIRED") {
+            INVALID_COVER:
+                "封面格式不正确，请重新选择图片。"
+        };
 
-            return "请输入书名。";
-
-        }
-
-        if (error.code === "INVALID_COVER") {
-
-            return "封面格式不正确，请重新选择图片。";
-
-        }
-
-        return error.message || "创建失败，请重试。";
-
+        return messages[error.code] ||
+            error.message ||
+            "创建失败，请重试。";
     }
 
 
     function validateCreatedBook(book) {
-
         if (!book || typeof book !== "object") {
-
             throw new Error(
                 "存储模块没有返回有效的书籍数据。"
             );
-
         }
 
-        var bookId =
-            book.id !== undefined && book.id !== null
-                ? book.id
-                : book.bookId;
+        const id = book.id ?? book.bookId;
 
         if (
-            bookId === undefined ||
-            bookId === null ||
-            String(bookId).trim() === ""
+            id === undefined ||
+            id === null ||
+            String(id).trim() === ""
         ) {
-
             throw new Error(
                 "书籍创建结果缺少 ID，请检查 storage.js。"
             );
-
         }
 
         return book;
-
     }
 
 
-/* ==================================================
-   二十七、页面地址
-================================================== */
-
-/*
- * 返回新建页面
- * 当前页面：pages/create-book.html
- * 目标页面：pages/create.html
- */
-
-function getCreateUrl() {
-
-    var url = new URL(window.location.href);
-
-    var suffix = "/pages/create-book.html";
-
-    if (url.pathname.endsWith(suffix)) {
-
-        url.pathname =
-            url.pathname.slice(0, -suffix.length) +
-            "/pages/create.html";
-
-    } else {
-
-        var pagesIndex = url.pathname.lastIndexOf("/pages/");
-
-        if (pagesIndex !== -1) {
-
-            url.pathname =
-                url.pathname.slice(0, pagesIndex) +
-                "/pages/create.html";
-
-        } else {
-
-            url.pathname =
-                url.pathname.slice(
-                    0,
-                    url.pathname.lastIndexOf("/") + 1
-                ) +
-                "pages/create.html";
-
-        }
-
-    }
-
-    url.search = "";
-    url.hash = "";
-
-    return url.href;
-
-}
-
-
-/*
- * 创建成功后返回首页书架
- */
-
-function getHomeUrl() {
-
-    var url = new URL(window.location.href);
-
-    var suffix = "/pages/create-book.html";
-
-    if (url.pathname.endsWith(suffix)) {
-
-        url.pathname =
-            url.pathname.slice(0, -suffix.length) +
-            "/index.html";
-
-    } else {
-
-        var pagesIndex = url.pathname.lastIndexOf("/pages/");
-
-        if (pagesIndex !== -1) {
-
-            url.pathname =
-                url.pathname.slice(0, pagesIndex) +
-                "/index.html";
-
-        } else {
-
-            url.pathname =
-                url.pathname.slice(
-                    0,
-                    url.pathname.lastIndexOf("/") + 1
-                ) +
-                "index.html";
-
-        }
-
-    }
-
-    url.search = "";
-    url.hash = "";
-
-    return url.href;
-
-}
     /* ==================================================
-       二十八、提交书籍
+       二十七、创建书籍
     ================================================== */
 
     async function handleSubmit(event) {
-
         event.preventDefault();
 
         if (
-            isSubmitting ||
-            isProcessingImage ||
-            isSaved ||
-            cropIsOpen
+            state.submitting ||
+            state.processingImage ||
+            state.saved ||
+            state.cropOpen
         ) {
-
             return;
-
         }
 
         hideMessage();
 
         if (!validateTitle()) {
-
-            elements.title.focus();
-
+            el.title.focus();
             return;
-
         }
 
-        var storage;
+        let storage;
 
         try {
-
             storage = getStorage();
-
         } catch (error) {
-
             showMessage(
                 getCreateErrorMessage(error),
                 "error"
             );
 
             return;
-
         }
 
-        isSubmitting = true;
-
+        state.submitting = true;
         updateSubmitButton();
 
         try {
+            const title = getTitle();
 
-            var title = getTitleValue();
+            const result = await storage.createBook({
+                title: title,
+                description: "",
+                cover: state.cover
+            });
 
-            var result = await Promise.resolve(
+            const book = validateCreatedBook(result);
 
-                storage.createBook({
-
-                    title: title,
-                    description: "",
-                    cover: selectedCoverData
-
-                })
-
-            );
-
-            var book = validateCreatedBook(result);
-
-            isSaved = true;
+            state.saved = true;
 
             showMessage(
                 "《" +
@@ -1987,17 +1469,11 @@ function getHomeUrl() {
                 "success"
             );
 
-            redirectTimer = window.setTimeout(
-                function () {
-
-                    window.location.replace(getHomeUrl());
-
-                },
-                REDIRECT_DELAY
-            );
+            state.redirectTimer = window.setTimeout(() => {
+                window.location.replace(getHomeUrl());
+            }, CONFIG.redirectDelay);
 
         } catch (error) {
-
             console.error(
                 "[WritingCreateBook] 创建失败：",
                 error
@@ -2008,166 +1484,124 @@ function getHomeUrl() {
                 "error"
             );
 
-            isSubmitting = false;
-
+            state.submitting = false;
             updateSubmitButton();
-
         }
-
     }
 
 
     /* ==================================================
-       二十九、取消和返回
+       二十八、取消和返回
     ================================================== */
 
     function hasUnsavedInput() {
-
         return Boolean(
-            elements.title.value.trim() ||
-            selectedCoverData
+            el.title.value.trim() ||
+            state.cover
         );
-
     }
 
 
     function handleCancel(event) {
-
         if (event) {
-
             event.preventDefault();
             event.stopPropagation();
-
         }
 
         if (
-            isSubmitting ||
-            isSaved ||
-            isLeavingPage
+            state.submitting ||
+            state.saved ||
+            state.leaving
         ) {
-
             return;
-
         }
 
         if (
-            cropIsOpen ||
-            isProcessingImage ||
+            state.cropOpen ||
+            state.processingImage ||
             hasUnsavedInput()
         ) {
-
-            var confirmed = window.confirm(
-                "当前书籍尚未创建，确定放弃填写并返回书架吗？"
+            const confirmed = window.confirm(
+                "当前书籍尚未创建，确定放弃填写并返回吗？"
             );
 
             if (!confirmed) return;
-
         }
 
-        imageSelectionToken++;
+        state.selectionToken++;
 
-        if (cropIsOpen) {
-
-            closeCropModal();
-
+        if (state.cropOpen) {
+            closeCropModal(false);
         }
 
-        isProcessingImage = false;
+        state.processingImage = false;
 
         updateSubmitButton();
 
-        isLeavingPage = true;
+        state.leaving = true;
 
         window.location.assign(getCreateUrl());
-
     }
 
 
-    function bindBackButton(button) {
-
+    function bindCancelButton(button) {
         if (!button) return;
 
-        button.addEventListener(
-            "click",
-            handleCancel
-        );
-
+        button.addEventListener("click", handleCancel);
     }
+
+
+    bindCancelButton(el.cancelButton);
+    bindCancelButton(el.cancelTopButton);
 
 
     /* ==================================================
-       三十、绑定事件
+       二十九、输入事件
     ================================================== */
 
-    elements.title.maxLength = MAX_TITLE_LENGTH;
+    el.title.maxLength = CONFIG.maxTitleLength;
 
-    elements.title.addEventListener(
-        "input",
-        function () {
+    el.title.addEventListener("input", () => {
+        updateTitleCounter();
 
-            updateTitleCounter();
-
-            if (
-                elements.titleError &&
-                !elements.titleError.hidden
-            ) {
-
-                validateTitle();
-
-            }
-
-            hideMessage();
-
+        if (
+            el.titleError &&
+            !el.titleError.hidden
+        ) {
+            validateTitle();
         }
-    );
+
+        hideMessage();
+    });
 
 
-    elements.title.addEventListener(
-        "blur",
-        function () {
-
-            if (elements.title.value.trim()) {
-
-                validateTitle();
-
-            }
-
+    el.title.addEventListener("blur", () => {
+        if (el.title.value.trim()) {
+            validateTitle();
         }
-    );
+    });
 
 
-    elements.form.addEventListener(
-        "submit",
-        handleSubmit
-    );
+    el.form.addEventListener("submit", handleSubmit);
 
 
-    bindBackButton(elements.cancelButton);
-    bindBackButton(elements.cancelTopButton);
+    /* ==================================================
+       三十、离开页面保护
+    ================================================== */
 
-
-    window.addEventListener(
-        "beforeunload",
-        function (event) {
-
-            if (
-                isSubmitting ||
-                isSaved ||
-                isLeavingPage
-            ) {
-
-                return;
-
-            }
-
-            if (!hasUnsavedInput()) return;
-
-            event.preventDefault();
-
-            event.returnValue = "";
-
+    window.addEventListener("beforeunload", event => {
+        if (
+            state.submitting ||
+            state.saved ||
+            state.leaving ||
+            !hasUnsavedInput()
+        ) {
+            return;
         }
-    );
+
+        event.preventDefault();
+        event.returnValue = "";
+    });
 
 
     /* ==================================================
@@ -2175,7 +1609,6 @@ function getHomeUrl() {
     ================================================== */
 
     function initialize() {
-
         updateTitleCounter();
 
         updateCoverPreview();
@@ -2183,30 +1616,23 @@ function getHomeUrl() {
         updateSubmitButton();
 
         setTitleError("");
-
-        clearCoverError();
+        setCoverError("");
 
         hideMessage();
 
-        if (elements.cropModal) {
-
-            elements.cropModal.hidden = true;
-
+        if (el.cropModal) {
+            el.cropModal.hidden = true;
         }
 
-        if (elements.cropZoom) {
-
-            elements.cropZoom.min = String(MIN_ZOOM);
-            elements.cropZoom.max = String(MAX_ZOOM);
-            elements.cropZoom.step = "0.01";
-            elements.cropZoom.value = String(MIN_ZOOM);
-
+        if (el.cropZoom) {
+            el.cropZoom.min = String(CONFIG.minZoom);
+            el.cropZoom.max = String(CONFIG.maxZoom);
+            el.cropZoom.step = "0.01";
+            el.cropZoom.value = String(CONFIG.minZoom);
         }
 
-        if (elements.cropZoomValue) {
-
-            elements.cropZoomValue.textContent = "100%";
-
+        if (el.cropZoomValue) {
+            el.cropZoomValue.textContent = "100%";
         }
 
         console.info(
@@ -2214,18 +1640,12 @@ function getHomeUrl() {
         );
 
         console.info(
-            "[WritingCreateBook] 裁剪界面完整：",
-            hasCropElements()
-        );
-
-        console.info(
-            "[WritingCreateBook] 存储模块可用：",
+            "[WritingCreateBook] 存储模块：",
             Boolean(
                 window.WritingStorage &&
                 typeof window.WritingStorage.createBook === "function"
             )
         );
-
     }
 
 
@@ -2234,19 +1654,13 @@ function getHomeUrl() {
     ================================================== */
 
     window.WritingCreateBook = Object.freeze({
-
         validateTitle: validateTitle,
-
         clearCoverPreview: clearCoverPreview,
-
         resetCrop: resetCrop,
-
         cancelCrop: cancelCrop
-
     });
 
 
     initialize();
-
 
 })();
